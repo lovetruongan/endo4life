@@ -45,34 +45,39 @@ check_service() {
     echo ""
 }
 
+# Determine host IP (use environment variable if set, otherwise localhost)
+HOST_TARGET=${HOST_IP:-localhost}
+echo "🎯 Target host: $HOST_TARGET"
+echo ""
+
 # Check all services
 echo "🔍 Performing health checks for all services..."
 echo ""
 
 # PostgreSQL - TCP check
-check_service "PostgreSQL" "localhost" "5432" "" 10
+check_service "PostgreSQL" "$HOST_TARGET" "5432" "" 10
 
 # PgAdmin - HTTP check
-check_service "PgAdmin" "localhost" "5050" "" 10
+check_service "PgAdmin" "$HOST_TARGET" "5050" "" 10
 
 # Keycloak - HTTP check (longer timeout as it takes time to start)
-check_service "Keycloak" "localhost" "7070" "" 30
+check_service "Keycloak" "$HOST_TARGET" "7070" "" 30
 
 # MinIO API - Health endpoint check
-check_service "MinIO API" "localhost" "9000" "/minio/health/live" 10
+check_service "MinIO API" "$HOST_TARGET" "9000" "/minio/health/live" 10
 
 # MinIO Console - HTTP check
-check_service "MinIO Console" "localhost" "9001" "" 10
+check_service "MinIO Console" "$HOST_TARGET" "9001" "" 10
 
 # Summary
 echo "=================================================="
 echo "🎉 All Endo4Life services are healthy and available!"
 echo ""
 echo "📊 Service Status Summary:"
-echo "   - PostgreSQL:    http://localhost:5432 ✅"
-echo "   - PgAdmin:       http://localhost:5050 ✅"
-echo "   - Keycloak:      http://localhost:7070 ✅"
-echo "   - MinIO API:     http://localhost:9000 ✅"
-echo "   - MinIO Console: http://localhost:9001 ✅"
+echo "   - PostgreSQL:    http://$HOST_TARGET:5432 ✅"
+echo "   - PgAdmin:       http://$HOST_TARGET:5050 ✅"
+echo "   - Keycloak:      http://$HOST_TARGET:7070 ✅"
+echo "   - MinIO API:     http://$HOST_TARGET:9000 ✅"
+echo "   - MinIO Console: http://$HOST_TARGET:9001 ✅"
 echo ""
 echo "🚀 Ready for development!"

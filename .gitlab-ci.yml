@@ -13,11 +13,26 @@ services_health_check:
   tags:
     - anngu
   image: ubuntu:latest
+  variables:
+    DOCKER_HOST_IP: "host.docker.internal"
   before_script:
     - apt-get update -qq
     - apt-get install -y netcat-openbsd curl
+    - echo "Detecting Docker host IP..."
+    - |
+      if nc -z host.docker.internal 5432 2>/dev/null; then
+        export HOST_IP="host.docker.internal"
+      elif nc -z 172.17.0.1 5432 2>/dev/null; then
+        export HOST_IP="172.17.0.1"
+      elif nc -z 192.168.65.1 5432 2>/dev/null; then
+        export HOST_IP="192.168.65.1"
+      else
+        # Try to get the host IP from the default gateway
+        export HOST_IP=$(ip route show default | awk '/default/ {print $3}')
+      fi
+    - echo "Using host IP: $HOST_IP"
   script:
-    - ./scripts/health-check.sh
+    - HOST_IP=${HOST_IP} ./scripts/health-check.sh
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - when: manual
