@@ -12,6 +12,10 @@ services_health_check:
   stage: health-check
   tags:
     - anngu
+  image: ubuntu:latest
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y netcat-openbsd curl
   script:
     - ./scripts/health-check.sh
   rules:

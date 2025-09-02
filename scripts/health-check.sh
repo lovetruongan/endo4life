@@ -5,6 +5,15 @@ set -e
 echo "🚀 Starting Endo4Life Services Health Check..."
 echo "=================================================="
 
+# Function to check TCP port availability using bash
+check_tcp_port() {
+    local host=$1
+    local port=$2
+    local timeout=3
+    
+    timeout $timeout bash -c "exec 3<>/dev/tcp/$host/$port" 2>/dev/null
+}
+
 # Function to check service availability
 check_service() {
     local service_name=$1
@@ -24,7 +33,7 @@ check_service() {
             return 1
         fi
     else
-        # TCP port check
+        # TCP port check using netcat
         if timeout $timeout bash -c "until nc -z $host $port; do echo 'Waiting for $service_name...'; sleep 2; done"; then
             echo "✅ $service_name is available on $host:$port"
         else
