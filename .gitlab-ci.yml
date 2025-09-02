@@ -1,16 +1,60 @@
-# You can override the included template(s) by including variable overrides
-# SAST customization: https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
-# Secret Detection customization: https://docs.gitlab.com/user/application_security/secret_detection/pipeline/configure
-# Dependency Scanning customization: https://docs.gitlab.com/ee/user/application_security/dependency_scanning/#customizing-the-dependency-scanning-settings
-# Container Scanning customization: https://docs.gitlab.com/ee/user/application_security/container_scanning/#customizing-the-container-scanning-settings
-# Note that environment variables can be set in several places
-# See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
 stages:
-- test
-- secret-detection
+  - secret-detection
+  - health-check
+
 variables:
-  SECRET_DETECTION_ENABLED: 'true'
+  SECRET_DETECTION_ENABLED: "true"
+
 secret_detection:
   stage: secret-detection
+
+services_health_check:
+  stage: health-check
+  tags:
+    - anngu
+  script:
+    - echo "Checking Endo4Life services availability..."
+
+    # Check PostgreSQL
+    - echo "🔍 Checking PostgreSQL on port 5432..."
+    - timeout 10 bash -c 'until nc -z localhost 5432; do echo "Waiting for PostgreSQL..."; sleep 2; done'
+    - echo "✅ PostgreSQL is available"
+
+    # Check PgAdmin
+    - echo "🔍 Checking PgAdmin on port 5050..."
+    - timeout 10 bash -c 'until curl -f http://localhost:5050 > /dev/null 2>&1; do echo "Waiting for PgAdmin..."; sleep 2; done'
+    - echo "✅ PgAdmin is available"
+
+    # Check Keycloak
+    - echo "🔍 Checking Keycloak on port 7070..."
+    - timeout 30 bash -c 'until curl -f http://localhost:7070 > /dev/null 2>&1; do echo "Waiting for Keycloak..."; sleep 3; done'
+    - echo "✅ Keycloak is available"
+
+    # Check MinIO API
+    - echo "🔍 Checking MinIO API on port 9000..."
+    - timeout 10 bash -c 'until curl -f http://localhost:9000/minio/health/live > /dev/null 2>&1; do echo "Waiting for MinIO API..."; sleep 2; done'
+    - echo "✅ MinIO API is available"
+
+    # Check MinIO Console
+    - echo "🔍 Checking MinIO Console on port 9001..."
+    - timeout 10 bash -c 'until curl -f http://localhost:9001 > /dev/null 2>&1; do echo "Waiting for MinIO Console..."; sleep 2; done'
+    - echo "✅ MinIO Console is available"
+
+    # Summary
+    - echo "🎉 All Endo4Life services are healthy and available!"
+    - echo "📊 Service Status Summary:"
+    - echo "   - PostgreSQL: http://localhost:5432 ✅"
+    - echo "   - PgAdmin: http://localhost:5050 ✅"
+    - echo "   - Keycloak: http://localhost:7070 ✅"
+    - echo "   - MinIO API: http://localhost:9000 ✅"
+    - echo "   - MinIO Console: http://localhost:9001 ✅"
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - when: manual
+
+  allow_failure: false
+  timeout: 5 minutes
+
 include:
-- template: Security/Secret-Detection.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
