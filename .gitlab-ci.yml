@@ -13,46 +13,10 @@ services_health_check:
   tags:
     - anngu
   script:
-    - echo "Checking Endo4Life services availability..."
-
-    # Check PostgreSQL
-    - echo "🔍 Checking PostgreSQL on port 5432..."
-    - timeout 10 bash -c 'until nc -z localhost 5432; do echo "Waiting for PostgreSQL..."; sleep 2; done'
-    - echo "✅ PostgreSQL is available"
-
-    # Check PgAdmin
-    - echo "🔍 Checking PgAdmin on port 5050..."
-    - timeout 10 bash -c 'until curl -f http://localhost:5050 > /dev/null 2>&1; do echo "Waiting for PgAdmin..."; sleep 2; done'
-    - echo "✅ PgAdmin is available"
-
-    # Check Keycloak
-    - echo "🔍 Checking Keycloak on port 7070..."
-    - timeout 30 bash -c 'until curl -f http://localhost:7070 > /dev/null 2>&1; do echo "Waiting for Keycloak..."; sleep 3; done'
-    - echo "✅ Keycloak is available"
-
-    # Check MinIO API
-    - echo "🔍 Checking MinIO API on port 9000..."
-    - timeout 10 bash -c 'until curl -f http://localhost:9000/minio/health/live > /dev/null 2>&1; do echo "Waiting for MinIO API..."; sleep 2; done'
-    - echo "✅ MinIO API is available"
-
-    # Check MinIO Console
-    - echo "🔍 Checking MinIO Console on port 9001..."
-    - timeout 10 bash -c 'until curl -f http://localhost:9001 > /dev/null 2>&1; do echo "Waiting for MinIO Console..."; sleep 2; done'
-    - echo "✅ MinIO Console is available"
-
-    # Summary
-    - echo "🎉 All Endo4Life services are healthy and available!"
-    - echo "📊 Service Status Summary:"
-    - echo "   - PostgreSQL: http://localhost:5432 ✅"
-    - echo "   - PgAdmin: http://localhost:5050 ✅"
-    - echo "   - Keycloak: http://localhost:7070 ✅"
-    - echo "   - MinIO API: http://localhost:9000 ✅"
-    - echo "   - MinIO Console: http://localhost:9001 ✅"
-
+    - ./scripts/health-check.sh
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - when: manual
-
   allow_failure: false
   timeout: 5 minutes
 
