@@ -27,10 +27,9 @@ services_health_check:
       elif nc -z 192.168.65.1 5432 2>/dev/null; then
         export HOST_IP="192.168.65.1"
       else
-        # Try to get the host IP from the default gateway
         export HOST_IP=$(ip route show default | awk '/default/ {print $3}')
       fi
-    - echo "Using host IP: $HOST_IP"
+      echo "Using host IP: $HOST_IP"
   script:
     - HOST_IP=${HOST_IP} ./scripts/health-check.sh
   rules:
