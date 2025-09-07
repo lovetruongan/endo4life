@@ -83,7 +83,7 @@ spring:
         enabled: true
         cron: 0 0 * * * *
   datasource:
-    url: jdbc:postgresql://postgresql:5432/elearning
+    url: jdbc:postgresql://${DB_HOST:3.107.208.12}:${DB_PORT:5432}/${DB_NAME:elearning}
     username: ${POSTGRES_USER:postgres}
     password: ${POSTGRES_PASSWORD:postgres123}
     driverClassName: org.postgresql.Driver

@@ -37,8 +37,8 @@ public class TokenProvider {
         validRoles = Set.of(
                 AuthoritiesConstants.ADMIN.toLowerCase(),
                 AuthoritiesConstants.SPECIALIST.toLowerCase(),
-                AuthoritiesConstants.DOCTOR.toLowerCase(),
-                AuthoritiesConstants.PATIENT.toLowerCase());
+                AuthoritiesConstants.COORDINATOR.toLowerCase(),
+                AuthoritiesConstants.CUSTOMER.toLowerCase());
     }
 
     private boolean isValidRole(String role) {
