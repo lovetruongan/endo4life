@@ -30,13 +30,20 @@ services_health_check:
         export HOST_IP=$(ip route show default | awk '/default/ {print $3}')
       fi
       echo "Using host IP: $HOST_IP"
+
+      # Set environment based on branch or manual variable
+      if [ "$CI_COMMIT_BRANCH" = "main" ] && [ -z "$ENVIRONMENT" ]; then
+        export ENVIRONMENT="production"
+        echo "Setting environment to production for main branch"
+      fi
+      echo "Environment: ${ENVIRONMENT:-development}"
   script:
-    - HOST_IP=${HOST_IP} ./scripts/health-check.sh
+    - HOST_IP=${HOST_IP} ENVIRONMENT=${ENVIRONMENT} ./scripts/health-check.sh
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - when: manual
   allow_failure: false
-  timeout: 5 minutes
+  timeout: 10 minutes
 
 include:
   - template: Security/Secret-Detection.gitlab-ci.yml

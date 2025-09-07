@@ -159,6 +159,30 @@ services:
       - "traefik.http.routers.minio-console.rule=Host(`minio.endo4life.shop`)"
       - "traefik.http.routers.minio-console.service=minio-console"
       - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
+  
+  backend:
+    build: ./backend
+    container_name: endo4life_backend
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres123}
+      - POSTGRES_DB=${POSTGRES_DB:-elearning}
+      - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET:-your-client-secret}
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+    networks:
+      - proxy
+      - endo4life-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`api.endo4life.shop`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.backend.loadbalancer.server.port=8080"
 
 volumes:
   postgres_data:
