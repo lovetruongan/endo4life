@@ -57,7 +57,7 @@ spring:
       internal-url: https://keycloak.endo4life.shop
       realm: endo4life
       client-id: endo4life-be
-      secret: ${KEYCLOAK_CLIENT_SECRET:your-client-secret}
+      secret: ${KEYCLOAK_CLIENT_SECRET:s4eLS0HhO2agpKjrveyCRi3TvLaRy1pc}
       jwk-set-uri: https://keycloak.endo4life.shop/realms/endo4life/protocol/openid-connect/certs
       issuer-uri: https://keycloak.endo4life.shop/realms/endo4life
       webhook:

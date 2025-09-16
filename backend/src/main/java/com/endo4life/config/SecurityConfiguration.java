@@ -53,7 +53,7 @@ public class SecurityConfiguration {
                         .requestMatchers(mvc.pattern("/api/public/**")).permitAll()
                         .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
                         .requestMatchers(mvc.pattern("/v3/api-docs/**")).permitAll()
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

@@ -1,0 +1,510 @@
+openapi: "3.0.3"
+info:
+  title: "Endo4Life APIs"
+  description: "AI-integrated e-Learning platform for endometriosis education"
+  version: 1.0.0
+servers:
+  - url: https://api.endo4life.shop
+    description: Production server
+  - url: http://localhost:8080
+    description: Development server
+security:
+  - bearerAuth: []
+paths:
+  # Health endpoints
+  /actuator/health:
+    get:
+      description: Get health status of backend service
+      operationId: actuatorHealth
+      security: []
+      tags:
+        - "actuator"
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponseDto"
+
+  # Course Management APIs
+  /api/v1/courses:
+    get:
+      description: Get courses by criteria
+      operationId: getCourses
+      tags:
+        - "course-v1"
+      parameters:
+        - name: criteria
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/CourseCriteria"
+        - name: pageable
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Pageable"
+      responses:
+        200:
+          description: Courses loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseResponsePaginatedDto"
+    post:
+      description: Create a new course
+      operationId: createCourse
+      tags:
+        - "course-v1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCourseRequestDto"
+      responses:
+        201:
+          description: Course created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+
+  /api/v1/courses/{id}:
+    get:
+      description: Get course by ID
+      operationId: getCourseById
+      tags:
+        - "course-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Course found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseDetailResponseDto"
+        404:
+          description: Course not found
+    put:
+      description: Update course
+      operationId: updateCourse
+      tags:
+        - "course-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCourseRequestDto"
+      responses:
+        200:
+          description: Course updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseDetailResponseDto"
+    delete:
+      description: Delete course
+      operationId: deleteCourse
+      tags:
+        - "course-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: Course deleted successfully
+
+  # Resource Management APIs
+  /api/v1/resources:
+    get:
+      description: Get resources by criteria
+      operationId: getResources
+      tags:
+        - "resource-v1"
+      parameters:
+        - name: criteria
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/ResourceCriteria"
+        - name: pageable
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Pageable"
+      responses:
+        200:
+          description: Resources loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceResponsePaginatedDto"
+    post:
+      description: Create a new resource
+      operationId: createResource
+      tags:
+        - "resource-v1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateResourceRequestDto"
+      responses:
+        201:
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+
+  /api/v1/resources/{id}:
+    get:
+      description: Get resource by ID
+      operationId: getResourceById
+      tags:
+        - "resource-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Resource found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceDetailResponseDto"
+        404:
+          description: Resource not found
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # Common schemas
+    IdWrapperDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+
+    HealthResponseDto:
+      type: object
+      properties:
+        status:
+          type: string
+        service:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+
+    Pageable:
+      type: object
+      properties:
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+        sort:
+          type: array
+          items:
+            type: string
+
+    # Course schemas
+    CourseResponsePaginatedDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/CourseResponseDto"
+        total:
+          type: integer
+          format: int64
+
+    CourseResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        lecturer:
+          type: string
+        state:
+          $ref: "#/components/schemas/CourseState"
+        rating:
+          type: number
+          format: double
+        registrationNumber:
+          type: integer
+        viewNumber:
+          type: integer
+        thumbnail:
+          type: string
+        thumbnailUrl:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        tagsDetail:
+          type: array
+          items:
+            type: string
+        totalCourseSection:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CourseDetailResponseDto:
+      allOf:
+        - $ref: "#/components/schemas/CourseResponseDto"
+        - type: object
+          properties:
+            courseSections:
+              type: array
+              items:
+                $ref: "#/components/schemas/CourseSectionResponseDto"
+
+    CreateCourseRequestDto:
+      type: object
+      required:
+        - title
+        - state
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        lecturer:
+          type: string
+        state:
+          $ref: "#/components/schemas/CourseState"
+        tags:
+          type: array
+          items:
+            type: string
+        tagsDetail:
+          type: array
+          items:
+            type: string
+
+    UpdateCourseRequestDto:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        lecturer:
+          type: string
+        state:
+          $ref: "#/components/schemas/CourseState"
+        tags:
+          type: array
+          items:
+            type: string
+        tagsDetail:
+          type: array
+          items:
+            type: string
+
+    CourseCriteria:
+      type: object
+      properties:
+        title:
+          type: string
+        state:
+          $ref: "#/components/schemas/CourseState"
+
+    CourseState:
+      type: string
+      enum:
+        - DRAFT
+        - PUBLIC
+        - PRIVATE
+        - ARCHIVED
+
+    # Course Section schemas
+    CourseSectionResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        state:
+          type: string
+        thumbnail:
+          type: string
+        thumbnailUrl:
+          type: string
+        totalCredits:
+          type: integer
+        videoDuration:
+          type: integer
+        tags:
+          type: array
+          items:
+            type: string
+        tagsDetail:
+          type: array
+          items:
+            type: string
+
+    # Resource schemas
+    ResourceResponsePaginatedDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResourceResponseDto"
+        total:
+          type: integer
+          format: int64
+
+    ResourceResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          $ref: "#/components/schemas/ResourceType"
+        state:
+          $ref: "#/components/schemas/ResourceState"
+        thumbnail:
+          type: string
+        thumbnailUrl:
+          type: string
+        viewNumber:
+          type: integer
+        commentCount:
+          type: integer
+        tags:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    ResourceDetailResponseDto:
+      allOf:
+        - $ref: "#/components/schemas/ResourceResponseDto"
+        - type: object
+          properties:
+            path:
+              type: string
+            resourceUrl:
+              type: string
+            dimension:
+              type: string
+            size:
+              type: string
+            extension:
+              type: string
+            time:
+              type: integer
+
+    CreateResourceRequestDto:
+      type: object
+      required:
+        - title
+        - type
+        - state
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        type:
+          $ref: "#/components/schemas/ResourceType"
+        state:
+          $ref: "#/components/schemas/ResourceState"
+        tags:
+          type: array
+          items:
+            type: string
+
+    ResourceCriteria:
+      type: object
+      properties:
+        title:
+          type: string
+        type:
+          $ref: "#/components/schemas/ResourceType"
+        state:
+          $ref: "#/components/schemas/ResourceState"
+        tags:
+          type: array
+          items:
+            type: string
+
+    ResourceType:
+      type: string
+      enum:
+        - IMAGE
+        - VIDEO
+        - AVATAR
+        - THUMBNAIL
+        - OTHER
+        - PROCESS
+
+    ResourceState:
+      type: string
+      enum:
+        - DRAFT
+        - PUBLIC
+        - PRIVATE
+        - UNLISTED
