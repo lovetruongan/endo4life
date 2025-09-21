@@ -48,12 +48,11 @@ public class SecurityConfiguration {
                         .requestMatchers(mvc.pattern("/api/v1/webhooks/minio/**")).permitAll()
                         .requestMatchers(mvc.pattern("/api/v1/webhooks/keycloak/")).permitAll()
                         .requestMatchers(mvc.pattern("/api/v1/webhooks/keycloak/**")).permitAll()
-                        .requestMatchers(mvc.pattern("/api/v1/users/**")).hasAuthority(AuthoritiesConstants.ADMIN)
-                        .requestMatchers(mvc.pattern("/api/v1/resource/**")).hasAuthority(AuthoritiesConstants.ADMIN)
+                        .requestMatchers(mvc.pattern("/api/v1/test/public")).permitAll()
                         .requestMatchers(mvc.pattern("/api/public/**")).permitAll()
                         .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
                         .requestMatchers(mvc.pattern("/v3/api-docs/**")).permitAll()
-                        .anyRequest().permitAll())
+                        .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

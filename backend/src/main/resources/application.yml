@@ -53,13 +53,13 @@ spring:
   application:
     name: endo4life-service
     keycloak-configuration:
-      base-url: https://keycloak.endo4life.shop
-      internal-url: https://keycloak.endo4life.shop
-      realm: endo4life
-      client-id: endo4life-be
-      secret: ${KEYCLOAK_CLIENT_SECRET:s4eLS0HhO2agpKjrveyCRi3TvLaRy1pc}
-      jwk-set-uri: https://keycloak.endo4life.shop/realms/endo4life/protocol/openid-connect/certs
-      issuer-uri: https://keycloak.endo4life.shop/realms/endo4life
+      base-url: ${KEYCLOAK_BASE_URL:https://keycloak.endo4life.shop}
+      internal-url: ${KEYCLOAK_INTERNAL_URL:https://keycloak.endo4life.shop}
+      realm: ${KEYCLOAK_REALM:endo4life}
+      client-id: ${KEYCLOAK_CLIENT_ID:endo4life_app}
+      secret: ${KEYCLOAK_CLIENT_SECRET:jDydD7wpcIf69MyvpMHAUy44E5QeZxfv}
+      jwk-set-uri: ${KEYCLOAK_BASE_URL:https://keycloak.endo4life.shop}/realms/${KEYCLOAK_REALM:endo4life}/protocol/openid-connect/certs
+      issuer-uri: ${KEYCLOAK_BASE_URL:https://keycloak.endo4life.shop}/realms/${KEYCLOAK_REALM:endo4life}
       webhook:
         enabled: true
         client-id: admin-cli
@@ -107,3 +107,14 @@ spring:
       max-file-size: 5120MB
       max-request-size: 51200MB
       resolve-lazily: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_BASE_URL:https://keycloak.endo4life.shop}/realms/${KEYCLOAK_REALM:endo4life}
+          jwk-set-uri: ${KEYCLOAK_BASE_URL:https://keycloak.endo4life.shop}/realms/${KEYCLOAK_REALM:endo4life}/protocol/openid-connect/certs
+
+# Trust all certificates for development (NOT for production)
+trust:
+  store: ${TRUST_STORE:}
+  store-password: ${TRUST_STORE_PASSWORD:}
