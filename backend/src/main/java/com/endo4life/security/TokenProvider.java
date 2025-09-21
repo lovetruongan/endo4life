@@ -35,14 +35,14 @@ public class TokenProvider {
     public TokenProvider(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
         validRoles = Set.of(
-                AuthoritiesConstants.ADMIN.toLowerCase(),
-                AuthoritiesConstants.SPECIALIST.toLowerCase(),
-                AuthoritiesConstants.COORDINATOR.toLowerCase(),
-                AuthoritiesConstants.CUSTOMER.toLowerCase());
+                AuthoritiesConstants.ADMIN,
+                AuthoritiesConstants.SPECIALIST,
+                AuthoritiesConstants.COORDINATOR,
+                AuthoritiesConstants.CUSTOMER);
     }
 
     private boolean isValidRole(String role) {
-        return validRoles.contains(role.toLowerCase());
+        return validRoles.contains(role.toUpperCase());
     }
 
     public Authentication getAuthentication(String token) throws BadCredentialsException {
@@ -60,8 +60,7 @@ public class TokenProvider {
                 ArrayList<String> globalRoles = (ArrayList) realmAcessMap.getOrDefault("roles", List.of());
                 if (!CollectionUtils.isEmpty(globalRoles)) {
                     globalAuthorities = globalRoles.stream()
-                            .filter(this::isValidRole)
-                            .map(SimpleGrantedAuthority::new)
+                            .map(role -> new SimpleGrantedAuthority(role))
                             .collect(Collectors.toList());
                     authorities.addAll(globalAuthorities);
                 }
@@ -70,14 +69,21 @@ public class TokenProvider {
             String clientId = applicationProperties.keycloakConfiguration().clientId();
             String sessionId = claims.get("sid", String.class);
             Map<String, Object> resourceAccess = (Map<String, Object>) claims.get("resource_access");
+
+            log.info("Extracting roles for clientId: {}", clientId);
+            log.info("Resource access map: {}", resourceAccess);
+
             if (Objects.nonNull(resourceAccess)) {
                 Map<String, Object> clientRoleMap = (Map<String, Object>) resourceAccess.getOrDefault(clientId,
                         new LinkedHashMap<>());
+                log.info("Client role map for {}: {}", clientId, clientRoleMap);
+
                 List<String> clientRoles = (List<String>) clientRoleMap.getOrDefault("roles", List.of());
+                log.info("Client roles found: {}", clientRoles);
+
                 if (!CollectionUtils.isEmpty(clientRoles)) {
                     clientAuthorities = clientRoles.stream()
-                            .filter(this::isValidRole)
-                            .map(SimpleGrantedAuthority::new)
+                            .map(role -> new SimpleGrantedAuthority(role))
                             .collect(Collectors.toList());
                     authorities.addAll(clientAuthorities);
                 }

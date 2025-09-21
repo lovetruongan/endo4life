@@ -28,9 +28,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         var token = StringUtils.removeStart(request.getHeader(HttpHeaders.AUTHORIZATION), "Bearer ");
         if (StringUtils.isNotBlank(token)) {
-            var authentication = tokenProvider.getAuthentication(token);
-            log.info("Authentication Object: {}", authentication);
-            UserContextHolder.withAuthentication(authentication);
+            try {
+                var authentication = tokenProvider.getAuthentication(token);
+                log.info("Authentication Object: {}", authentication);
+                log.info("Authorities: {}", authentication.getAuthorities());
+                UserContextHolder.withAuthentication(authentication);
+            } catch (Exception e) {
+                log.error("Failed to authenticate token: {}", e.getMessage());
+            }
         }
         filterChain.doFilter(request, response);
     }

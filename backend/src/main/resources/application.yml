@@ -56,8 +56,8 @@ spring:
       base-url: ${KEYCLOAK_BASE_URL:https://keycloak.endo4life.shop}
       internal-url: ${KEYCLOAK_INTERNAL_URL:https://keycloak.endo4life.shop}
       realm: ${KEYCLOAK_REALM:endo4life}
-      client-id: ${KEYCLOAK_CLIENT_ID:endo4life-be}
-      secret: ${KEYCLOAK_CLIENT_SECRET:s4eLS0HhO2agpKjrveyCRi3TvLaRy1pc}
+      client-id: ${KEYCLOAK_CLIENT_ID:endo4life_app}
+      secret: ${KEYCLOAK_CLIENT_SECRET:jDydD7wpcIf69MyvpMHAUy44E5QeZxfv}
       jwk-set-uri: ${KEYCLOAK_BASE_URL:https://keycloak.endo4life.shop}/realms/${KEYCLOAK_REALM:endo4life}/protocol/openid-connect/certs
       issuer-uri: ${KEYCLOAK_BASE_URL:https://keycloak.endo4life.shop}/realms/${KEYCLOAK_REALM:endo4life}
       webhook:
