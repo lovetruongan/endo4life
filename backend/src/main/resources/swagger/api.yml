@@ -201,6 +201,179 @@ paths:
         404:
           description: Resource not found
 
+  # User Management APIs
+  /api/v1/users:
+    get:
+      description: Get users by criteria
+      operationId: getUsers
+      tags:
+        - "user-v1"
+      parameters:
+        - name: criteria
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/UserInfoCriteria"
+        - name: pageable
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Pageable"
+      responses:
+        200:
+          description: Users loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponsePaginatedDto"
+    post:
+      description: Create a new user
+      operationId: createUser
+      tags:
+        - "user-v1"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - user
+              properties:
+                user:
+                  $ref: "#/components/schemas/CreateUserRequestDto"
+                avatar:
+                  type: string
+                  format: binary
+                  description: "Profile image"
+                certificate:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        201:
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+
+  /api/v1/users/{id}:
+    get:
+      description: Get user by ID
+      operationId: getUserById
+      tags:
+        - "user-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponseDto"
+        404:
+          description: User not found
+    put:
+      description: Update user
+      operationId: updateUser
+      tags:
+        - "user-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - user
+              properties:
+                user:
+                  $ref: "#/components/schemas/UpdateUserRequestDto"
+                avatar:
+                  type: string
+                  format: binary
+                deleteCertificatePaths:
+                  type: array
+                  items:
+                    type: string
+                newCertificates:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        204:
+          description: User updated successfully
+    delete:
+      description: Delete user
+      operationId: deleteUser
+      tags:
+        - "user-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: password
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: User deleted successfully
+
+  /api/v1/users/current:
+    get:
+      description: Get current user info
+      operationId: getCurrentUserInfo
+      tags:
+        - "user-v1"
+      responses:
+        200:
+          description: Current user info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponseDto"
+
+  /api/v1/users/invite:
+    post:
+      description: Invite a new user
+      operationId: inviteUser
+      tags:
+        - "user-v1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InviteUserRequestDto"
+      responses:
+        201:
+          description: User invited successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+
 components:
   securitySchemes:
     bearerAuth:
@@ -508,3 +681,163 @@ components:
         - PUBLIC
         - PRIVATE
         - UNLISTED
+
+    # User schemas
+    UserResponsePaginatedDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserResponseDto"
+        total:
+          type: integer
+          format: int64
+
+    UserResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        phoneNumber:
+          type: string
+        state:
+          $ref: "#/components/schemas/UserInfoState"
+        role:
+          $ref: "#/components/schemas/UserInfoRole"
+        avatarPath:
+          type: string
+        avatarLink:
+          type: string
+        certificateLinks:
+          type: array
+          items:
+            type: string
+        isUpdatedProfile:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateUserRequestDto:
+      type: object
+      required:
+        - email
+        - firstName
+        - lastName
+        - role
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phoneNumber:
+          type: string
+        role:
+          $ref: "#/components/schemas/UserInfoRole"
+        state:
+          $ref: "#/components/schemas/UserInfoState"
+        password:
+          type: string
+          minLength: 8
+
+    UpdateUserRequestDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phoneNumber:
+          type: string
+        role:
+          $ref: "#/components/schemas/UserInfoRole"
+        state:
+          $ref: "#/components/schemas/UserInfoState"
+
+    InviteUserRequestDto:
+      type: object
+      required:
+        - email
+        - firstName
+        - lastName
+        - role
+      properties:
+        email:
+          type: string
+          format: email
+        firstName:
+          type: string
+        lastName:
+          type: string
+        role:
+          $ref: "#/components/schemas/UserInfoRole"
+
+    UserInfoCriteria:
+      type: object
+      properties:
+        searchWord:
+          type: string
+        emails:
+          type: array
+          items:
+            type: string
+        role:
+          $ref: "#/components/schemas/UserInfoRole"
+        state:
+          $ref: "#/components/schemas/UserInfoState"
+        fromDate:
+          type: string
+          format: date-time
+        toDate:
+          type: string
+          format: date-time
+
+    UserInfoState:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - PENDING
+        - SUSPENDED
+
+    UserInfoRole:
+      type: string
+      enum:
+        - ADMIN
+        - SPECIALIST
+        - COORDINATOR
+        - CUSTOMER
+
+    UserInfoDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        avatarUrl:
+          type: string

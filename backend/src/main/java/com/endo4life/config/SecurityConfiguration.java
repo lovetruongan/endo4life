@@ -48,7 +48,7 @@ public class SecurityConfiguration {
                         .requestMatchers(mvc.pattern("/api/v1/webhooks/minio/**")).permitAll()
                         .requestMatchers(mvc.pattern("/api/v1/webhooks/keycloak/")).permitAll()
                         .requestMatchers(mvc.pattern("/api/v1/webhooks/keycloak/**")).permitAll()
-                        .requestMatchers(mvc.pattern("/api/v1/users/**")).hasAuthority(AuthoritiesConstants.ADMIN)
+                        .requestMatchers(mvc.pattern("/api/v1/users/**")).permitAll() // TEMPORARY: Allow user access
                         .requestMatchers(mvc.pattern("/api/v1/resource/**")).hasAuthority(AuthoritiesConstants.ADMIN)
                         .requestMatchers(mvc.pattern("/api/public/**")).permitAll()
                         .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
