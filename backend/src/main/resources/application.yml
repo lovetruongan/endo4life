@@ -53,22 +53,22 @@ spring:
   application:
     name: endo4life-service
     keycloak-configuration:
-      base-url: ${KEYCLOAK_BASE_URL:https://keycloak.endo4life.shop}
-      internal-url: ${KEYCLOAK_INTERNAL_URL:https://keycloak.endo4life.shop}
+      base-url: ${KEYCLOAK_BASE_URL:https://keycloak.mydevopsproject2023.id.vn}
+      internal-url: ${KEYCLOAK_INTERNAL_URL:https://keycloak.mydevopsproject2023.id.vn}
       realm: ${KEYCLOAK_REALM:endo4life}
       client-id: ${KEYCLOAK_CLIENT_ID:endo4life_app}
       secret: ${KEYCLOAK_CLIENT_SECRET:jDydD7wpcIf69MyvpMHAUy44E5QeZxfv}
-      jwk-set-uri: ${KEYCLOAK_BASE_URL:https://keycloak.endo4life.shop}/realms/${KEYCLOAK_REALM:endo4life}/protocol/openid-connect/certs
-      issuer-uri: ${KEYCLOAK_BASE_URL:https://keycloak.endo4life.shop}/realms/${KEYCLOAK_REALM:endo4life}
+      jwk-set-uri: ${KEYCLOAK_BASE_URL:https://keycloak.mydevopsproject2023.id.vn}/realms/${KEYCLOAK_REALM:endo4life}/protocol/openid-connect/certs
+      issuer-uri: ${KEYCLOAK_BASE_URL:https://keycloak.mydevopsproject2023.id.vn}/realms/${KEYCLOAK_REALM:endo4life}
       webhook:
         enabled: true
         client-id: admin-cli
         realm: master
         secret: ${KEYCLOAK_WEBHOOK_SECRET:webhook-secret}
-        path: https://api.endo4life.shop/api/v1/webhooks/keycloak
+        path: https://api.mydevopsproject2023.id.vn/api/v1/webhooks/keycloak
       invite-lifespan: 432000
     minio-configuration:
-      endpoint: https://minio-api.endo4life.shop
+      endpoint: https://minio-api.mydevopsproject2023.id.vn
       username: ${MINIO_USERNAME:admin}
       password: ${MINIO_PASSWORD:minio123456}
       webhook-identifier: _
@@ -111,8 +111,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${KEYCLOAK_BASE_URL:https://keycloak.endo4life.shop}/realms/${KEYCLOAK_REALM:endo4life}
-          jwk-set-uri: ${KEYCLOAK_BASE_URL:https://keycloak.endo4life.shop}/realms/${KEYCLOAK_REALM:endo4life}/protocol/openid-connect/certs
+          issuer-uri: ${KEYCLOAK_BASE_URL:https://keycloak.mydevopsproject2023.id.vn}/realms/${KEYCLOAK_REALM:endo4life}
+          jwk-set-uri: ${KEYCLOAK_BASE_URL:https://keycloak.mydevopsproject2023.id.vn}/realms/${KEYCLOAK_REALM:endo4life}/protocol/openid-connect/certs
 
 # Trust all certificates for development (NOT for production)
 trust:

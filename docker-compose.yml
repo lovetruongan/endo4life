@@ -28,7 +28,7 @@ services:
       - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.endo4life.shop`)"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.mydevopsproject2023.id.vn`)"
       - "traefik.http.routers.traefik.entrypoints=websecure"
       - "traefik.http.routers.traefik.service=api@internal"
 
@@ -37,6 +37,8 @@ services:
     image: postgres:15-alpine
     container_name: endo4life_postgres
     restart: always
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_DB=${POSTGRES_DB:-elearning}
@@ -70,11 +72,11 @@ services:
     labels:
       - "traefik.enable=true"
       # HTTPS router
-      - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.endo4life.shop`)"
+      - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.mydevopsproject2023.id.vn`)"
       - "traefik.http.routers.pgadmin.entrypoints=websecure"
       - "traefik.http.routers.pgadmin.tls.certresolver=letsencrypt"
       # HTTP to HTTPS redirect
-      - "traefik.http.routers.pgadmin-http.rule=Host(`pgadmin.endo4life.shop`)"
+      - "traefik.http.routers.pgadmin-http.rule=Host(`pgadmin.mydevopsproject2023.id.vn`)"
       - "traefik.http.routers.pgadmin-http.entrypoints=web"
       - "traefik.http.routers.pgadmin-http.middlewares=pgadmin-redirect"
       - "traefik.http.middlewares.pgadmin-redirect.redirectscheme.scheme=https"
@@ -83,10 +85,10 @@ services:
 
   # Keycloak with Traefik labels
   keycloak:
-    image: quay.io/keycloak/keycloak:23.0.6
+    image: quay.io/keycloak/keycloak:21.0.1
     container_name: endo4life_keycloak
     restart: always
-    command: start --proxy=edge --hostname=keycloak.endo4life.shop --hostname-strict=false
+    command: start --proxy=edge --hostname=keycloak.mydevopsproject2023.id.vn --hostname-strict=false
     depends_on:
       postgresql:
         condition: service_healthy
@@ -104,7 +106,7 @@ services:
       
       # Proxy configuration
       - PROXY_ADDRESS_FORWARDING=true
-      - KEYCLOAK_FRONTEND_URL=https://keycloak.endo4life.shop
+      - KEYCLOAK_FRONTEND_URL=https://keycloak.mydevopsproject2023.id.vn
       
     volumes:
       - keycloak_data:/opt/keycloak/data
@@ -114,16 +116,16 @@ services:
     labels:
       - "traefik.enable=true"
       # HTTPS router
-      - "traefik.http.routers.keycloak.rule=Host(`keycloak.endo4life.shop`)"
+      - "traefik.http.routers.keycloak.rule=Host(`keycloak.mydevopsproject2023.id.vn`)"
       - "traefik.http.routers.keycloak.entrypoints=websecure"
       - "traefik.http.routers.keycloak.tls.certresolver=letsencrypt"
       - "traefik.http.routers.keycloak.middlewares=keycloak-headers"
       - "traefik.http.middlewares.keycloak-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.middlewares.keycloak-headers.headers.customrequestheaders.X-Forwarded-Port=443"
-      - "traefik.http.middlewares.keycloak-headers.headers.customrequestheaders.X-Forwarded-Host=keycloak.endo4life.shop"
+      - "traefik.http.middlewares.keycloak-headers.headers.customrequestheaders.X-Forwarded-Host=keycloak.mydevopsproject2023.id.vn"
       - "traefik.http.middlewares.keycloak-headers.headers.customrequestheaders.X-Forwarded-For="
       # HTTP to HTTPS redirect
-      - "traefik.http.routers.keycloak-http.rule=Host(`keycloak.endo4life.shop`)"
+      - "traefik.http.routers.keycloak-http.rule=Host(`keycloak.mydevopsproject2023.id.vn`)"
       - "traefik.http.routers.keycloak-http.entrypoints=web"
       - "traefik.http.routers.keycloak-http.middlewares=keycloak-redirect"
       - "traefik.http.middlewares.keycloak-redirect.redirectscheme.scheme=https"
@@ -151,38 +153,14 @@ services:
       - "traefik.enable=true"
       # MinIO API
       - "traefik.http.routers.minio-api.entrypoints=websecure"
-      - "traefik.http.routers.minio-api.rule=Host(`minio-api.endo4life.shop`)"
+      - "traefik.http.routers.minio-api.rule=Host(`minio-api.mydevopsproject2023.id.vn`)"
       - "traefik.http.routers.minio-api.service=minio-api"
       - "traefik.http.services.minio-api.loadbalancer.server.port=9000"
       # MinIO Console
       - "traefik.http.routers.minio-console.entrypoints=websecure"
-      - "traefik.http.routers.minio-console.rule=Host(`minio.endo4life.shop`)"
+      - "traefik.http.routers.minio-console.rule=Host(`minio.mydevopsproject2023.id.vn`)"
       - "traefik.http.routers.minio-console.service=minio-console"
       - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
-  
-  backend:
-    build: ./backend
-    container_name: endo4life_backend
-    restart: always
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER:-postgres}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres123}
-      - POSTGRES_DB=${POSTGRES_DB:-elearning}
-      - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET:-your-client-secret}
-    depends_on:
-      postgresql:
-        condition: service_healthy
-      keycloak:
-        condition: service_started
-    networks:
-      - proxy
-      - endo4life-network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`api.endo4life.shop`)"
-      - "traefik.http.routers.backend.entrypoints=websecure"
-      - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
-      - "traefik.http.services.backend.loadbalancer.server.port=8080"
 
 volumes:
   postgres_data:
