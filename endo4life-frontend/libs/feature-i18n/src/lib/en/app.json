@@ -1,0 +1,12 @@
+{
+  "appName": "E-Learning",
+  "accountMenu": {
+    "textProfile": "Profile",
+    "textThemeModeDark": "Dark",
+    "textThemeModeLight": "Light",
+    "textLangVi": "Vietnamese",
+    "textLangEn": "English",
+    "textLogin": "Login",
+    "textLogout": "Logout"
+  }
+}

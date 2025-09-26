@@ -1,0 +1,120 @@
+{
+  "txtImageManagement": "Image Management",
+  "actions": {
+    "editImage": "Edit Image Details",
+    "deleteImage": "Delete Image",
+    "downloadImage": "Download",
+    "deleteImageMutiple": "Delete Selected Images",
+    "changeImage": "Change Image",
+    "cropImage": "Crop Image",
+    "addFile": "Add File"
+  },
+  "leading": {
+    "txtAddImage": "Add Image",
+    "txtExport": "Export",
+    "txtImport": "Import",
+    "txtFilter": "Filter"
+  },
+  "basicInfo": {
+    "image": "Image",
+    "title": "Image Title",
+    "description": "Description",
+    "tag": "Injure",
+    "detailTag": "Detail Injure",
+    "viewNumber": "Views",
+    "commentCount": "Comments",
+    "display": "Display",
+    "createdAt": "Uploaded On",
+    "updatedAt": "Last Updated",
+    "dimension": "Dimensions",
+    "size": "Size",
+    "format": "Format",
+    "state": "State"
+  },
+  "state": {
+    "PUBLIC": "Public",
+    "UNLISTED": "Hidden",
+    "DRAFT": "Draft"
+  },
+  "imageTable": {
+    "headerActions": "Actions"
+  },
+  "imageFilter": {
+    "inputSearchPlaceholder": "Search Images",
+    "selectDisplayPlaceholder": "Display"
+  },
+  "imageFilterForm": {
+    "title": "Filter",
+    "resetFilter": "Reset Filter",
+    "fromDate": "Start Date",
+    "toDate": "End Date",
+    "placeholders": {
+      "tag": "Select Tag",
+      "detailTag": "Select Detail Tag"
+    }
+  },
+  "imageStateForm": {
+    "subtitle": "Edit Image Display Mode"
+  },
+  "imageStateDialog": {
+    "status": {
+      "success": "Display value updated successfully!",
+      "error": "Failed to update display value! Please try again."
+    }
+  },
+  "imageDeleteMultipleConfirmDialog": {
+    "confirmationMessage": "Are you sure you want to delete these {{count}} images?",
+    "cannotRestore": "Deleted images cannot be restored.",
+    "status": {
+      "success": "{{count}} images deleted successfully",
+      "error": "Error deleting multiple images"
+    }
+  },
+  "imageDeleteConfirmDialog": {
+    "title": "Delete Image",
+    "confirmationMessage": "Are you sure you want to delete this image?",
+    "cannotRestore": "Deleted image cannot be restored.",
+    "status": {
+      "success": "Image deleted successfully",
+      "error": "Failed to delete image"
+    }
+  },
+  "imageDetailForm": {
+    "title": "Edit Image",
+    "status": {
+      "success": "Image information updated successfully!",
+      "error": "Update failed! Please try again."
+    }
+  },
+  "imageCreateForm": {
+    "title": "Add New Image",
+    "status": {
+      "success": "Image created successfully!",
+      "error": "Creation failed! Please try again."
+    }
+  },
+  "imageImportForm": {
+    "title": "Import File Operations",
+    "subtitle": "Complete the information below to create the file",
+    "status": {
+      "success": "Image created successfully!",
+      "error": "Creation failed! Please try again."
+    },
+    "importFiles": "Upload your image and video files"
+  },
+  "imageImportZipModal": {
+    "compressedFileRequired": "At least one compressed file is required",
+    "onlyOneZipAllowed": "Only one zip file can be uploaded",
+    "uploadZip": "Upload your zip file"
+  },
+  "imageCropping": {
+    "loadingCropFrame": "Loading crop frame...",
+    "processing": "Processing...",
+    "preview": "Preview",
+    "createCrop": "Create Crop"
+  },
+  "errors": {
+    "invalidImageId": "Invalid image ID!",
+    "insufficientInfo": "Insufficient information!"
+  }
+}

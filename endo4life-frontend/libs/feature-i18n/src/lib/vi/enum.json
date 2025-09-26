@@ -1,0 +1,6 @@
+{
+  "entityStatus": {
+    "DRAFT": "Chưa xuất bản",
+    "PUBLISHED": "Đã xuất bản"    
+  }
+}

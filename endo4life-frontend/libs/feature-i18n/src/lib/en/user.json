@@ -1,0 +1,124 @@
+{
+  "txtUserManagement": "User Management",
+  "txtUpdatedSuccessfully": "Account updated successfully",
+  "txtUpdatedUnsuccessfully": "Account update failed",
+  "userDetailTitle": "Account Information",
+  "userUpdateAction": "Update",
+  "userDeleteAccount": "Delete Account",
+  "userCreateAccount": "Create Account",
+  "basicInfo": {
+    "title": "Basic Information",
+    "subTitle": "Basic information about your account",
+    "avatar": "Avatar",
+    "invalidAvatarImage": "Invalid image, please try again",
+    "invalidFileType": "Certificate file is not a PDF, please try again",
+    "changeAvatarAction": "Change Avatar",
+    "uploadFileAction": "Upload Certificate",
+    "username": "Username",
+    "fullName": "Full Name",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "phoneNumber": "Phone Number",
+    "role": "Role",
+    "state": "Display Status",
+    "certificate": "Certificate",
+    "noFilesUploaded": "No files uploaded"
+  },
+  "actions": {
+    "txtRemoveUser": "Remove User",
+    "txtRemoveUserMutiple": "Remove Selected Users",
+    "txtEditUser": "Edit User"
+  },
+  "accountStatus": {
+    "title": "Account Status",
+    "subTitle": "Account status including role and account status",
+    "role": "Role",
+    "isActive": "Status"
+  },
+  "accountSecurity": {
+    "title": "Security",
+    "subTitle": "Password and other important information",
+    "password": "Password",
+    "passwordPlaceholder": "Enter password",
+    "changePassAction": "Change Password",
+    "invalidPasswordMatch": "Passwords do not match"
+  },
+  "roles": {
+    "ADMIN": "Administrator",
+    "COORDINATOR": "Coordinator",
+    "CUSTOMER": "User",
+    "SPECIALIST": "Specialist"
+  },
+  "state": {
+    "ACTIVE": "Active",
+    "PENDING": "Pending Activation",
+    "INACTIVE": "Inactive"
+  },
+  "deleteForm": {
+    "invalidUserId": "Invalid user ID",
+    "mustNotBlankPassword": "Password must not be blank",
+    "successfullyDeleteUser": "Account deleted successfully",
+    "unsuccessfullyDeleteUser": "Failed to delete user account",
+    "passwordRequiredToDelete": "Enter password to delete account"
+  },
+  "deleteDialog": {
+    "confirmationMessage": "Are you sure you want to delete this user?",
+    "confirmationMessageMultiple": "Are you sure you want to delete {{count}} users?",
+    "cannotRestore": "Deleted users cannot be restored."
+  },
+  "inviteForm": {
+    "title": "Invite User",
+    "emailFieldLabel": "Email",
+    "emailFieldPlaceholder": "example@gmail.com",
+    "roleFieldLabel": "Role",
+    "roleFieldPlaceholder": "Select Role",
+    "statusFieldLabel": "Status",
+    "statusFieldPlaceholder": "Select Status",
+    "successfullyInviteUser": "User invited successfully!",
+    "unsuccessfullyInviteUser": "Failed to invite user! This account already exists."
+  },
+  "createForm": {
+    "title": "Create Account",
+    "subtitle": "Complete the information below to create a new account",
+    "status": {
+      "success": "User created successfully!",
+      "error": "Creation failed! Please try again."
+    }
+  },
+  "updateForm": {
+    "title": "Update Account",
+    "subtitle": "Complete the information below to update the account",
+    "status": {
+      "success": "User updated successfully!",
+      "error": "Update failed! Please try again."
+    }
+  },
+  "userFilter": {
+    "selectStatePlaceholder": "Status",
+    "selectRolePlaceholder": "Role",
+    "inputSearchPlaceholder": "Search Users"
+  },
+  "userTable": {
+    "txtLoadingData": "Loading data...",
+    "txtNoResults": "No data",
+    "headerDisplayName": "Full Name",
+    "headerEmail": "Email",
+    "headerRole": "Role",
+    "headerPhoneNumber": "Phone Number",
+    "headerIsActive": "Status",
+    "headerCreatedAt": "Created At",
+    "headerActions": "Actions",
+    "txtUserCount": "user(s)"
+  },
+  "leading": {
+    "txtAddUser": "Add User",
+    "txtExport": "Export",
+    "txtInviteUser": "Invite User"
+  },
+  "errors": {
+    "insufficientInfo": "Insufficient information!"
+  }
+}

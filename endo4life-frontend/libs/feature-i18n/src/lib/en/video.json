@@ -1,0 +1,119 @@
+{
+  "txtVideoManagement": "Video Management",
+  "actions": {
+    "editVideo": "Edit Video Details",
+    "deleteVideo": "Delete Video",
+    "downloadVideo": "Download",
+    "deleteVideoMutiple": "Delete Selected Videos",
+    "changeVideo": "Change Video",
+    "cropVideo": "Crop Video",
+    "addFile": "Add File"
+  },
+  "leading": {
+    "txtAddVideo": "Add Video",
+    "txtExport": "Export",
+    "txtImport": "Import",
+    "txtFilter": "Filter"
+  },
+  "basicInfo": {
+    "video": "Video",
+    "title": "Video Title",
+    "description": "Description",
+    "tag": "Injure",
+    "detailTag": "Detail Injure",
+    "viewNumber": "Views",
+    "commentCount": "Comments",
+    "display": "Display",
+    "createdAt": "Uploaded On",
+    "updatedAt": "Last Updated",
+    "dimension": "Dimensions",
+    "size": "Size",
+    "format": "Format",
+    "state": "State"
+  },
+  "state": {
+    "PUBLIC": "Public",
+    "UNLISTED": "Hidden",
+    "DRAFT": "Draft"
+  },
+  "videoTable": {
+    "headerActions": "Actions"
+  },
+  "videoFilter": {
+    "inputSearchPlaceholder": "Search Videos",
+    "selectDisplayPlaceholder": "Display"
+  },
+  "videoFilterForm": {
+    "title": "Filter",
+    "resetFilter": "Reset Filter",
+    "fromDate": "Start Date",
+    "toDate": "End Date",
+    "placeholders": {
+      "tag": "Select Tag",
+      "detailTag": "Select Detail Tag"
+    }
+  },
+  "videoStateForm": {
+    "subtitle": "Edit Video Display Mode"
+  },
+  "videoStateDialog": {
+    "status": {
+      "success": "Display value updated successfully!",
+      "error": "Failed to update display value! Please try again."
+    }
+  },
+  "videoDeleteMultipleConfirmDialog": {
+    "confirmationMessage": "Are you sure you want to delete these {{count}} videos?",
+    "cannotRestore": "Deleted videos cannot be restored.",
+    "status": {
+      "success": "{{count}} videos deleted successfully",
+      "error": "Error deleting multiple videos"
+    }
+  },
+  "videoDeleteConfirmDialog": {
+    "title": "Delete Video",
+    "confirmationMessage": "Are you sure you want to delete this video?",
+    "cannotRestore": "Deleted video cannot be restored.",
+    "status": {
+      "success": "Video deleted successfully",
+      "error": "Failed to delete video"
+    }
+  },
+  "videoDetailForm": {
+    "title": "Edit Video",
+    "status": {
+      "success": "Video information updated successfully!",
+      "error": "Update failed! Please try again."
+    }
+  },
+  "videoCreateForm": {
+    "title": "Add New Video",
+    "status": {
+      "success": "Video created successfully!",
+      "error": "Creation failed! Please try again."
+    }
+  },
+  "videoImportForm": {
+    "title": "Import File Operations",
+    "subtitle": "Complete the information below to create the file",
+    "status": {
+      "success": "Video created successfully!",
+      "error": "Creation failed! Please try again."
+    }
+  },
+  "videoImportZipModal": {
+    "compressedFileRequired": "At least one compressed file is required",
+    "onlyOneZipAllowed": "Only one zip file can be uploaded",
+    "uploadZip": "Upload your zip file"
+  },
+  "videoCropping": {
+    "loadingCropFrame": "Loading crop frame...",
+    "processing": "Processing...",
+    "preview": "Preview",
+    "createCrop": "Create Crop"
+  },
+  "errors": {
+    "invalidVideoId": "Invalid video ID!",
+    "insufficientInfo": "Insufficient information!"
+  }
+}

@@ -1,0 +1,2315 @@
+openapi: "3.0.3"
+info:
+  title: "E-learning APIs"
+  version: 0.0.1
+servers:
+  - url: http://localhost:8080
+    description: Development server
+security:
+  - bearerAuth: []
+paths:
+  /actuator/health:
+    get:
+      description: Get health status of backend service
+      operationId: actuatorHealth
+      security: []
+      tags:
+        - "actuator"
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponseDto"
+  /actuator/info:
+    get:
+      description: Get information about ai-assistance service
+      operationId: actuatorInfo
+      tags:
+        - actuator
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InformationGetResponse"
+  /api/v1/users:
+    get:
+      description: Get users by criteria
+      operationId: getUsers
+      tags:
+        - "user-v1"
+      parameters:
+        - name: criteria
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/UserInfoCriteria"
+        - name: pageable
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Pageable"
+      responses:
+        200:
+          description: All users loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponsePaginatedDto"
+    post:
+      description: Create a new user
+      operationId: createUser
+      tags:
+        - "user-v1"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - user
+              properties:
+                user:
+                  $ref: "#/components/schemas/CreateUserRequestDto"
+                avatar:
+                  type: string
+                  format: binary
+                  description: "Profile image"
+                certificate:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        201:
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+        412:
+          description: User already exists
+    delete:
+      tags:
+        - "user-v1"
+      operationId: deleteUsers
+      parameters:
+        - name: userIds
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+        - name: password
+          in: query
+          schema:
+            type: string
+      responses:
+        204:
+          description: Delete tag success
+  /api/v1/users/info:
+    get:
+      operationId: getCurrentUserInfo
+      description: Get current user info
+      tags:
+        - "user-v1"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+  /api/v1/users/{id}:
+    get:
+      description: Get an user by ID
+      operationId: getUserById
+      tags:
+        - "user-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: User loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponseDto"
+    put:
+      description: Update an existing user
+      operationId: updateUser
+      tags:
+        - "user-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                user:
+                  $ref: "#/components/schemas/UpdateUserRequestDto"
+                avatar:
+                  type: string
+                  format: binary
+                  description: "Profile image"
+                deleteCertificatePaths:
+                  type: array
+                  items:
+                    type: string
+                newCertificates:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+
+      responses:
+        204:
+          description: User updated successfully
+    delete:
+      description: Delete an user by ID
+      operationId: deleteUser
+      tags:
+        - "user-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: password
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: User deleted successfully
+  /api/v1/users/invite:
+    post:
+      description: Invite a new user
+      operationId: inviteUser
+      tags:
+        - "user-v1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InviteUserRequestDto"
+      responses:
+        201:
+          description: User invited successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+        412:
+          description: User already exists
+  /api/v1/resources:
+    get:
+      description: Get all resources
+      operationId: getResources
+      tags:
+        - "resource-v1"
+      parameters:
+        - name: criteria
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/ResourceCriteria"
+        - name: pageable
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Pageable"
+      responses:
+        200:
+          description: All resource loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceResponsePaginatedDto"
+    post:
+      description: Create new resources
+      operationId: createResource
+      tags:
+        - "resource-v1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateResourceRequest'
+      responses:
+        200:
+          description: Resource uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+    delete:
+      description: Delete resources by list of ids
+      operationId: deleteResources
+      tags:
+        - "resource-v1"
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+      responses:
+        204:
+          description: Resource deleted successfully
+  /api/v1/resources/{id}:
+    get:
+      description: Get a resource by ID
+      operationId: getResourceById
+      tags:
+        - "resource-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Resource loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceDetailResponseDto"
+    put:
+      description: Update an existing resource
+      operationId: updateResource
+      tags:
+        - "resource-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateResourceRequestDto"
+      responses:
+        204:
+          description: Resource updated successfully
+    delete:
+      description: Delete a resource by ID
+      operationId: deleteResource
+      tags:
+        - "resource-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: Resource deleted successfully
+  /api/v1/comments:
+    get:
+      description: Get all comments with criteria
+      operationId: getComments
+      tags:
+        - "comment-v1"
+      parameters:
+        - name: criteria
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/CommentCriteria"
+        - name: pageable
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Pageable"
+      responses:
+        200:
+          description: All resource loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentResponsePaginatedDto"
+    post:
+      tags:
+        - "comment-v1"
+      operationId: createComment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommentRequestDto'
+      responses:
+        200:
+          description: Create comment success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+  /api/v1/tags:
+    get:
+      tags:
+        - "tag-v1"
+      operationId: getTags
+      parameters:
+        - name: parentTag
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+        - name: type
+          in: query
+          schema:
+            $ref: '#/components/schemas/TagType'
+      responses:
+        200:
+          description: "Get tags"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TagResponseDto'
+    post:
+      tags:
+        - "tag-v1"
+      operationId: createTag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTagRequestDto'
+      responses:
+        201:
+          description: Create tag success
+    delete:
+      tags:
+        - "tag-v1"
+      operationId: deleteTag
+      parameters:
+        - name: tagIds
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+        - name: tagDetailIds
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+      responses:
+        204:
+          description: Delete tag success
+  /api/v1/webhooks/minio:
+    post:
+      tags:
+        - "webhook-v1"
+      operationId: subscribeMinioEvent
+      summary: "Receive notifications from MinIO webhook"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebhookMinIOEventDto"
+      responses:
+        "200":
+          description: Successful operation
+  /api/v1/webhooks/keycloak:
+    post:
+      tags:
+        - "webhook-v1"
+      operationId: subscribeKeycloakEvent
+      summary: "Receive a keycloak webhook"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebhookKeycloakRequestDto"
+      responses:
+        "200":
+          description: Successful operation
+  /api/v1/courses:
+    get:
+      description: Get all courses.
+      operationId: getCourses
+      tags:
+        - "course-v1"
+      parameters:
+        - name: criteria
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/CourseCriteria"
+        - name: pageable
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Pageable"
+      responses:
+        200:
+          description: All courses loaded successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseResponsePaginatedDto"
+    post:
+      description: Create a new Course
+      operationId: createCourse
+      tags:
+        - "course-v1"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - course
+              properties:
+                course:
+                  $ref: "#/components/schemas/CreateCourseRequestDto"
+      responses:
+        201:
+          description: Course created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+    delete:
+      description: Delete list ids of courses.
+      operationId: deleteCourses
+      tags:
+        - "course-v1"
+      parameters:
+        - name: ids
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+      responses:
+        204:
+          description: List courses deleted successfully.
+  /api/v1/courses/{id}:
+    get:
+      description: Get course by ID
+      operationId: getCourseById
+      tags:
+        - "course-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Course loaded successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseDetailCourseDto"
+    put:
+      description: Update an existing course.
+      operationId: updateCourse
+      tags:
+        - "course-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                metadata:
+                  $ref: "#/components/schemas/UpdateCourseRequestDto"
+              required:
+                - metadata
+      responses:
+        200:
+          description: Course updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDetailCourseDto'
+    delete:
+      description: Delete a Course.
+      operationId: deleteCourse
+      tags:
+        - "course-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: A Course deleted successfully.
+  /api/v1/course-sections:
+    get:
+      description: Get all Course sections
+      operationId: getCourseSections
+      tags:
+        - "course-section-v1"
+      parameters:
+        - name: criteria
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/CourseSectionCriteria"
+        - name: pageable
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Pageable"
+      responses:
+        200:
+          description: All Course sections loaded successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseSectionResponsePaginatedDto"
+    post:
+      description: Create a new course-section for a Course.
+      operationId: createCourseSection
+      tags:
+        - "course-section-v1"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - courseSection
+              properties:
+                courseSection:
+                  $ref: "#/components/schemas/CreateCourseSectionRequestDto"
+      responses:
+        201:
+          description: A Course section created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+    delete:
+      description: Delete list ids of course sections.
+      operationId: deleteCourseSections
+      tags:
+        - "course-section-v1"
+      parameters:
+        - name: ids
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+      responses:
+        204:
+          description: List course sections deleted successfully.
+  /api/v1/course-sections/{id}:
+    get:
+      description: Get course section by ID.
+      operationId: getCourseSectionById
+      tags:
+        - "course-section-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: A Course section loaded successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseDetailCourseSectionDto"
+    put:
+      description: Update an existing course section.
+      operationId: updateCourseSection
+      tags:
+        - "course-section-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                metadata:
+                  $ref: "#/components/schemas/UpdateCourseSectionRequestDto"
+              required:
+                - metadata
+      responses:
+        200:
+          description: Course section updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdWrapperDto'
+    delete:
+      description: Delete a Course Section.
+      operationId: deleteCourseSection
+      tags:
+        - "course-section-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: A Course Section deleted successfully.
+  /api/v1/user/resources:
+    get:
+      description: Get list resources for page user.
+      operationId: getUserResources
+      tags:
+        - "user-resource-v1"
+      parameters:
+        - name: criteria
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/ResourceCriteria"
+        - name: pageable
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Pageable"
+      responses:
+        200:
+          description: All resources for page user loaded successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResourceResponsePaginatedDto"
+  /api/v1/user/resources/{id}:
+    get:
+      description: Get resource by ID for page user.
+      operationId: getUserResourceById
+      tags:
+        - "user-resource-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Resource loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResourceDetailResponseDto"
+  /api/v1/user/resources-accessed:
+    get:
+      description: Get the list of resources accessed by the user using userInfoId and type.
+      operationId: getResourcesAccessedByUserInfoIdAndType
+      tags:
+        - "user-resource-history-v1"
+      parameters:
+        - name: criteria
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/UserResourceHistoryCriteria"
+        - name: pageable
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Pageable"
+      responses:
+        200:
+          description: List of resources accessed by the user using userInfoId and type loaded successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResourcesAccessedResponsePaginatedDto"
+    post:
+      description: Create a resource accessed by the user
+      operationId: createUserResource
+      tags:
+        - "user-resource-history-v1"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                userInfoId:
+                  type: string
+                  format: uuid
+                  description: "userInfoId of a user."
+                resourceId:
+                  type: string
+                  format: uuid
+                  description: "resourceId of a resource."
+                type:
+                  allOf:
+                    - $ref: "#/components/schemas/UserResourceType"
+              required:
+                - userInfoId
+                - resourceId
+                - type
+      responses:
+        201:
+          description: A resource accessed by the user created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+  /api/v1/doctor-user-conversations:
+    post:
+      description: create a conversation between doctor and user.
+      operationId: createConversationDoctorAndUser
+      tags:
+        - "doctor-user-conversations-v1"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - metadata
+              properties:
+                metadata:
+                  $ref: "#/components/schemas/CreateDoctorUserConversationDto"
+      responses:
+        201:
+          description: A Doctor and User Conversation created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+  /api/v1/tests:
+    get:
+      description: Get an entrace Test for a Course.
+      operationId: getTestByCourseIdAndType
+      tags:
+        - "test-v1"
+      parameters:
+        - name: courseId
+          in: query
+          description: The ID of the Course to fetch Test corresponding.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: type
+          in: query
+          description: The type of the Test to be fetch.
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: The Test of the course loaded successful.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DetailTestOfTheCourseDto"
+        400:
+          description: Invalid parameters.
+        404:
+          description: Test not found.
+    post:
+      description: Create an entrance Test for a Course.
+      operationId: createTest
+      tags:
+        - "test-v1"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                test:
+                  $ref: "#/components/schemas/CreateTestRequestDto"
+              required:
+                - test
+      responses:
+        201:
+          description: An entrance Test for a Course created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+  /api/v1/tests/{id}:
+    put:
+      description: Update an existing entrance Test of a Course.
+      operationId: updateTest
+      tags:
+        - "test-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                test:
+                  $ref: "#/components/schemas/UpdateTestRequestDto"
+              required:
+                - test
+      responses:
+        200:
+          description: An entrance Test of Course updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DetailTestOfTheCourseDto"
+    delete:
+      description: Delete a Test of the Course.
+      operationId: deleteTest
+      tags:
+        - "test-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: A Test of the Course deleted successfully.
+  /api/v1/generate/pre-signed-urls:
+    post:
+      description: This API is used to generate a list of pre-signed URLs for uploading to MinIO.
+      operationId: generatePreSignedUrls
+      tags:
+        - "pre-signed-url-v1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeneratePreSignedUrlDto'
+      responses:
+        200:
+          description: Generate pre-signed urls successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    pageable:
+      name: pageable
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/Pageable"
+  schemas:
+    IdWrapperDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+    UserInfoRole:
+      type: string
+      enum:
+        - ADMIN
+        - SPECIALIST
+        - COORDINATOR
+        - CUSTOMER
+    ResourceState:
+      type: string
+      enum:
+        - PUBLIC
+        - UNLISTED
+    CourseState:
+      type: string
+      enum:
+        - PUBLIC
+        - DRAFT
+        - UNLISTED
+    UserResourceType:
+      type: string
+      enum:
+        - IMAGE
+        - VIDEO
+    ResourceType:
+      type: string
+      enum:
+        - VIDEO
+        - IMAGE
+        - AVATAR
+        - THUMBNAIL
+        - OTHER
+        - PROCESS
+    TagType:
+      type: string
+      enum:
+        - DAMAGE_TAG
+        - ANATOMY_LOCATION_TAG
+        - HP_TAG
+        - LIGHT_TAG
+        - UPPER_GASTRO_ANATOMY_TAG
+    HealthResponseDto:
+      type: object
+      properties:
+        status:
+          type: string
+    InformationGetResponse:
+      type: object
+      properties:
+        version:
+          type: string
+        releaseDate:
+          type: string
+          format: date-time
+    UserInfoState:
+      type: string
+      enum:
+        - ACTIVE
+        - PENDING
+        - INACTIVE
+    DoctorUserConversationState:
+      type: string
+      enum:
+        - PUBLIC
+        - DRAFT
+    Pageable:
+      type: object
+      description: This object will be overridden by Spring's Pageable
+      properties:
+        page:
+          type: integer
+          minimum: 0
+          default: 0
+        size:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+        sort:
+          type: array
+          items:
+            type: string
+          example: createdAt,DESC
+    TagResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        content:
+          type: string
+        type:
+          $ref: '#/components/schemas/TagType'
+    UserResponsePaginatedDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserResponseDto"
+        total:
+          type: integer
+          format: int64
+    CreateDoctorUserConversationDto:
+      type: object
+      properties:
+        state:
+          allOf:
+            - $ref: "#/components/schemas/DoctorUserConversationState"
+        type:
+          allOf:
+            - $ref: "#/components/schemas/DoctorUserConversationType"
+        resourceId:
+          type: string
+          format: uuid
+        questionerId:
+          type: string
+          format: uuid
+        assigneeId:
+          type: string
+          format: uuid
+        content:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+            format: binary
+            description: "A image attachmented by user or doctor."
+          description: "A list of images attachmented for conversations between doctor and user."
+      required:
+        - state
+        - type
+        - resourceId
+        - questionerId
+        - content
+    DoctorUserConversationType:
+      type: string
+      enum:
+        - VIDEO
+        - IMAGE
+    UserResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Id of the user"
+        userId:
+          type: string
+          format: uuid
+        username:
+          type: string
+          description: "Username of the user"
+        firstName:
+          type: string
+          description: "First name of user"
+        lastName:
+          type: string
+          description: "Last name of user"
+        role:
+          allOf:
+            - $ref: "#/components/schemas/UserInfoRole"
+        email:
+          type: string
+          pattern: "^[A-Za-z0-9+_.-]+@(.+)$"
+          description: "Email address of the user"
+        phoneNumber:
+          type: string
+          pattern: "(\\+)?\\d+"
+          description: "Phone number of the user"
+        state:
+          $ref: '#/components/schemas/UserInfoState'
+        isUpdatedProfile:
+          type: boolean
+          description: "Check if profile is updated or not"
+        avatarLink:
+          type: string
+          description: "Link to avatar"
+        certificateLinks:
+          type: array
+          items:
+            type: string
+        createdBy:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+    CreateUserRequestDto:
+      type: object
+      required:
+        - password
+        - email
+        - role
+      properties:
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          pattern: "^[A-Za-z0-9+_.-]+@(.+)$"
+        phoneNumber:
+          type: string
+          pattern: "(\\+)?\\d+"
+        role:
+          allOf:
+            - $ref: "#/components/schemas/UserInfoRole"
+        password:
+          type: string
+          pattern: "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"
+        state:
+          $ref: '#/components/schemas/UserInfoState'
+    CreateResourceRequest:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/UploadType'
+        metadata:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateResourceRequestDto"
+      required:
+        - type
+    UploadType:
+      type: string
+      enum:
+        - VIDEO
+        - IMAGE
+        - COMPRESSED
+        - OTHER
+    CreateCourseSectionRequestDto:
+      type: object
+      properties:
+        courseId:
+          type: string
+          format: uuid
+          description: "courseId of a course section."
+        state:
+          $ref: '#/components/schemas/CourseState'
+        title:
+          type: string
+          description: "Title of a course section."
+        attribute:
+          type: object
+          properties:
+            metadata:
+              $ref: "#/components/schemas/MetaDataCourseSectionDto"
+        totalCredits:
+          type: integer
+          description: "total credits of a course section."
+        tags:
+          type: array
+          items:
+            type: string
+          description: "Tags specification for a course section."
+        tagsDetail:
+          type: array
+          items:
+            type: string
+          description: "Tags detail specification for a course section."
+        thumbnail:
+          type: string
+          format: uuid
+        attachments:
+          type: string
+          format: uuid
+      required:
+        - courseId
+    UpdateCourseSectionRequestDto:
+      type: object
+      properties:
+        state:
+          $ref: '#/components/schemas/CourseState'
+        title:
+          type: string
+          description: "Title of course"
+        tags:
+          type: array
+          items:
+            type: string
+          description: "Tags specification for course"
+        tagsDetail:
+          type: array
+          items:
+            type: string
+          description: "Tags detail specification for course"
+        totalCredits:
+          type: integer
+          description: "total credits of a course section."
+        attribute:
+          type: object
+          properties:
+            metadata:
+              $ref: "#/components/schemas/MetaDataCourseSectionDto"
+        thumbnail:
+          type: string
+          format: uuid
+        attachments:
+          type: string
+          format: uuid
+    CourseSectionResponsePaginatedDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/CourseSectionResponseDto"
+        total:
+          type: integer
+          format: int64
+    CourseSectionResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        state:
+          $ref: '#/components/schemas/CourseState'
+        thumbnailUrl:
+          type: string
+        attachments:
+          type: string
+        lastUpdated:
+          type: string
+    CreateCourseRequestDto:
+      type: object
+      properties:
+        thumbnail:
+          type: string
+          format: uuid
+        state:
+          $ref: '#/components/schemas/CourseState'
+        title:
+          type: string
+          description: "Title of course"
+        description:
+          type: string
+          description: "Description of course"
+        lecturer:
+          type: string
+          description: "Lecturer of course"
+        tags:
+          type: array
+          items:
+            type: string
+          description: "Tags specification for course"
+        tagsDetail:
+          type: array
+          items:
+            type: string
+          description: "Tags detail specification for course"
+      required:
+        - title
+        - description
+        - lecturer
+    UpdateCourseRequestDto:
+      type: object
+      properties:
+        thumbnail:
+          type: string
+          format: uuid
+        state:
+          $ref: '#/components/schemas/CourseState'
+        title:
+          type: string
+          description: "Title of course"
+        description:
+          type: string
+          description: "Description of course"
+        lecturer:
+          type: string
+          description: "Lecturer of course"
+        tags:
+          type: array
+          items:
+            type: string
+          description: "Tags specification for course"
+        tagsDetail:
+          type: array
+          items:
+            type: string
+          description: "Tags detail specification for course"
+    CourseCriteria:
+      type: object
+      properties:
+        title:
+          type: string
+          description: "Title of course"
+        state:
+          allOf:
+            - $ref: "#/components/schemas/CourseState"
+    CourseSectionCriteria:
+      type: object
+      properties:
+        courseId:
+          type: string
+          format: uuid
+        title:
+          type: string
+          description: "Title of course"
+        state:
+          allOf:
+            - $ref: "#/components/schemas/CourseState"
+    UserResourceHistoryCriteria:
+      type: object
+      properties:
+        userInfoId:
+          type: string
+          format: uuid
+        type:
+          allOf:
+            - $ref: "#/components/schemas/UserResourceType"
+      required:
+        - userInfoId
+        - type
+    UserResourceResponsePaginatedDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserResourceResponseDto"
+        total:
+          type: integer
+          format: int64
+    UserResourceResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Id of the resource"
+        title:
+          type: string
+          description: "Title of the resource"
+        thumbnailUrl:
+          type: string
+          description: "url of thumbnail"
+        type:
+          type: string
+          description: Type of resource (VIDEO/IMAGE)
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        tag:
+          type: array
+          items:
+            type: string
+        detailTag:
+          type: array
+          items:
+            type: string
+        time:
+          type: integer
+    CourseResponsePaginatedDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/CourseResponseDto"
+        total:
+          type: integer
+          format: int64
+    CourseResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tags:
+          type: array
+          items:
+            type: string
+          description: "Tags specification for course"
+        tagsDetail:
+          type: array
+          items:
+            type: string
+          description: "Tags detail specification for course"
+        description:
+          type: string
+        lecturer:
+          type: string
+        title:
+          type: string
+        state:
+          $ref: '#/components/schemas/CourseState'
+        thumbnailUrl:
+          type: string
+        lastUpdated:
+          type: string
+    ResponseDetailCourseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        state:
+          $ref: '#/components/schemas/CourseState'
+        title:
+          type: string
+        description:
+          type: string
+        lecturer:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        tagsDetail:
+          type: array
+          items:
+            type: string
+        thumbnailUrl:
+          type: string
+        createdBy:
+          type: string
+        updatedBy:
+          type: string
+    MetaDataCourseSectionDto:
+      type: object
+      properties:
+        description:
+          type: string
+        mainContent:
+          type: string
+        lessonObjectives:
+          type: string
+        target:
+          type: string
+    ResponseDetailCourseSectionDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        state:
+          $ref: '#/components/schemas/CourseState'
+        lectureReviewQuestionsDto:
+          $ref: '#/components/schemas/DetailTestOfTheCourseDto'
+        title:
+          type: string
+        attribute:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        tagsDetail:
+          type: array
+          items:
+            type: string
+        thumbnailUrl:
+          type: string
+        attachmentUrl:
+          type: string
+        attachment:
+          type: string
+        createdBy:
+          type: string
+        updatedBy:
+          type: string
+        totalCredits:
+          type: integer
+    CreateTestRequestDto:
+      type: object
+      properties:
+        title:
+          type: string
+          description: "Title for a Test"
+        description:
+          type: string
+          description: "Description for a Test"
+        courseId:
+          type: string
+          format: uuid
+        courseSectionId:
+          type: string
+          format: uuid
+        state:
+          allOf:
+            - $ref: "#/components/schemas/CourseState"
+        type:
+          allOf:
+            - $ref: "#/components/schemas/TestType"
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuestionDto"
+      required:
+        - courseId
+        - type
+    GeneratePreSignedUrlDto:
+      type: object
+      properties:
+        resourceType:
+          allOf:
+            - $ref: "#/components/schemas/ResourceType"
+        numberOfUrls:
+          type: integer
+      required:
+        - resourceType
+        - numberOfUrls
+    DetailTestOfTheCourseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        courseId:
+          type: string
+          format: uuid
+        state:
+          allOf:
+            - $ref: "#/components/schemas/CourseState"
+        type:
+          allOf:
+            - $ref: "#/components/schemas/TestType"
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuestionDetailDto"
+      required:
+        - courseId
+    QuestionDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        type:
+          allOf:
+            - $ref: "#/components/schemas/QuestionType"
+        description:
+          type: string
+        answers:
+          $ref: "#/components/schemas/AnswerWrapperDto"
+        isDelete:
+          type: boolean
+          default: null
+        questionAttachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuestionAttachmentDto"
+    QuestionAttachmentDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        bucket:
+          type: string
+        objectKeyUrl:
+          type: string
+        objectKey:
+          type: string
+          format: uuid
+          description: The unique identifier of the image in MinIO
+          example: "7dc0b6f6-cb16-491d-a915-c12648903457"
+        width:
+          type: integer
+        height:
+          type: integer
+        fileName:
+          type: string
+        fileType:
+          type: string
+        fileSize:
+          type: integer
+        isDelete:
+          type: boolean
+          default: null
+    AnswerWrapperDto:
+      type: object
+      properties:
+        metadata:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnswerMetadata'
+    AnswerMetadata:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        content:
+          type: string
+        isCorrect:
+          type: boolean
+        essay_answer:
+          type: string
+    TestType:
+      type: string
+      enum:
+        - ENTRANCE_TEST_COURSE
+        - FINAL_EXAM_COURSE
+        - SURVEY_COURSE
+        - LECTURE_REVIEW_QUESTIONS_COURSE
+    QuestionType:
+      type: string
+      enum:
+        - FREE_TEXT
+        - SINGLE_SELECT
+        - MULTIPLE_SELECT
+    UserResourcesAccessedResponsePaginatedDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserResourcesAccessedResponseDto"
+        total:
+          type: integer
+          format: int64
+    QuestionDetailDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        type:
+          allOf:
+            - $ref: "#/components/schemas/QuestionType"
+        description:
+          type: string
+        answers:
+          type: string
+        isDelete:
+          type: boolean
+          default: null
+        questionAttachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuestionAttachmentDto"
+    UpdateTestRequestDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        courseId:
+          type: string
+          format: uuid
+        state:
+          allOf:
+            - $ref: "#/components/schemas/CourseState"
+        type:
+          allOf:
+            - $ref: "#/components/schemas/TestType"
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuestionDto"
+      required:
+        - courseId
+    UserResourcesAccessedResponseDto:
+      type: object
+      properties:
+        thumbnailUrl:
+          type: string
+        createdBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        tags:
+          type: array
+          items:
+            type: string
+        tagsDetail:
+          type: array
+          items:
+            type: string
+        videoDuration:
+          type: integer
+    UserResourceDetailResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        resourceUrl:
+          type: string
+        dimension:
+          type: string
+        description:
+          type: string
+        extension:
+          type: string
+        tag:
+          type: array
+          items:
+            type: string
+        detailTag:
+          type: array
+          items:
+            type: string
+        time:
+          type: integer
+        type:
+          type: string
+          description: Type of resource (VIDEO/IMAGE)
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+    UpdateUserRequestDto:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+          pattern: "^\\+\\d{1,3}-\\d{3}-\\d{3}-\\d{4}$"
+          description: "Phone number of the user"
+        role:
+          allOf:
+            - $ref: "#/components/schemas/UserInfoRole"
+        state:
+          $ref: '#/components/schemas/UserInfoState'
+        isUpdatedProfile:
+          type: boolean
+        firstName:
+          type: string
+        lastName:
+          type: string
+    UserInfoCriteria:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        emails:
+          type: array
+          items:
+            type: string
+        searchWord:
+          type: string
+        role:
+          allOf:
+            - $ref: "#/components/schemas/UserInfoRole"
+        state:
+          $ref: '#/components/schemas/UserInfoState'
+        fromDate:
+          type: string
+          format: date-time
+        toDate:
+          type: string
+          format: date-time
+    InviteUserRequestDto:
+      type: object
+      required:
+        - email
+        - role
+      properties:
+        email:
+          type: string
+          description: "Email address of the user"
+        role:
+          $ref: "#/components/schemas/UserInfoRole"
+        state:
+          $ref: '#/components/schemas/UserInfoState'
+    CommentCriteria:
+      type: object
+      properties:
+        resourceId:
+          type: string
+          format: uuid
+        courseId:
+          type: string
+          format: uuid
+    CommentResponsePaginatedDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/CommentResponseDto"
+        total:
+          type: integer
+          format: int64
+    ResourceCriteria:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+            description: "Ids of the resource"
+        title:
+          type: string
+          description: "Title of the resource"
+        state:
+          allOf:
+            - $ref: "#/components/schemas/ResourceState"
+        resourceType:
+          allOf:
+            - $ref: "#/components/schemas/ResourceType"
+        fromDate:
+          type: string
+          format: date-time
+        toDate:
+          type: string
+          format: date-time
+        tag:
+          type: array
+          items:
+            type: string
+        detailTag:
+          type: array
+          items:
+            type: string
+        anatomyLocationTag:
+          type: array
+          items:
+            type: string
+        lightTag:
+          type: array
+          items:
+            type: string
+        hpTag:
+          type: array
+          items:
+            type: string
+        upperGastroAnatomyTag:
+          type: array
+          items:
+            type: string
+        commentCountTo:
+          type: integer
+        commentCountFrom:
+          type: integer
+        viewNumberTo:
+          type: integer
+        viewNumberFrom:
+          type: integer
+        searchWords:
+          type: string
+    ResourceResponsePaginatedDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResourceResponseDto"
+        total:
+          type: integer
+          format: int64
+    ResourceDetailResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        resourceUrl:
+          type: string
+        dimension:
+          type: string
+        description:
+          type: string
+        state:
+          $ref: "#/components/schemas/ResourceState"
+        size:
+          type: string
+        extension:
+          type: string
+        tag:
+          type: array
+          items:
+            type: string
+        detailTag:
+          type: array
+          items:
+            type: string
+        anatomyLocationTag:
+          type: array
+          items:
+            type: string
+        lightTag:
+          type: array
+          items:
+            type: string
+        hpTag:
+          type: array
+          items:
+            type: string
+        upperGastroAnatomyTag:
+          type: array
+          items:
+            type: string
+        time:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ResourceResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Id of the resource"
+        title:
+          type: string
+          description: "Title of the resource"
+        state:
+          $ref: "#/components/schemas/ResourceState"
+        thumbnailUrl:
+          type: string
+          description: "url of thumbnail"
+        commentCount:
+          type: integer
+        viewNumber:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        tag:
+          type: array
+          items:
+            type: string
+        detailTag:
+          type: array
+          items:
+            type: string
+        anatomyLocationTag:
+          type: array
+          items:
+            type: string
+        lightTag:
+          type: array
+          items:
+            type: string
+        hpTag:
+          type: array
+          items:
+            type: string
+        upperGastroAnatomyTag:
+          type: array
+          items:
+            type: string
+        time:
+          type: integer
+    CreateTagRequestDto:
+      type: object
+      properties:
+        tag:
+          type: array
+          items:
+            type: string
+        detailTag:
+          type: array
+          items:
+            type: string
+        type:
+          $ref: "#/components/schemas/TagType"
+    CreateCommentRequestDto:
+      type: object
+      properties:
+        attachments:
+          type: array
+          items:
+            type: string
+        resourceId:
+          type: string
+          format: uuid
+        courseId:
+          type: string
+          format: uuid
+        parentId:
+          type: string
+          format: uuid
+        content:
+          type: string
+        userInfoId:
+          type: string
+          format: uuid
+      required:
+        - userInfoId
+    CreateResourceRequestDto:
+      type: object
+      properties:
+        thumbnail:
+          type: string
+          format: uuid
+        objectKey:
+          type: string
+          format: uuid
+        title:
+          type: string
+          description: "Title of the resource"
+        description:
+          type: string
+          description: "Description of the resource"
+        state:
+          allOf:
+            - $ref: "#/components/schemas/ResourceState"
+            - type: string
+              default: UNLISTED
+        tag:
+          type: array
+          items:
+            type: string
+        detailTag:
+          type: array
+          items:
+            type: string
+        anatomyLocationTag:
+          type: array
+          items:
+            type: string
+        lightTag:
+          type: array
+          items:
+            type: string
+        hpTag:
+          type: array
+          items:
+            type: string
+        upperGastroAnatomyTag:
+          type: array
+          items:
+            type: string
+      required:
+        - title
+        - description
+        - display
+        - thumbnail
+    UpdateResourceRequestDto:
+      type: object
+      properties:
+        title:
+          type: string
+          description: "Title of the resource"
+        description:
+          type: string
+          description: "Description of the resource"
+        state:
+          $ref: "#/components/schemas/ResourceState"
+        tag:
+          type: array
+          items:
+            type: string
+        detailTag:
+          type: array
+          items:
+            type: string
+        anatomyLocationTag:
+          type: array
+          items:
+            type: string
+        lightTag:
+          type: array
+          items:
+            type: string
+        hpTag:
+          type: array
+          items:
+            type: string
+        upperGastroAnatomyTag:
+          type: array
+          items:
+            type: string
+        thumbnail:
+          type: string
+          format: uuid
+        attachment:
+          type: string
+          format: uuid
+        typeAttachment:
+          $ref: '#/components/schemas/UploadType'
+    CommentResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        content:
+          type: string
+          description: "content"
+        attachments:
+          type: array
+          items:
+            type: string
+        createdBy:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        comment:
+          $ref: "#/components/schemas/CommentResponseDto"
+    WebhookMinIOEventDto:
+      type: object
+      additionalProperties: true
+      properties:
+        EventName:
+          type: string
+          example:
+            - s3:ObjectCreated:Put
+            - s3:ObjectRemoved:Delete
+            - s3:ObjectCreated:CompleteMultipartUpload
+        Key:
+          type: string
+          description: <bucket>/<object_key>
+          example: images/Screenshot 2024-04-26 at 14.17.49.png
+        Records:
+          type: array
+          items:
+            type: object
+            properties:
+              eventVersion:
+                type: string
+                example: 2.0
+              eventSource:
+                type: string
+                example: minio:s3
+              awsRegion:
+                type: string
+                example: us-east-2
+              eventTime:
+                type: string
+                example: 2024-07-24T03:19:19.405Z
+              eventName:
+                type: string
+                example: s3:ObjectRemoved:Delete
+              userIdentity:
+                type: object
+              requestParameters:
+                type: object
+              responseElements:
+                type: object
+              s3:
+                type: object
+              source:
+                type: object
+    WebhookKeycloakRequestDto:
+      type: object
+      properties:
+        uid:
+          type: string
+        realmId:
+          type: string
+        organizationId:
+          type: string
+        type:
+          type: string
+        representation:
+          type: string
+        operationType:
+          type: string
+        resourcePath:
+          type: string
+        resourceType:
+          type: string
+        error:
+          type: string
+        authDetails:
+          $ref: "#/components/schemas/KeycloakAuthDetailRepresentation"
+        details:
+          type: object
+          additionalProperties: true
+    KeycloakAuthDetailRepresentation:
+      type: object
+      properties:
+        realmId:
+          type: string
+        clientId:
+          type: string
+        userId:
+          type: string
+        ipAddress:
+          type: string
+        username:
+          type: string
+        sessionId:
+          type: string

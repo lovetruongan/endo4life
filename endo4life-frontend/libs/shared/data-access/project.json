@@ -1,0 +1,29 @@
+{
+  "name": "data-access",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/data-access/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/shared/data-access",
+        "main": "libs/shared/data-access/src/index.ts",
+        "tsConfig": "libs/shared/data-access/tsconfig.lib.json",
+        "assets": ["libs/shared/data-access/*.md"]
+      }
+    },
+    "codegen": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "openapi-generator-cli generate -i src/lib/swagger/api.yml -o src/lib/generated -g typescript-axios --additional-properties=supportsES6=true,useSingleRequestParameter=true,apiPackage=api,modelPackage=models,nullSafeAdditionalProps=true"
+        ],
+        "cwd": "libs/shared/data-access",
+        "parallel": false
+      }
+    }
+  }
+}

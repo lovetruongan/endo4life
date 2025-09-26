@@ -1,0 +1,27 @@
+{
+  "txtCourseManagement": "Course management",
+  "courseTable": {
+    "course": "Course",
+    "title": "Title",
+    "state": "State",
+    "headerActions": "Action"
+  },
+  "courseFilter": {
+    "selectStatePlaceholder": "Display",
+    "inputSearchPlaceholder": "Search course"
+  },
+  "filterForm": {
+    "title": "Filter"
+  },
+  "state": {
+    "PUBLIC": "Public",
+    "PRIVATE": "Private",
+    "PREVIEW": "Preview"
+  },
+  "leading": {
+    "txtAddcourse": "Add course",
+    "txtExport": "Export",
+    "txtImport": "Import",
+    "txtFilter": "Filter"
+  }
+}

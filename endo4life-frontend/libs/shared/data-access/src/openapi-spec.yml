@@ -1,0 +1,843 @@
+openapi: "3.0.3"
+info:
+  title: "Endo4Life APIs"
+  description: "AI-integrated e-Learning platform for endometriosis education"
+  version: 1.0.0
+servers:
+  - url: https://api.endo4life.shop
+    description: Production server
+  - url: http://localhost:8080
+    description: Development server
+security:
+  - bearerAuth: []
+paths:
+  # Health endpoints
+  /actuator/health:
+    get:
+      description: Get health status of backend service
+      operationId: actuatorHealth
+      security: []
+      tags:
+        - "actuator"
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponseDto"
+
+  # Course Management APIs
+  /api/v1/courses:
+    get:
+      description: Get courses by criteria
+      operationId: getCourses
+      tags:
+        - "course-v1"
+      parameters:
+        - name: criteria
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/CourseCriteria"
+        - name: pageable
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Pageable"
+      responses:
+        200:
+          description: Courses loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseResponsePaginatedDto"
+    post:
+      description: Create a new course
+      operationId: createCourse
+      tags:
+        - "course-v1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCourseRequestDto"
+      responses:
+        201:
+          description: Course created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+
+  /api/v1/courses/{id}:
+    get:
+      description: Get course by ID
+      operationId: getCourseById
+      tags:
+        - "course-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Course found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseDetailResponseDto"
+        404:
+          description: Course not found
+    put:
+      description: Update course
+      operationId: updateCourse
+      tags:
+        - "course-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCourseRequestDto"
+      responses:
+        200:
+          description: Course updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseDetailResponseDto"
+    delete:
+      description: Delete course
+      operationId: deleteCourse
+      tags:
+        - "course-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: Course deleted successfully
+
+  # Resource Management APIs
+  /api/v1/resources:
+    get:
+      description: Get resources by criteria
+      operationId: getResources
+      tags:
+        - "resource-v1"
+      parameters:
+        - name: criteria
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/ResourceCriteria"
+        - name: pageable
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Pageable"
+      responses:
+        200:
+          description: Resources loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceResponsePaginatedDto"
+    post:
+      description: Create a new resource
+      operationId: createResource
+      tags:
+        - "resource-v1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateResourceRequestDto"
+      responses:
+        201:
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+
+  /api/v1/resources/{id}:
+    get:
+      description: Get resource by ID
+      operationId: getResourceById
+      tags:
+        - "resource-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Resource found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceDetailResponseDto"
+        404:
+          description: Resource not found
+
+  # User Management APIs
+  /api/v1/users:
+    get:
+      description: Get users by criteria
+      operationId: getUsers
+      tags:
+        - "user-v1"
+      parameters:
+        - name: criteria
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/UserInfoCriteria"
+        - name: pageable
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Pageable"
+      responses:
+        200:
+          description: Users loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponsePaginatedDto"
+    post:
+      description: Create a new user
+      operationId: createUser
+      tags:
+        - "user-v1"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - user
+              properties:
+                user:
+                  $ref: "#/components/schemas/CreateUserRequestDto"
+                avatar:
+                  type: string
+                  format: binary
+                  description: "Profile image"
+                certificate:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        201:
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+
+  /api/v1/users/{id}:
+    get:
+      description: Get user by ID
+      operationId: getUserById
+      tags:
+        - "user-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponseDto"
+        404:
+          description: User not found
+    put:
+      description: Update user
+      operationId: updateUser
+      tags:
+        - "user-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - user
+              properties:
+                user:
+                  $ref: "#/components/schemas/UpdateUserRequestDto"
+                avatar:
+                  type: string
+                  format: binary
+                deleteCertificatePaths:
+                  type: array
+                  items:
+                    type: string
+                newCertificates:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        204:
+          description: User updated successfully
+    delete:
+      description: Delete user
+      operationId: deleteUser
+      tags:
+        - "user-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: password
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: User deleted successfully
+
+  /api/v1/users/current:
+    get:
+      description: Get current user info
+      operationId: getCurrentUserInfo
+      tags:
+        - "user-v1"
+      responses:
+        200:
+          description: Current user info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponseDto"
+
+  /api/v1/users/invite:
+    post:
+      description: Invite a new user
+      operationId: inviteUser
+      tags:
+        - "user-v1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InviteUserRequestDto"
+      responses:
+        201:
+          description: User invited successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # Common schemas
+    IdWrapperDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+
+    HealthResponseDto:
+      type: object
+      properties:
+        status:
+          type: string
+        service:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+
+    Pageable:
+      type: object
+      properties:
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+        sort:
+          type: array
+          items:
+            type: string
+
+    # Course schemas
+    CourseResponsePaginatedDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/CourseResponseDto"
+        total:
+          type: integer
+          format: int64
+
+    CourseResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        lecturer:
+          type: string
+        state:
+          $ref: "#/components/schemas/CourseState"
+        rating:
+          type: number
+          format: double
+        registrationNumber:
+          type: integer
+        viewNumber:
+          type: integer
+        thumbnail:
+          type: string
+        thumbnailUrl:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        tagsDetail:
+          type: array
+          items:
+            type: string
+        totalCourseSection:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CourseDetailResponseDto:
+      allOf:
+        - $ref: "#/components/schemas/CourseResponseDto"
+        - type: object
+          properties:
+            courseSections:
+              type: array
+              items:
+                $ref: "#/components/schemas/CourseSectionResponseDto"
+
+    CreateCourseRequestDto:
+      type: object
+      required:
+        - title
+        - state
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        lecturer:
+          type: string
+        state:
+          $ref: "#/components/schemas/CourseState"
+        tags:
+          type: array
+          items:
+            type: string
+        tagsDetail:
+          type: array
+          items:
+            type: string
+
+    UpdateCourseRequestDto:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        lecturer:
+          type: string
+        state:
+          $ref: "#/components/schemas/CourseState"
+        tags:
+          type: array
+          items:
+            type: string
+        tagsDetail:
+          type: array
+          items:
+            type: string
+
+    CourseCriteria:
+      type: object
+      properties:
+        title:
+          type: string
+        state:
+          $ref: "#/components/schemas/CourseState"
+
+    CourseState:
+      type: string
+      enum:
+        - DRAFT
+        - PUBLIC
+        - PRIVATE
+        - ARCHIVED
+
+    # Course Section schemas
+    CourseSectionResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        state:
+          type: string
+        thumbnail:
+          type: string
+        thumbnailUrl:
+          type: string
+        totalCredits:
+          type: integer
+        videoDuration:
+          type: integer
+        tags:
+          type: array
+          items:
+            type: string
+        tagsDetail:
+          type: array
+          items:
+            type: string
+
+    # Resource schemas
+    ResourceResponsePaginatedDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResourceResponseDto"
+        total:
+          type: integer
+          format: int64
+
+    ResourceResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          $ref: "#/components/schemas/ResourceType"
+        state:
+          $ref: "#/components/schemas/ResourceState"
+        thumbnail:
+          type: string
+        thumbnailUrl:
+          type: string
+        viewNumber:
+          type: integer
+        commentCount:
+          type: integer
+        tags:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    ResourceDetailResponseDto:
+      allOf:
+        - $ref: "#/components/schemas/ResourceResponseDto"
+        - type: object
+          properties:
+            path:
+              type: string
+            resourceUrl:
+              type: string
+            dimension:
+              type: string
+            size:
+              type: string
+            extension:
+              type: string
+            time:
+              type: integer
+
+    CreateResourceRequestDto:
+      type: object
+      required:
+        - title
+        - type
+        - state
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        type:
+          $ref: "#/components/schemas/ResourceType"
+        state:
+          $ref: "#/components/schemas/ResourceState"
+        tags:
+          type: array
+          items:
+            type: string
+
+    ResourceCriteria:
+      type: object
+      properties:
+        title:
+          type: string
+        type:
+          $ref: "#/components/schemas/ResourceType"
+        state:
+          $ref: "#/components/schemas/ResourceState"
+        tags:
+          type: array
+          items:
+            type: string
+
+    ResourceType:
+      type: string
+      enum:
+        - IMAGE
+        - VIDEO
+        - AVATAR
+        - THUMBNAIL
+        - OTHER
+        - PROCESS
+
+    ResourceState:
+      type: string
+      enum:
+        - DRAFT
+        - PUBLIC
+        - PRIVATE
+        - UNLISTED
+
+    # User schemas
+    UserResponsePaginatedDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserResponseDto"
+        total:
+          type: integer
+          format: int64
+
+    UserResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        phoneNumber:
+          type: string
+        state:
+          $ref: "#/components/schemas/UserInfoState"
+        role:
+          $ref: "#/components/schemas/UserInfoRole"
+        avatarPath:
+          type: string
+        avatarLink:
+          type: string
+        certificateLinks:
+          type: array
+          items:
+            type: string
+        isUpdatedProfile:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateUserRequestDto:
+      type: object
+      required:
+        - email
+        - firstName
+        - lastName
+        - role
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phoneNumber:
+          type: string
+        role:
+          $ref: "#/components/schemas/UserInfoRole"
+        state:
+          $ref: "#/components/schemas/UserInfoState"
+        password:
+          type: string
+          minLength: 8
+
+    UpdateUserRequestDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phoneNumber:
+          type: string
+        role:
+          $ref: "#/components/schemas/UserInfoRole"
+        state:
+          $ref: "#/components/schemas/UserInfoState"
+
+    InviteUserRequestDto:
+      type: object
+      required:
+        - email
+        - firstName
+        - lastName
+        - role
+      properties:
+        email:
+          type: string
+          format: email
+        firstName:
+          type: string
+        lastName:
+          type: string
+        role:
+          $ref: "#/components/schemas/UserInfoRole"
+
+    UserInfoCriteria:
+      type: object
+      properties:
+        searchWord:
+          type: string
+        emails:
+          type: array
+          items:
+            type: string
+        role:
+          $ref: "#/components/schemas/UserInfoRole"
+        state:
+          $ref: "#/components/schemas/UserInfoState"
+        fromDate:
+          type: string
+          format: date-time
+        toDate:
+          type: string
+          format: date-time
+
+    UserInfoState:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - PENDING
+        - SUSPENDED
+
+    UserInfoRole:
+      type: string
+      enum:
+        - ADMIN
+        - SPECIALIST
+        - COORDINATOR
+        - CUSTOMER
+
+    UserInfoDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        avatarUrl:
+          type: string

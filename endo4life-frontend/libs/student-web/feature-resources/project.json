@@ -1,0 +1,9 @@
+{
+  "name": "feature-resources",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/student-web/feature-resources/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project feature-resources --web",
+  "targets": {}
+}
