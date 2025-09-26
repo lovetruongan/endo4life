@@ -10,7 +10,7 @@ public interface KeycloakService {
 
     MappingsRepresentation getUserRoles(UUID userId);
 
-    UUID createUserInKeycloak(String email, String firstName, String lastName, String role);
+    UUID createUserInKeycloak(String email, String firstName, String lastName, String role, String password);
 
     UUID inviteUserInKeycloak(String email, String firstName, String lastName, String role);
 
@@ -25,4 +25,6 @@ public interface KeycloakService {
     boolean checkPassword(String password);
 
     List<String> getUserRolesById(String userId);
+
+    void deleteUserFromKeycloak(UUID userId);
 }

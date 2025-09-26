@@ -31,10 +31,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 var authentication = tokenProvider.getAuthentication(token);
                 log.info("Authentication Object: {}", authentication);
+                log.info("Principal: {}", authentication.getPrincipal());
                 log.info("Authorities: {}", authentication.getAuthorities());
+                log.info("Is Authenticated: {}", authentication.isAuthenticated());
                 UserContextHolder.withAuthentication(authentication);
             } catch (Exception e) {
-                log.error("Failed to authenticate token: {}", e.getMessage());
+                log.error("Failed to authenticate token: {}", e.getMessage(), e);
             }
         }
         filterChain.doFilter(request, response);

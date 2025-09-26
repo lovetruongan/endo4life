@@ -2,7 +2,6 @@ package com.endo4life.service.keycloak;
 
 import com.endo4life.config.ApplicationProperties;
 import com.endo4life.security.UserContextHolder;
-import com.endo4life.security.AuthoritiesConstants;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -71,13 +70,34 @@ public class KeycloakServiceImpl implements KeycloakService {
     }
 
     @Override
-    public UUID createUserInKeycloak(String email, String firstName, String lastName, String role) {
+    public UUID createUserInKeycloak(String email, String firstName, String lastName, String role, String password) {
+        // Check if user already exists
+        var existingUsers = realmResource.users().search(email, true);
+        if (!existingUsers.isEmpty()) {
+            log.warn("User with email {} already exists in Keycloak", email);
+            throw new RuntimeException("User with email " + email + " already exists");
+        }
+
         UserRepresentation keycloakUser = new UserRepresentation();
         keycloakUser.setEmail(email);
         keycloakUser.setFirstName(firstName);
         keycloakUser.setLastName(lastName);
-        keycloakUser.setUsername(removeEmailSuffix(email));
+        // Make username unique by adding timestamp
+        keycloakUser.setUsername(removeEmailSuffix(email) + "_" + System.currentTimeMillis());
         keycloakUser.setEnabled(true);
+        keycloakUser.setEmailVerified(true); // Set email as verified to avoid required action
+        keycloakUser.setRequiredActions(Collections.emptyList()); // Clear any required actions
+
+        // Set password if provided
+        if (password != null && !password.trim().isEmpty()) {
+            CredentialRepresentation credential = new CredentialRepresentation();
+            credential.setType(CredentialRepresentation.PASSWORD);
+            credential.setValue(password);
+            credential.setTemporary(false);
+            keycloakUser.setCredentials(List.of(credential));
+        }
+
+        log.info("Creating user in Keycloak - username: {}, email: {}", keycloakUser.getUsername(), email);
 
         var createdId = createKeycloakUser(keycloakUser);
         assignRoleToUser(createdId, role);
@@ -86,8 +106,14 @@ public class KeycloakServiceImpl implements KeycloakService {
 
     @Override
     public UUID inviteUserInKeycloak(String email, String firstName, String lastName, String role) {
-        UUID userId = createUserInKeycloak(email, firstName, lastName, role);
-        sendVerificationEmail(userId.toString(), email);
+        // For invite, we don't set a password - user will set it later
+        UUID userId = createUserInKeycloak(email, firstName, lastName, role, null);
+        try {
+            sendVerificationEmail(userId.toString(), email);
+        } catch (Exception e) {
+            log.warn("Failed to send verification email to {}: {}", email, e.getMessage());
+            // Continue without email - user can be notified through other means
+        }
         return userId;
     }
 
@@ -180,7 +206,19 @@ public class KeycloakServiceImpl implements KeycloakService {
 
     private UUID createKeycloakUser(UserRepresentation user) {
         var usersResource = realmResource.users();
-        return UUID.fromString(CreatedResponseUtil.getCreatedId(usersResource.create(user)));
+        var response = usersResource.create(user);
+
+        // Log the response for debugging
+        if (response.getStatus() != 201) {
+            log.error("Keycloak create user failed with status: {}", response.getStatus());
+            if (response.hasEntity()) {
+                String errorDetails = response.readEntity(String.class);
+                log.error("Keycloak error details: {}", errorDetails);
+                throw new RuntimeException("Failed to create user in Keycloak: " + errorDetails);
+            }
+        }
+
+        return UUID.fromString(CreatedResponseUtil.getCreatedId(response));
     }
 
     private void sendVerificationEmail(String userId, String email) {
@@ -225,7 +263,33 @@ public class KeycloakServiceImpl implements KeycloakService {
                 .map(RoleRepresentation::getName).toList();
     }
 
+    public void clearUserRequiredActions(String username) {
+        try {
+            var users = realmResource.users().search(username, true);
+            if (!users.isEmpty()) {
+                var user = users.get(0);
+                user.setRequiredActions(Collections.emptyList());
+                user.setEmailVerified(true);
+                realmResource.users().get(user.getId()).update(user);
+                log.info("Cleared required actions for user: {}", username);
+            }
+        } catch (Exception e) {
+            log.error("Failed to clear required actions for user: {}", username, e);
+        }
+    }
+
     private String removeEmailSuffix(String email) {
         return email.substring(0, email.indexOf("@"));
+    }
+
+    @Override
+    public void deleteUserFromKeycloak(UUID userId) {
+        try {
+            realmResource.users().delete(userId.toString());
+            log.info("Successfully deleted user {} from Keycloak", userId);
+        } catch (Exception e) {
+            log.error("Failed to delete user {} from Keycloak: {}", userId, e.getMessage());
+            throw new RuntimeException("Failed to delete user from Keycloak", e);
+        }
     }
 }
