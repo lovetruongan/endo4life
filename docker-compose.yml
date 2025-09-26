@@ -85,10 +85,10 @@ services:
 
   # Keycloak with Traefik labels
   keycloak:
-    image: quay.io/keycloak/keycloak:21.0.1
+    image: quay.io/keycloak/keycloak:26.3.5
     container_name: endo4life_keycloak
     restart: always
-    command: start --proxy=edge --hostname=keycloak.mydevopsproject2023.id.vn --hostname-strict=false
+    command: start --hostname=https://keycloak.mydevopsproject2023.id.vn --proxy-headers=xforwarded
     depends_on:
       postgresql:
         condition: service_healthy
@@ -97,16 +97,14 @@ services:
       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN:-admin}
       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin123}
       
-      # Database configuration (Keycloak 23.0.6 format)
-      - DB_VENDOR=postgres
-      - DB_ADDR=postgresql
-      - DB_DATABASE=${POSTGRES_DB:-elearning}
-      - DB_USER=${POSTGRES_USER:-postgres}
-      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres123}
+      # Database configuration (Keycloak 26.3.5 format)
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://postgresql:5432/${POSTGRES_DB:-elearning}
+      - KC_DB_USERNAME=${POSTGRES_USER:-postgres}
+      - KC_DB_PASSWORD=${POSTGRES_PASSWORD:-postgres123}
       
-      # Proxy configuration
-      - PROXY_ADDRESS_FORWARDING=true
-      - KEYCLOAK_FRONTEND_URL=https://keycloak.mydevopsproject2023.id.vn
+      # Proxy configuration (Keycloak 26.3.5 format)
+      - KC_HTTP_ENABLED=true
       
     volumes:
       - keycloak_data:/opt/keycloak/data

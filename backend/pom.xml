@@ -22,7 +22,7 @@
         <spring-boot.version>${project.parent.version}</spring-boot.version>
         <lombok.version>1.18.30</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
-        <keycloak.version>23.0.6</keycloak.version>
+        <keycloak.version>26.0.6</keycloak.version>
         <minio.version>8.5.7</minio.version>
         <jackson-databind-nullable.version>0.2.4</jackson-databind-nullable.version>
         <springdoc-openapi.version>2.3.0</springdoc-openapi.version>

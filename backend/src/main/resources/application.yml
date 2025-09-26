@@ -57,14 +57,14 @@ spring:
       internal-url: ${KEYCLOAK_INTERNAL_URL:https://keycloak.mydevopsproject2023.id.vn}
       realm: ${KEYCLOAK_REALM:endo4life}
       client-id: ${KEYCLOAK_CLIENT_ID:endo4life_app}
-      secret: ${KEYCLOAK_CLIENT_SECRET:jDydD7wpcIf69MyvpMHAUy44E5QeZxfv}
+      secret: ${KEYCLOAK_CLIENT_SECRET:0LsxczPTGzHaGeZI8N9mIWn0XbtNfF4d}
       jwk-set-uri: ${KEYCLOAK_BASE_URL:https://keycloak.mydevopsproject2023.id.vn}/realms/${KEYCLOAK_REALM:endo4life}/protocol/openid-connect/certs
       issuer-uri: ${KEYCLOAK_BASE_URL:https://keycloak.mydevopsproject2023.id.vn}/realms/${KEYCLOAK_REALM:endo4life}
       webhook:
         enabled: true
-        client-id: admin-cli
-        realm: master
-        secret: ${KEYCLOAK_WEBHOOK_SECRET:webhook-secret}
+        client-id: endo4life_app
+        realm: endo4life
+        secret: ${KEYCLOAK_WEBHOOK_SECRET:0LsxczPTGzHaGeZI8N9mIWn0XbtNfF4d}
         path: https://api.mydevopsproject2023.id.vn/api/v1/webhooks/keycloak
       invite-lifespan: 432000
     minio-configuration:

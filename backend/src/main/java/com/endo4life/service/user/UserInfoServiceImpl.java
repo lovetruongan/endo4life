@@ -2,7 +2,6 @@ package com.endo4life.service.user;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -56,12 +55,19 @@ public class UserInfoServiceImpl implements UserInfoService {
             List<MultipartFile> certificate) {
         validateCreateUserRequest(createUserRequestDto);
 
+        // Check if user already exists in our database
+        if (checkExistEmail(createUserRequestDto.getEmail())) {
+            throw new UserAlreadyExistsException(
+                    "User with email " + createUserRequestDto.getEmail() + " already exists");
+        }
+
         // Create user in Keycloak first
         UUID userId = keycloakService.createUserInKeycloak(
                 createUserRequestDto.getEmail(),
                 createUserRequestDto.getFirstName(),
                 createUserRequestDto.getLastName(),
-                createUserRequestDto.getRole().getValue());
+                createUserRequestDto.getRole().getValue(),
+                createUserRequestDto.getPassword());
 
         // Create user in our database
         UserInfo userInfo = userInfoMapper.toUserInfo(createUserRequestDto);
@@ -76,23 +82,48 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public UUID inviteUser(InviteUserRequestDto requestDto) {
-        validateEmail(requestDto.getEmail());
+        if (!validateEmail(requestDto.getEmail())) {
+            throw new BadRequestException("Invalid email format");
+        }
 
-        UUID userId = keycloakService.inviteUserInKeycloak(
-                requestDto.getEmail(),
-                requestDto.getFirstName(),
-                requestDto.getLastName(),
-                requestDto.getRole().getValue());
+        if (checkExistEmail(requestDto.getEmail())) {
+            throw new UserAlreadyExistsException("User with email " + requestDto.getEmail() + " already exists");
+        }
 
-        UserInfo userInfo = userInfoMapper.toUserInfo(requestDto);
-        userInfo.setUserId(userId);
-        userInfo.setState(UserInfoState.PENDING);
-        userInfo.setCreatedAt(LocalDateTime.now());
-        userInfo.setCreatedBy(UserContextHolder.getEmail().orElse(Constants.SYSTEM));
-        userInfoRepository.save(userInfo);
+        UUID keycloakUserId = null;
+        try {
+            // Create user in Keycloak first
+            keycloakUserId = keycloakService.inviteUserInKeycloak(
+                    requestDto.getEmail(),
+                    requestDto.getFirstName(),
+                    requestDto.getLastName(),
+                    requestDto.getRole().getValue());
 
-        return userInfo.getId();
+            // Create user in our database
+            UserInfo userInfo = userInfoMapper.toUserInfo(requestDto);
+            userInfo.setUserId(keycloakUserId);
+            userInfo.setState(UserInfoState.PENDING);
+            userInfo.setCreatedAt(LocalDateTime.now());
+            userInfo.setCreatedBy(UserContextHolder.getEmail().orElse(Constants.SYSTEM));
+            userInfoRepository.save(userInfo);
+
+            return userInfo.getId();
+        } catch (Exception e) {
+            // If database save fails, try to delete the user from Keycloak
+            if (keycloakUserId != null) {
+                try {
+                    log.warn("Database save failed, attempting to rollback Keycloak user: {}", keycloakUserId);
+                    keycloakService.deleteUserFromKeycloak(keycloakUserId);
+                    log.info("Successfully rolled back Keycloak user creation");
+                } catch (Exception rollbackEx) {
+                    log.error("Failed to rollback Keycloak user creation: {}", rollbackEx.getMessage());
+                    // User remains in Keycloak but not in our database - manual cleanup required
+                }
+            }
+            throw e;
+        }
     }
 
     @Override
