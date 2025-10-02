@@ -1,5 +1,6 @@
 package com.endo4life.domain.document;
 
+import com.endo4life.constant.Constants;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -31,63 +32,56 @@ import org.apache.commons.lang3.StringUtils;
 public class Resource extends AbstractEntity {
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", length = 20)
     private ResourceType type;
 
-    @Column(name = "path")
     private String path;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "state", nullable = false)
+    @Column(nullable = false)
     private ResourceState state;
 
-    @Column(name = "thumbnail")
+    @Column(nullable = false)
     private String thumbnail;
 
-    @Column(name = "dimension")
     private String dimension;
 
-    @Column(name = "size")
     private String size;
 
-    @Column(name = "title", nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false)
     private String title;
 
     @Type(JsonBinaryType.class)
-    @Column(name = "label_polygon", columnDefinition = "jsonb")
+    @Column(columnDefinition = "jsonb")
     private String labelPolygon;
 
-    @Column(name = "view_number")
     private Integer viewNumber = 0;
 
-    @Column(name = "description", columnDefinition = "TEXT")
+    @Column(columnDefinition = "text")
     private String description;
 
-    @Column(name = "tag", columnDefinition = "TEXT")
+    @Column(columnDefinition = "text")
     private String tag;
 
-    @Column(name = "detail_tag", columnDefinition = "TEXT")
+    @Column(columnDefinition = "text")
     private String detailTag;
 
-    @Column(name = "anatomy_location_tag", columnDefinition = "TEXT")
+    @Column(columnDefinition = "text")
     private String anatomyLocationTag;
 
-    @Column(name = "hp_tag", columnDefinition = "TEXT")
+    @Column(columnDefinition = "text")
     private String hpTag;
 
-    @Column(name = "light_tag", columnDefinition = "TEXT")
+    @Column(columnDefinition = "text")
     private String lightTag;
 
-    @Column(name = "upper_gastro_anatomy_tag", columnDefinition = "TEXT")
+    @Column(columnDefinition = "text")
     private String upperGastroAnatomyTag;
 
-    @Column(name = "time")
     private Integer time;
 
-    @Column(name = "extension")
     private String extension;
 
-    @Column(name = "comment_count", nullable = false)
+    @Column(nullable = false)
     private Integer commentCount = 0;
 
     public void incrementCommentCount() {
@@ -104,12 +98,12 @@ public class Resource extends AbstractEntity {
         if (StringUtils.isBlank(this.detailTag)) {
             return new ArrayList<>();
         }
-        return new ArrayList<>(Arrays.asList(this.detailTag.split(",")));
+        return new ArrayList<>(Arrays.asList(this.detailTag.split(Constants.COMMA)));
     }
 
     public void setDetailTag(List<String> detailTags) {
         if (CollectionUtils.isNotEmpty(detailTags)) {
-            this.detailTag = String.join(",", detailTags);
+            this.detailTag = String.join(Constants.COMMA, detailTags);
         } else {
             this.detailTag = null;
         }
@@ -119,14 +113,74 @@ public class Resource extends AbstractEntity {
         if (StringUtils.isBlank(this.tag)) {
             return new ArrayList<>();
         }
-        return new ArrayList<>(Arrays.asList(this.tag.split(",")));
+        return new ArrayList<>(Arrays.asList(this.tag.split(Constants.COMMA)));
     }
 
     public void setTag(List<String> tags) {
         if (CollectionUtils.isNotEmpty(tags)) {
-            this.tag = String.join(",", tags);
+            this.tag = String.join(Constants.COMMA, tags);
         } else {
             this.tag = null;
+        }
+    }
+
+    public List<String> getAnatomyLocationTag() {
+        if (StringUtils.isBlank(this.anatomyLocationTag)) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(Arrays.asList(this.anatomyLocationTag.split(Constants.COMMA)));
+    }
+
+    public void setAnatomyLocationTag(List<String> tags) {
+        if (CollectionUtils.isNotEmpty(tags)) {
+            this.anatomyLocationTag = String.join(Constants.COMMA, tags);
+        } else {
+            this.anatomyLocationTag = null;
+        }
+    }
+
+    public List<String> getLightTag() {
+        if (StringUtils.isBlank(this.lightTag)) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(Arrays.asList(this.lightTag.split(Constants.COMMA)));
+    }
+
+    public void setLightTag(List<String> tags) {
+        if (CollectionUtils.isNotEmpty(tags)) {
+            this.lightTag = String.join(Constants.COMMA, tags);
+        } else {
+            this.lightTag = null;
+        }
+    }
+
+    public List<String> getHpTag() {
+        if (StringUtils.isBlank(this.hpTag)) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(Arrays.asList(this.hpTag.split(Constants.COMMA)));
+    }
+
+    public void setHpTag(List<String> tags) {
+        if (CollectionUtils.isNotEmpty(tags)) {
+            this.hpTag = String.join(Constants.COMMA, tags);
+        } else {
+            this.hpTag = null;
+        }
+    }
+
+    public List<String> getUpperGastroAnatomyTag() {
+        if (StringUtils.isBlank(this.upperGastroAnatomyTag)) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(Arrays.asList(this.upperGastroAnatomyTag.split(Constants.COMMA)));
+    }
+
+    public void setUpperGastroAnatomyTag(List<String> tags) {
+        if (CollectionUtils.isNotEmpty(tags)) {
+            this.upperGastroAnatomyTag = String.join(Constants.COMMA, tags);
+        } else {
+            this.upperGastroAnatomyTag = null;
         }
     }
 

@@ -5,9 +5,11 @@ import org.springframework.context.annotation.Configuration;
 import com.endo4life.web.rest.api.UserV1ApiController;
 import com.endo4life.web.rest.api.ResourceV1ApiController;
 import com.endo4life.web.rest.api.CourseV1ApiController;
+import com.endo4life.web.rest.api.MinioV1ApiController;
 import com.endo4life.web.rest.api.UserV1ApiDelegate;
 import com.endo4life.web.rest.api.ResourceV1ApiDelegate;
 import com.endo4life.web.rest.api.CourseV1ApiDelegate;
+import com.endo4life.web.rest.api.MinioV1ApiDelegate;
 
 @Configuration
 public class WebConfig {
@@ -25,5 +27,16 @@ public class WebConfig {
     @Bean
     public CourseV1ApiController courseV1ApiController(CourseV1ApiDelegate delegate) {
         return new CourseV1ApiController(delegate);
+    }
+
+    @Bean
+    public MinioV1ApiController minioV1ApiController(MinioV1ApiDelegate delegate) {
+        return new MinioV1ApiController(delegate);
+    }
+
+    @Bean
+    public com.endo4life.web.rest.api.WebhookV1ApiController webhookV1ApiController(
+            com.endo4life.web.rest.api.WebhookV1ApiDelegate delegate) {
+        return new com.endo4life.web.rest.api.WebhookV1ApiController(delegate);
     }
 }

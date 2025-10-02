@@ -107,6 +107,20 @@
             <version>${minio.version}</version>
         </dependency>
         
+        <!-- JavaCV for video processing -->
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>javacv-platform</artifactId>
+            <version>1.5.6</version>
+        </dependency>
+
+        <!-- Thumbnailator for image processing -->
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>0.4.20</version>
+        </dependency>
+        
         <!-- OpenAPI -->
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -165,6 +179,12 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency> -->
+        
+        <!-- Spring Test for MockMultipartFile -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
         
         <!-- Test Dependencies -->
         <dependency>

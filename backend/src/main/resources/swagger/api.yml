@@ -160,7 +160,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ResourceResponsePaginatedDto"
     post:
-      description: Create a new resource
+      description: Create resource(s) after uploading to MinIO
       operationId: createResource
       tags:
         - "resource-v1"
@@ -169,14 +169,34 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateResourceRequestDto"
+              $ref: "#/components/schemas/CreateResourceRequest"
       responses:
-        201:
-          description: Resource created successfully
+        200:
+          description: Resources created successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/IdWrapperDto"
+                type: array
+                items:
+                  type: string
+                  format: uuid
+    delete:
+      description: Delete resources by list of ids
+      operationId: deleteResources
+      tags:
+        - "resource-v1"
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+      responses:
+        204:
+          description: Resources deleted successfully
 
   /api/v1/resources/{id}:
     get:
@@ -200,6 +220,21 @@ paths:
                 $ref: "#/components/schemas/ResourceDetailResponseDto"
         404:
           description: Resource not found
+    delete:
+      description: Delete a resource by ID
+      operationId: deleteResource
+      tags:
+        - "resource-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: Resource deleted successfully
 
   # User Management APIs
   /api/v1/users:
@@ -373,6 +408,65 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/IdWrapperDto"
+
+  # Webhook APIs
+  /api/v1/webhooks/minio:
+    post:
+      description: Receive MinIO webhook events
+      operationId: subscribeMinioEvent
+      security: []
+      tags:
+        - "webhook-v1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebhookMinIOEventDto"
+      responses:
+        200:
+          description: Webhook processed successfully
+
+  /api/v1/webhooks/keycloak:
+    post:
+      description: Receive Keycloak webhook events
+      operationId: subscribeKeycloakEvent
+      security: []
+      tags:
+        - "webhook-v1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebhookKeycloakRequestDto"
+      responses:
+        200:
+          description: Webhook processed successfully
+
+  # MinIO File Management APIs
+  /api/v1/minio/presigned-urls:
+    post:
+      description: Generate pre-signed URLs for upload
+      operationId: generatePreSignedUrls
+      security: []
+      tags:
+        - "minio-v1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GeneratePreSignedUrlDto"
+      responses:
+        200:
+          description: Pre-signed URLs generated successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
 
 components:
   securitySchemes:
@@ -629,23 +723,64 @@ components:
             time:
               type: integer
 
+    CreateResourceRequest:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/UploadType"
+        metadata:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateResourceRequestDto"
+      required:
+        - type
+
+    UploadType:
+      type: string
+      enum:
+        - VIDEO
+        - IMAGE
+        - COMPRESSED
+        - OTHER
+
     CreateResourceRequestDto:
       type: object
-      required:
-        - title
-        - type
-        - state
       properties:
+        thumbnail:
+          type: string
+          format: uuid
+        objectKey:
+          type: string
+          format: uuid
         title:
           type: string
-          minLength: 1
+          description: "Title of the resource"
         description:
           type: string
-        type:
-          $ref: "#/components/schemas/ResourceType"
+          description: "Description of the resource"
         state:
           $ref: "#/components/schemas/ResourceState"
-        tags:
+        tag:
+          type: array
+          items:
+            type: string
+        detailTag:
+          type: array
+          items:
+            type: string
+        anatomyLocationTag:
+          type: array
+          items:
+            type: string
+        lightTag:
+          type: array
+          items:
+            type: string
+        hpTag:
+          type: array
+          items:
+            type: string
+        upperGastroAnatomyTag:
           type: array
           items:
             type: string
@@ -681,6 +816,19 @@ components:
         - PUBLIC
         - PRIVATE
         - UNLISTED
+
+    GeneratePreSignedUrlDto:
+      type: object
+      required:
+        - resourceType
+        - numberOfUrls
+      properties:
+        resourceType:
+          $ref: "#/components/schemas/ResourceType"
+        numberOfUrls:
+          type: integer
+          minimum: 1
+          maximum: 100
 
     # User schemas
     UserResponsePaginatedDto:
@@ -841,3 +989,36 @@ components:
           type: string
         avatarUrl:
           type: string
+
+    WebhookMinIOEventDto:
+      type: object
+      additionalProperties: true
+      properties:
+        EventName:
+          type: string
+        Key:
+          type: string
+          description: <bucket>/<object_key>
+        Records:
+          type: array
+          items:
+            type: object
+
+    WebhookKeycloakRequestDto:
+      type: object
+      properties:
+        uid:
+          type: string
+        realmId:
+          type: string
+        type:
+          type: string
+        resourceType:
+          type: string
+        operationType:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+        authDetails:
+          type: object

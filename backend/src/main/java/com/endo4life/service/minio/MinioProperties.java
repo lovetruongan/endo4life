@@ -14,6 +14,7 @@ public class MinioProperties {
     private String username;
     private String password;
     private String webhookIdentifier;
+    private String region;
 
     private String bucketVideo;
     private String bucketImage;

@@ -1,7 +1,6 @@
 package com.endo4life.repository.specifications;
 
 import lombok.experimental.UtilityClass;
-import com.endo4life.domain.document.AbstractEntity_;
 import com.endo4life.web.rest.model.ResourceCriteria;
 import com.endo4life.web.rest.model.ResourceState;
 import com.endo4life.web.rest.model.ResourceType;
@@ -9,12 +8,9 @@ import jakarta.persistence.metamodel.SingularAttribute;
 import com.endo4life.domain.document.Resource;
 import com.endo4life.domain.document.Resource_;
 import com.endo4life.utils.StringUtil;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Objects;
 
 @UtilityClass
@@ -61,6 +57,6 @@ public class ResourceSpecifications {
     private Specification<Resource> isValid() {
         return (root, query, builder) -> builder.and(
                 builder.isNotNull(root.get(Resource_.type)),
-                builder.isNotNull(root.get(Resource_.title)));
+                builder.isNotNull(root.get(Resource_.path)));
     }
 }

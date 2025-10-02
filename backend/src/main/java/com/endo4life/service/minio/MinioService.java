@@ -16,18 +16,30 @@ public interface MinioService {
     // Lấy file (stream)
     InputStream getFile(String bucket, String objectName);
 
-    // Xoá file
-    void removeFile(String bucket, String objectName);
+    // Xoá file - fileName first for consistency
+    void removeFile(String fileName, String bucket);
 
     // Xoá nhiều file
-    void removeFiles(String bucket, List<String> objectNames);
+    void removeFiles(List<String> fileNames, String bucket);
 
     // Update (thực chất là xoá rồi upload lại)
-    String updateFile(String bucket, String oldObjectName, MultipartFile file, String newObjectName);
+    String updateFile(String fileName, MultipartFile file, String bucket, String newFileName);
 
-    // Tạo pre-signed URL để tải file (GET)
-    String createGetPreSignedLink(String bucket, String objectName);
+    // Tạo pre-signed URL để tải file (GET) - resourcePath first
+    String createGetPreSignedLink(String resourcePath, String bucket);
 
     // Tạo pre-signed URL để upload file (PUT)
-    String createPutPreSignedLink(String bucket, String objectName);
+    String createPutPreSignedLink(String resourcePath, String bucket);
+
+    // Upload file in chunks (for large files)
+    String uploadChunk(MultipartFile file, String bucketName, String fileName);
+
+    // Generate multiple pre-signed URLs for bulk upload
+    List<String> generatePreSignedUrls(com.endo4life.web.rest.model.GeneratePreSignedUrlDto dto);
+
+    // Get pre-signed link based on resource type
+    String getPreSignedLinkMethodGetWithResourceType(String objectKey, String resourceType);
+
+    // Get bucket name from resource type
+    String getBucketFromResourceType(String resourceType);
 }

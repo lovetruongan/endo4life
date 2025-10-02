@@ -154,11 +154,13 @@ services:
       - "traefik.http.routers.minio-api.rule=Host(`minio-api.mydevopsproject2023.id.vn`)"
       - "traefik.http.routers.minio-api.service=minio-api"
       - "traefik.http.services.minio-api.loadbalancer.server.port=9000"
+      - "traefik.http.services.minio-api.loadbalancer.passhostheader=true"
       # MinIO Console
       - "traefik.http.routers.minio-console.entrypoints=websecure"
       - "traefik.http.routers.minio-console.rule=Host(`minio.mydevopsproject2023.id.vn`)"
       - "traefik.http.routers.minio-console.service=minio-console"
       - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
+      - "traefik.http.services.minio-console.loadbalancer.passhostheader=true"
 
 volumes:
   postgres_data:

@@ -1,19 +1,15 @@
 package com.endo4life.web.rest;
 
 import com.endo4life.web.rest.api.ResourceV1ApiDelegate;
-import com.endo4life.web.rest.model.ResourceCriteria;
-import com.endo4life.web.rest.model.ResourceDetailResponseDto;
-import com.endo4life.web.rest.model.ResourceResponsePaginatedDto;
-import com.endo4life.web.rest.model.CreateResourceRequestDto;
-import com.endo4life.web.rest.model.IdWrapperDto;
+import com.endo4life.web.rest.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.endo4life.service.resource.ResourceService;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -33,13 +29,24 @@ public class ResourceV1ApiDelegateImpl implements ResourceV1ApiDelegate {
     }
 
     @Override
-    public ResponseEntity<IdWrapperDto> createResource(CreateResourceRequestDto createResourceRequest) {
-        UUID id = resourceService.createResource(createResourceRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new IdWrapperDto().id(id));
+    public ResponseEntity<List<UUID>> createResource(CreateResourceRequest createResourceRequest) {
+        return ResponseEntity.ok(resourceService.createResource(createResourceRequest));
     }
 
     @Override
     public ResponseEntity<ResourceDetailResponseDto> getResourceById(UUID id) {
         return ResponseEntity.ok(resourceService.getResourceById(id));
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteResource(UUID id) {
+        resourceService.deleteResource(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteResources(List<UUID> ids) {
+        resourceService.deleteResources(ids);
+        return ResponseEntity.noContent().build();
     }
 }
