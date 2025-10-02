@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties(prefix = "minio-configuration")
+@ConfigurationProperties(prefix = "spring.application.minio-configuration", ignoreUnknownFields = false)
 public class MinioProperties {
     private String endpoint;
     private String username;
