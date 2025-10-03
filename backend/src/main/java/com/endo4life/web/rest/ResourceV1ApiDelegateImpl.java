@@ -39,6 +39,13 @@ public class ResourceV1ApiDelegateImpl implements ResourceV1ApiDelegate {
     }
 
     @Override
+    public ResponseEntity<Void> updateResource(UUID id,
+            UpdateResourceRequestDto updateResourceRequest) {
+        resourceService.updateResource(id, updateResourceRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
     public ResponseEntity<Void> deleteResource(UUID id) {
         resourceService.deleteResource(id);
         return ResponseEntity.ok().build();

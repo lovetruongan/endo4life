@@ -4,6 +4,7 @@ import com.endo4life.web.rest.model.CreateResourceRequest;
 import com.endo4life.web.rest.model.ResourceCriteria;
 import com.endo4life.web.rest.model.ResourceDetailResponseDto;
 import com.endo4life.web.rest.model.ResourceResponseDto;
+import com.endo4life.web.rest.model.UpdateResourceRequestDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +18,8 @@ public interface ResourceService {
     ResourceDetailResponseDto getResourceById(UUID id);
 
     List<UUID> createResource(CreateResourceRequest createResourceRequest);
+
+    void updateResource(UUID id, UpdateResourceRequestDto resourceRequest);
 
     void deleteResource(UUID id);
 

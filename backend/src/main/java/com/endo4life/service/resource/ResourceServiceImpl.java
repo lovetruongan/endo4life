@@ -102,6 +102,45 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
+    public void updateResource(UUID id, UpdateResourceRequestDto updateResourceDto) {
+        Resource resource = resourceRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Resource with id not found " + id));
+        resource.setUpdatedBy(UserContextHolder.getEmail().orElse(Constants.SYSTEM));
+
+        // update thumbnail
+        UUID thumbnailDto = updateResourceDto.getThumbnail();
+        if (Objects.isNull(thumbnailDto) && StringUtils.isNotBlank(resource.getThumbnail())) {
+            minioService.removeFile(resource.getThumbnail(), minioConfig.bucketThumbnail());
+            resource.setThumbnail(null);
+        }
+        if (Objects.nonNull(thumbnailDto)) {
+            if (!StringUtils.equalsIgnoreCase(resource.getThumbnail(), thumbnailDto.toString()) &&
+                    StringUtils.isNotBlank(resource.getThumbnail())) {
+                minioService.removeFile(resource.getThumbnail(), minioConfig.bucketThumbnail());
+            }
+            resource.setThumbnail(thumbnailDto.toString());
+        }
+
+        // update path attachment if have!
+        UUID attachmentDto = updateResourceDto.getAttachment();
+        if (Objects.isNull(attachmentDto) && StringUtils.isNotBlank(resource.getPath())) {
+            minioService.removeFile(resource.getPath(),
+                    minioService.getBucketFromResourceType(resource.getType().getValue()));
+            resource.setPath(null);
+        }
+        if (Objects.nonNull(attachmentDto)) {
+            if (!StringUtils.equalsIgnoreCase(resource.getPath(), attachmentDto.toString()) &&
+                    StringUtils.isNotBlank(resource.getPath())) {
+                minioService.removeFile(resource.getPath(),
+                        minioService.getBucketFromResourceType(resource.getType().getValue()));
+            }
+            resource.setPath(attachmentDto.toString());
+        }
+        resourceMapper.toResource(resource, updateResourceDto);
+        resourceRepository.save(resource);
+    }
+
+    @Override
     public void deleteResource(UUID id) {
         Resource resource = resourceRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Resource with id not found: " + id));

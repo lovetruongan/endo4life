@@ -6,6 +6,7 @@ import com.endo4life.service.minio.MinioService;
 import com.endo4life.web.rest.model.CreateResourceRequestDto;
 import com.endo4life.web.rest.model.ResourceDetailResponseDto;
 import com.endo4life.web.rest.model.ResourceResponseDto;
+import com.endo4life.web.rest.model.UpdateResourceRequestDto;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -60,7 +61,12 @@ public abstract class ResourceMapper {
     @Mapping(target = "extension", ignore = true)
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "state", ignore = true)
-    public abstract void toResource(@org.mapstruct.MappingTarget Resource resource, CreateResourceRequestDto createRequest);
+    public abstract void toResource(@org.mapstruct.MappingTarget Resource resource,
+            CreateResourceRequestDto createRequest);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    public abstract void toResource(@org.mapstruct.MappingTarget Resource resource,
+            UpdateResourceRequestDto updateRequest);
 
     @Named("thumbnailToUrl")
     public String thumbnailToUrl(Resource resource) {

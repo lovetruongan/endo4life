@@ -220,6 +220,26 @@ paths:
                 $ref: "#/components/schemas/ResourceDetailResponseDto"
         404:
           description: Resource not found
+    put:
+      description: Update an existing resource
+      operationId: updateResource
+      tags:
+        - "resource-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateResourceRequestDto"
+      responses:
+        204:
+          description: Resource updated successfully
     delete:
       description: Delete a resource by ID
       operationId: deleteResource
@@ -784,6 +804,46 @@ components:
           type: array
           items:
             type: string
+
+    UpdateResourceRequestDto:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        state:
+          $ref: "#/components/schemas/ResourceState"
+        tag:
+          type: array
+          items:
+            type: string
+        detailTag:
+          type: array
+          items:
+            type: string
+        anatomyLocationTag:
+          type: array
+          items:
+            type: string
+        lightTag:
+          type: array
+          items:
+            type: string
+        hpTag:
+          type: array
+          items:
+            type: string
+        upperGastroAnatomyTag:
+          type: array
+          items:
+            type: string
+        thumbnail:
+          type: string
+          format: uuid
+        attachment:
+          type: string
+          format: uuid
 
     ResourceCriteria:
       type: object
