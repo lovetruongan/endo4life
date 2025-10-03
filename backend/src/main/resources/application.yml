@@ -69,8 +69,8 @@ spring:
       invite-lifespan: 432000
     minio-configuration:
       endpoint: https://minio-api.mydevopsproject2023.id.vn
-      username: ${MINIO_USERNAME:admin}
-      password: ${MINIO_PASSWORD:minio123456}
+      username: ${MINIO_USERNAME:endo4life}
+      password: ${MINIO_PASSWORD:U6ZeyWQKjLMA6t31lh4xdebjkhkCs6x9}
       webhook-identifier: _
       bucket-video: videos
       bucket-image: images
