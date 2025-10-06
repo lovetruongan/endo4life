@@ -256,6 +256,201 @@ paths:
         204:
           description: Resource deleted successfully
 
+  # Test Management APIs
+  /api/v1/tests:
+    get:
+      summary: Get a list of tests
+      tags: [ "test-v1" ]
+      operationId: getTests
+      parameters:
+        - in: query
+          name: courseId
+          schema:
+            type: string
+            format: uuid
+          description: Filter by course ID
+      responses:
+        '200':
+          description: A list of tests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TestResponseDto'
+    post:
+      summary: Create a new test
+      tags: [ "test-v1" ]
+      operationId: createTest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTestRequestDto'
+      responses:
+        '201':
+          description: Test created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdWrapperDto'
+
+  /api/v1/tests/{id}:
+    get:
+      summary: Get a test by ID
+      tags: [ "test-v1" ]
+      operationId: getTestById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: The test details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestDetailResponseDto'
+    put:
+      summary: Update a test
+      tags: [ "test-v1" ]
+      operationId: updateTest
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTestRequestDto'
+      responses:
+        '204':
+          description: Test updated successfully
+    delete:
+      summary: Delete a test
+      tags: [ "test-v1" ]
+      operationId: deleteTest
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Test deleted successfully
+
+  # Question Management APIs
+  /api/v1/tests/{testId}/questions:
+    get:
+      summary: Get all questions for a test
+      tags: [ "question-v1" ]
+      operationId: getQuestionsByTestId
+      parameters:
+        - name: testId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A list of questions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QuestionResponseDto'
+    post:
+      summary: Create a new question for a test
+      tags: [ "question-v1" ]
+      operationId: createQuestion
+      parameters:
+        - name: testId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQuestionRequestDto'
+      responses:
+        '201':
+          description: Question created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdWrapperDto'
+
+  /api/v1/questions/{id}:
+    get:
+      summary: Get a question by ID
+      tags: [ "question-v1" ]
+      operationId: getQuestionById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: The question details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionResponseDto'
+    put:
+      summary: Update a question
+      tags: [ "question-v1" ]
+      operationId: updateQuestion
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateQuestionRequestDto'
+      responses:
+        '204':
+          description: Question updated successfully
+    delete:
+      summary: Delete a question
+      tags: [ "question-v1" ]
+      operationId: deleteQuestion
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Question deleted successfully
+
   # User Management APIs
   /api/v1/users:
     get:
@@ -1049,6 +1244,141 @@ components:
           type: string
         avatarUrl:
           type: string
+
+    # Test schemas
+    TestResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        courseId:
+          type: string
+          format: uuid
+        type:
+          type: string
+        state:
+          type: string
+
+    TestDetailResponseDto:
+      allOf:
+        - $ref: '#/components/schemas/TestResponseDto'
+        - type: object
+          properties:
+            questions:
+              type: array
+              items:
+                $ref: '#/components/schemas/QuestionResponseDto'
+
+    CreateTestRequestDto:
+      type: object
+      required:
+        - title
+        - courseId
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        courseId:
+          type: string
+          format: uuid
+        type:
+          type: string
+        state:
+          type: string
+
+    UpdateTestRequestDto:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+        state:
+          type: string
+
+    # Question schemas
+    QuestionResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          $ref: '#/components/schemas/QuestionType'
+        answers:
+          type: object # Or string, depending on your answer structure
+          description: "JSON structure for answers, e.g., { options: [], correctAnswer: '' }"
+        orderIndex:
+          type: integer
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestionAttachmentResponseDto'
+
+    CreateQuestionRequestDto:
+      type: object
+      required:
+        - title
+        - type
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          $ref: '#/components/schemas/QuestionType'
+        answers:
+          type: object
+        orderIndex:
+          type: integer
+
+    UpdateQuestionRequestDto:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          $ref: '#/components/schemas/QuestionType'
+        answers:
+          type: object
+        orderIndex:
+          type: integer
+
+    QuestionAttachmentResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        fileName:
+          type: string
+        fileType:
+          type: string
+        fileUrl:
+          type: string
+          description: "Pre-signed URL to access the attachment"
+
+    QuestionType:
+      type: string
+      enum:
+        - SINGLE_CHOICE
+        - MULTIPLE_CHOICE
+        - FILL_IN_THE_BLANK
+        - ESSAY
 
     WebhookMinIOEventDto:
       type: object

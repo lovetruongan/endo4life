@@ -10,6 +10,10 @@ import com.endo4life.web.rest.api.UserV1ApiDelegate;
 import com.endo4life.web.rest.api.ResourceV1ApiDelegate;
 import com.endo4life.web.rest.api.CourseV1ApiDelegate;
 import com.endo4life.web.rest.api.MinioV1ApiDelegate;
+import com.endo4life.web.rest.api.TestV1ApiController;
+import com.endo4life.web.rest.api.TestV1ApiDelegate;
+import com.endo4life.web.rest.api.QuestionV1ApiController;
+import com.endo4life.web.rest.api.QuestionV1ApiDelegate;
 
 @Configuration
 public class WebConfig {
@@ -38,5 +42,15 @@ public class WebConfig {
     public com.endo4life.web.rest.api.WebhookV1ApiController webhookV1ApiController(
             com.endo4life.web.rest.api.WebhookV1ApiDelegate delegate) {
         return new com.endo4life.web.rest.api.WebhookV1ApiController(delegate);
+    }
+
+    @Bean
+    public TestV1ApiController testV1ApiController(TestV1ApiDelegate delegate) {
+        return new TestV1ApiController(delegate);
+    }
+
+    @Bean
+    public QuestionV1ApiController questionV1ApiController(QuestionV1ApiDelegate delegate) {
+        return new QuestionV1ApiController(delegate);
     }
 }
