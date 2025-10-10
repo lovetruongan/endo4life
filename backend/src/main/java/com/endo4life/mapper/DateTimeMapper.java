@@ -37,4 +37,9 @@ public abstract class DateTimeMapper {
                 .map(ZonedDateTime::toOffsetDateTime)
                 .orElse(null);
     }
+
+    // Automatic conversion method for MapStruct (without @Named)
+    public OffsetDateTime map(final @Nullable LocalDateTime localDateTime) {
+        return toOffsetDateTime(localDateTime);
+    }
 }

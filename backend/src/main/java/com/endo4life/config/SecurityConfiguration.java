@@ -51,6 +51,10 @@ public class SecurityConfiguration {
                         .requestMatchers(mvc.pattern("/api/v1/test/public")).permitAll()
                         .requestMatchers(mvc.pattern("/api/public/**")).permitAll()
                         .requestMatchers(mvc.pattern("/api/v1/minio/**")).permitAll() // MinIO endpoints
+                        .requestMatchers(mvc.pattern("/api/v1/user-courses/**")).permitAll()
+                        .requestMatchers(mvc.pattern("/api/v1/course-sections/**")).permitAll()
+                        .requestMatchers(mvc.pattern("/api/v1/user-course-lectures/**")).permitAll()
+                        .requestMatchers(mvc.pattern("/api/v1/tags")).permitAll()
                         .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
                         .requestMatchers(mvc.pattern("/v3/api-docs/**")).permitAll()
                         .anyRequest().authenticated())

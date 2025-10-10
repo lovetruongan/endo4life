@@ -2,14 +2,7 @@ package com.endo4life.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import com.endo4life.web.rest.api.UserV1ApiController;
-import com.endo4life.web.rest.api.ResourceV1ApiController;
-import com.endo4life.web.rest.api.CourseV1ApiController;
-import com.endo4life.web.rest.api.MinioV1ApiController;
-import com.endo4life.web.rest.api.UserV1ApiDelegate;
-import com.endo4life.web.rest.api.ResourceV1ApiDelegate;
-import com.endo4life.web.rest.api.CourseV1ApiDelegate;
-import com.endo4life.web.rest.api.MinioV1ApiDelegate;
+import com.endo4life.web.rest.api.*;
 
 @Configuration
 public class WebConfig {
@@ -35,8 +28,39 @@ public class WebConfig {
     }
 
     @Bean
-    public com.endo4life.web.rest.api.WebhookV1ApiController webhookV1ApiController(
-            com.endo4life.web.rest.api.WebhookV1ApiDelegate delegate) {
-        return new com.endo4life.web.rest.api.WebhookV1ApiController(delegate);
+    public WebhookV1ApiController webhookV1ApiController(WebhookV1ApiDelegate delegate) {
+        return new WebhookV1ApiController(delegate);
+    }
+
+    @Bean
+    public TagV1ApiController tagV1ApiController(TagV1ApiDelegate delegate) {
+        return new TagV1ApiController(delegate);
+    }
+
+    @Bean
+    public CourseSectionV1ApiController courseSectionV1ApiController(CourseSectionV1ApiDelegate delegate) {
+        return new CourseSectionV1ApiController(delegate);
+    }
+
+    @Bean
+    public EnrollCourseV1ApiController enrollCourseV1ApiController(EnrollCourseV1ApiDelegate delegate) {
+        return new EnrollCourseV1ApiController(delegate);
+    }
+
+    @Bean
+    public UserCourseLecturesV1ApiController userCourseLecturesV1ApiController(
+            UserCourseLecturesV1ApiDelegate delegate) {
+        return new UserCourseLecturesV1ApiController(delegate);
+    }
+
+    @Bean
+    public UserCourseV1ApiController userCourseV1ApiController(UserCourseV1ApiDelegate delegate) {
+        return new UserCourseV1ApiController(delegate);
+    }
+
+    @Bean
+    public UserResourceHistoryV1ApiController userResourceHistoryV1ApiController(
+            UserResourceHistoryV1ApiDelegate delegate) {
+        return new UserResourceHistoryV1ApiController(delegate);
     }
 }
