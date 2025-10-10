@@ -488,6 +488,31 @@ paths:
                 items:
                   type: string
 
+  # Doctor and User Conversations APIs
+  /api/v1/doctor-user-conversations:
+    post:
+      description: create a conversation between doctor and user.
+      operationId: createConversationDoctorAndUser
+      tags:
+        - "doctor-user-conversations-v1"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - metadata
+              properties:
+                metadata:
+                  $ref: "#/components/schemas/CreateDoctorUserConversationDto"
+      responses:
+        201:
+          description: A Doctor and User Conversation created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
   # Comment Management APIs
   /api/v1/comments:
     get:
@@ -1198,3 +1223,48 @@ components:
       required:
         - content
         - userInfoId
+    #Doctor and User Conversation:
+    DoctorUserConversationState:
+      type: string
+      enum:
+        - PUBLIC
+        - DRAFT
+    CreateDoctorUserConversationDto:
+      type: object
+      properties:
+        state:
+          allOf:
+            - $ref: "#/components/schemas/DoctorUserConversationState"
+        type:
+          allOf:
+            - $ref: "#/components/schemas/DoctorUserConversationType"
+        resourceId:
+          type: string
+          format: uuid
+        questionerId:
+          type: string
+          format: uuid
+        assigneeId:
+          type: string
+          format: uuid
+        content:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+            format: binary
+            description: "A image attachmented by user or doctor."
+          description: "A list of images attachmented for conversations between doctor and user."
+      required:
+        - state
+        - type
+        - resourceId
+        - questionerId
+        - content
+    DoctorUserConversationType:
+      type: string
+      enum:
+        - VIDEO
+        - IMAGE
+    
