@@ -5,7 +5,6 @@ import com.endo4life.domain.document.Test;
 import com.endo4life.mapper.TestMapper;
 import com.endo4life.repository.CourseRepository;
 import com.endo4life.repository.TestRepository;
-import com.endo4life.web.rest.errors.BadRequestException;
 import com.endo4life.web.rest.model.CreateTestRequestDto;
 import com.endo4life.web.rest.model.TestDetailResponseDto;
 import com.endo4life.web.rest.model.TestResponseDto;
@@ -30,18 +29,16 @@ public class TestServiceImpl implements TestService {
 
     @Override
     public List<TestResponseDto> getTestsByCourseId(UUID courseId) {
-        // Cần thêm phương thức findByCourseId trong TestRepository
-        // return testRepository.findByCourseId(courseId).stream()
-        //         .map(testMapper::toTestResponseDto)
-        //         .collect(Collectors.toList());
-        // Tạm thời trả về list rỗng
-        return List.of();
+        return testRepository.findByCourseId(courseId).stream()
+                .map(testMapper::toTestResponseDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public UUID createTest(CreateTestRequestDto createTestRequestDto) {
         Course course = courseRepository.findById(createTestRequestDto.getCourseId())
-                .orElseThrow(() -> new NotFoundException("Course not found with id: " + createTestRequestDto.getCourseId()));
+                .orElseThrow(
+                        () -> new NotFoundException("Course not found with id: " + createTestRequestDto.getCourseId()));
 
         Test test = testMapper.toTest(createTestRequestDto);
         test.setCourse(course);
