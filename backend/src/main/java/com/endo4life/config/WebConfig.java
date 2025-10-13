@@ -14,6 +14,8 @@ import com.endo4life.web.rest.api.TestV1ApiController;
 import com.endo4life.web.rest.api.TestV1ApiDelegate;
 import com.endo4life.web.rest.api.QuestionV1ApiController;
 import com.endo4life.web.rest.api.QuestionV1ApiDelegate;
+import com.endo4life.web.rest.api.DoctorUserConversationsV1ApiController;
+import com.endo4life.web.rest.api.DoctorUserConversationsV1ApiDelegate;
 
 @Configuration
 public class WebConfig {
@@ -52,5 +54,11 @@ public class WebConfig {
     @Bean
     public QuestionV1ApiController questionV1ApiController(QuestionV1ApiDelegate delegate) {
         return new QuestionV1ApiController(delegate);
+    }
+
+    @Bean
+    public DoctorUserConversationsV1ApiController doctorUserConversationsV1ApiController(
+            DoctorUserConversationsV1ApiDelegate delegate) {
+        return new DoctorUserConversationsV1ApiController(delegate);
     }
 }

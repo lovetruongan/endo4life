@@ -685,29 +685,104 @@ paths:
 
   # Doctor and User Conversations APIs
   /api/v1/doctor-user-conversations:
+    get:
+      description: Get doctor-user conversations by resource
+      operationId: getDoctorUserConversations
+      tags:
+        - "doctor-user-conversations-v1"
+      parameters:
+        - name: criteria
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/DoctorUserConversationCriteria"
+        - name: pageable
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Pageable"
+      responses:
+        200:
+          description: Conversations loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DoctorUserConversationResponsePaginatedDto"
     post:
-      description: create a conversation between doctor and user.
+      description: Create a conversation/question between doctor and user (questioner auto-filled from JWT)
       operationId: createConversationDoctorAndUser
       tags:
         - "doctor-user-conversations-v1"
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
-              type: object
-              required:
-                - metadata
-              properties:
-                metadata:
-                  $ref: "#/components/schemas/CreateDoctorUserConversationDto"
+              $ref: "#/components/schemas/CreateDoctorUserConversationDto"
       responses:
         201:
-          description: A Doctor and User Conversation created successfully
+          description: Doctor-User Conversation created successfully
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/IdWrapperDto"
+
+  /api/v1/doctor-user-conversations/{id}:
+    get:
+      description: Get conversation by ID with replies
+      operationId: getDoctorUserConversationById
+      tags:
+        - "doctor-user-conversations-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Conversation found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DoctorUserConversationResponseDto"
+    put:
+      description: Update conversation (admin/assignee only)
+      operationId: updateDoctorUserConversation
+      tags:
+        - "doctor-user-conversations-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDoctorUserConversationDto"
+      responses:
+        204:
+          description: Conversation updated successfully
+    delete:
+      description: Delete conversation (admin only)
+      operationId: deleteDoctorUserConversation
+      tags:
+        - "doctor-user-conversations-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: Conversation deleted successfully
   # Comment Management APIs
   /api/v1/comments:
     get:
@@ -1597,48 +1672,135 @@ components:
       required:
         - content
         - userInfoId
-    #Doctor and User Conversation:
+    # Doctor and User Conversation schemas
+    DoctorUserConversationCriteria:
+      type: object
+      properties:
+        resourceId:
+          type: string
+          format: uuid
+          description: "Filter by resource ID"
+        questionerId:
+          type: string
+          format: uuid
+          description: "Filter by questioner user ID"
+        assigneeId:
+          type: string
+          format: uuid
+          description: "Filter by assigned doctor ID"
+        state:
+          $ref: "#/components/schemas/DoctorUserConversationState"
+
+    DoctorUserConversationResponsePaginatedDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/DoctorUserConversationResponseDto"
+        total:
+          type: integer
+          format: int64
+
+    DoctorUserConversationResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          $ref: "#/components/schemas/DoctorUserConversationType"
+        state:
+          $ref: "#/components/schemas/DoctorUserConversationState"
+        content:
+          type: string
+          description: "Question or answer content"
+        attachmentUrls:
+          type: array
+          items:
+            type: string
+          description: "Array of presigned URLs for attached images"
+        resourceId:
+          type: string
+          format: uuid
+        questionerInfo:
+          $ref: "#/components/schemas/UserInfoDto"
+          description: "User who asked the question"
+        assigneeInfo:
+          $ref: "#/components/schemas/UserInfoDto"
+          description: "Doctor assigned to answer"
+        parentId:
+          type: string
+          format: uuid
+          description: "Parent conversation ID for replies"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        replies:
+          type: array
+          items:
+            $ref: "#/components/schemas/DoctorUserConversationResponseDto"
+          description: "Nested replies to this conversation"
+
+    CreateDoctorUserConversationDto:
+      type: object
+      properties:
+        state:
+          $ref: "#/components/schemas/DoctorUserConversationState"
+        type:
+          $ref: "#/components/schemas/DoctorUserConversationType"
+        resourceId:
+          type: string
+          format: uuid
+          description: "Resource (video/image) this conversation is about"
+        assigneeId:
+          type: string
+          format: uuid
+          description: "Optional: Doctor to assign the question to"
+        parentId:
+          type: string
+          format: uuid
+          description: "Optional: Parent conversation ID for replies"
+        content:
+          type: string
+          description: "Question or answer content"
+        attachmentUrls:
+          type: array
+          items:
+            type: string
+          description: "Array of MinIO object keys for attachments (uploaded via presigned URLs)"
+      required:
+        - state
+        - type
+        - resourceId
+        - content
+
+    UpdateDoctorUserConversationDto:
+      type: object
+      properties:
+        state:
+          $ref: "#/components/schemas/DoctorUserConversationState"
+        content:
+          type: string
+          description: "Updated content"
+        assigneeId:
+          type: string
+          format: uuid
+          description: "Reassign to different doctor"
+
     DoctorUserConversationState:
       type: string
       enum:
         - PUBLIC
         - DRAFT
-    CreateDoctorUserConversationDto:
-      type: object
-      properties:
-        state:
-          allOf:
-            - $ref: "#/components/schemas/DoctorUserConversationState"
-        type:
-          allOf:
-            - $ref: "#/components/schemas/DoctorUserConversationType"
-        resourceId:
-          type: string
-          format: uuid
-        questionerId:
-          type: string
-          format: uuid
-        assigneeId:
-          type: string
-          format: uuid
-        content:
-          type: string
-        images:
-          type: array
-          items:
-            type: string
-            format: binary
-            description: "A image attachmented by user or doctor."
-          description: "A list of images attachmented for conversations between doctor and user."
-      required:
-        - state
-        - type
-        - resourceId
-        - questionerId
-        - content
+      description: "PUBLIC = visible to all users, DRAFT = not yet published"
+
     DoctorUserConversationType:
       type: string
       enum:
         - VIDEO
         - IMAGE
-    
+      description: "Type of resource being discussed"
