@@ -30,6 +30,8 @@ import com.endo4life.web.rest.api.UserResourceHistoryV1ApiController;
 import com.endo4life.web.rest.api.UserResourceHistoryV1ApiDelegate;
 import com.endo4life.web.rest.api.WebhookV1ApiController;
 import com.endo4life.web.rest.api.WebhookV1ApiDelegate;
+import com.endo4life.web.rest.api.CommentV1ApiController;
+import com.endo4life.web.rest.api.CommentV1ApiDelegate;
 
 @Configuration
 public class WebConfig {
@@ -105,6 +107,11 @@ public class WebConfig {
     public UserResourceHistoryV1ApiController userResourceHistoryV1ApiController(
             UserResourceHistoryV1ApiDelegate delegate) {
         return new UserResourceHistoryV1ApiController(delegate);
+    }
+
+    @Bean
+    public CommentV1ApiController commentV1ApiController(CommentV1ApiDelegate delegate) {
+        return new CommentV1ApiController(delegate);
     }
 
 }

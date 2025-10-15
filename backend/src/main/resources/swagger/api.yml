@@ -2221,7 +2221,6 @@ components:
         - VIDEO
         - IMAGE
       description: "Type of resource being discussed"
-          additionalProperties: true
 
     # Tag schemas
     TagType:
