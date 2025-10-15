@@ -1,6 +1,7 @@
 package com.endo4life.service.resource;
 
 import com.endo4life.web.rest.model.CreateResourceRequest;
+import com.endo4life.web.rest.model.CreateResourceRequestDto;
 import com.endo4life.web.rest.model.ResourceCriteria;
 import com.endo4life.web.rest.model.ResourceDetailResponseDto;
 import com.endo4life.web.rest.model.ResourceResponseDto;
@@ -28,4 +29,14 @@ public interface ResourceService {
     void createThumbnail(MultipartFile file);
 
     void removeThumbnail(String... thumbnailPaths);
+
+    /**
+     * Handle compressed file upload (ZIP/RAR) and extract resources
+     */
+    void handleCompressedFile(MultipartFile file);
+
+    /**
+     * Handle multiple file uploads with metadata
+     */
+    void handleMultipleFile(List<MultipartFile> files, List<CreateResourceRequestDto> metadataList);
 }

@@ -50,7 +50,7 @@ public class UserInfoSpecifications {
             return null;
         }
         return (root, query, builder) -> builder.equal(root.get(UserInfo_.role),
-                com.endo4life.domain.document.UserInfo.UserInfoRole.valueOf(role.getValue()));
+                UserInfo.UserInfoRole.valueOf(role.getValue()));
     }
 
     private Specification<UserInfo> hasState(UserInfoState state) {
@@ -58,7 +58,7 @@ public class UserInfoSpecifications {
             return null;
         }
         return (root, query, builder) -> builder.equal(root.get(UserInfo_.state),
-                com.endo4life.domain.document.UserInfo.UserInfoState.valueOf(state.getValue()));
+                UserInfo.UserInfoState.valueOf(state.getValue()));
     }
 
     private Specification<UserInfo> bySearchWord(final String keyword) {

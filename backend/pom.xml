@@ -172,6 +172,27 @@
             <version>4.4</version>
         </dependency>
         
+        <!-- Apache Commons Compress for ZIP/RAR handling -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.25.0</version>
+        </dependency>
+        
+        <!-- Apache Commons CSV for CSV parsing -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.10.0</version>
+        </dependency>
+        
+        <!-- Junrar for RAR file extraction -->
+        <dependency>
+            <groupId>com.github.junrar</groupId>
+            <artifactId>junrar</artifactId>
+            <version>7.5.5</version>
+        </dependency>
+        
         <!-- Development Tools - TEMPORARILY DISABLED -->
         <!-- <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -63,13 +63,34 @@ public class WebhookServiceImpl implements WebhookService {
         }
     }
 
-    @Description("Handle Put event - auto-generate thumbnails")
+    @Description("Handle Put event - auto-generate thumbnails or process compressed files")
     private void processMinioPutEvent(DetailMinIOEventDto evtDetail) {
         log.info("processPutEvent called for bucket: {}, key: {}", evtDetail.bucket(), evtDetail.objectKey());
         InputStream stream = minioService.getFile(evtDetail.bucket(), evtDetail.objectKey());
 
         if (stream == null) {
             log.error("Failed to get file from MinIO");
+            return;
+        }
+
+        // Handle compressed files from process bucket
+        if (StringUtils.equalsIgnoreCase(evtDetail.bucket(), minioConfig.bucketProcess())) {
+            String contentType = FileUtil.getFileExtension(evtDetail.objectKey());
+            MultipartFile file = FileUtil.toMultipartFile(
+                    stream,
+                    evtDetail.objectKey(),
+                    contentType);
+
+            if (Constants.COMPRESSED_EXTENSIONS.contains(contentType)) {
+                log.info("Processing compressed file: {}", evtDetail.objectKey());
+                resourceService.handleCompressedFile(file);
+            } else {
+                // Handle other process bucket files if needed
+                log.info("Non-compressed file in process bucket: {}", evtDetail.objectKey());
+            }
+
+            // Remove the file from process bucket after processing
+            minioService.removeFile(evtDetail.objectKey(), evtDetail.bucket());
             return;
         }
 

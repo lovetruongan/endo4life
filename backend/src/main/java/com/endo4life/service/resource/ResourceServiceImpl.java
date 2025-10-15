@@ -1,9 +1,18 @@
 package com.endo4life.service.resource;
 
+import com.endo4life.domain.dto.ExtractedFile;
 import com.endo4life.service.file.FileService;
 import com.endo4life.service.minio.MinioService;
-import com.endo4life.utils.minio.MinIOUtil;
-import com.endo4life.web.rest.model.*;
+import com.endo4life.service.tag.TagService;
+import com.endo4life.utils.FileUtil;
+import com.endo4life.utils.ResourceUtil;
+import com.endo4life.web.rest.model.CreateResourceRequest;
+import com.endo4life.web.rest.model.CreateResourceRequestDto;
+import com.endo4life.web.rest.model.ResourceCriteria;
+import com.endo4life.web.rest.model.ResourceDetailResponseDto;
+import com.endo4life.web.rest.model.ResourceResponseDto;
+import com.endo4life.web.rest.model.UpdateResourceRequestDto;
+import com.endo4life.web.rest.model.UploadType;
 import jakarta.annotation.PostConstruct;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +25,7 @@ import com.endo4life.mapper.ResourceMapper;
 import com.endo4life.repository.ResourceRepository;
 import com.endo4life.repository.specifications.ResourceSpecifications;
 import com.endo4life.security.UserContextHolder;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -23,6 +33,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import com.endo4life.domain.document.Resource.ResourceType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +50,7 @@ public class ResourceServiceImpl implements ResourceService {
     private final ResourceMapper resourceMapper;
     private final MinioService minioService;
     private final FileService fileService;
+    private final TagService tagService;
     private final ApplicationProperties applicationProperties;
     private ApplicationProperties.MinioConfiguration minioConfig;
 
@@ -83,7 +95,7 @@ public class ResourceServiceImpl implements ResourceService {
                     resource.setUpdatedBy(UserContextHolder.getEmail().orElse(Constants.SYSTEM));
 
                     if (Objects.isNull(resource.getState())) {
-                        resource.setState(com.endo4life.domain.document.Resource.ResourceState.UNLISTED);
+                        resource.setState(Resource.ResourceState.UNLISTED);
                     }
                     if (Objects.nonNull(request.getThumbnail())) {
                         resource.setThumbnail(request.getThumbnail().toString());
@@ -213,15 +225,116 @@ public class ResourceServiceImpl implements ResourceService {
         }
     }
 
-    private com.endo4life.domain.document.Resource.ResourceType getUploadTypeCreateResource(UploadType uploadType) {
+    @Override
+    public void handleCompressedFile(MultipartFile file) {
+        var fileMap = fileService.processCompressedFile(file);
+        log.info("Handle compressed file with {} files", fileMap.size());
+        List<MultipartFile> files = fileMap.keySet().stream().map(ExtractedFile::getFile).toList();
+        List<CreateResourceRequestDto> metadataList = fileMap.entrySet().stream().map(entry -> {
+            ExtractedFile extractedFile = entry.getKey();
+            CreateResourceRequestDto metadata = entry.getValue();
+
+            List<String> tags = extractedFile.getTag();
+            if (CollectionUtils.isEmpty(tags)) {
+                return metadata;
+            }
+            List<String> regularTags = new ArrayList<>();
+            List<String> detailTags = new ArrayList<>();
+
+            for (String tag : tags) {
+                if (tagService.isDetailTag(tag)) {
+                    detailTags.add(tag);
+                } else {
+                    regularTags.add(tag);
+                }
+            }
+            metadata.setTag(regularTags);
+            metadata.setDetailTag(detailTags);
+
+            return metadata;
+        }).toList();
+        handleMultipleFile(files, metadataList);
+    }
+
+    @Override
+    public void handleMultipleFile(List<MultipartFile> files, List<CreateResourceRequestDto> metadataList) {
+        log.info("Handle multiple files: {}", files.size());
+        for (int i = 0; i < files.size(); i++) {
+            MultipartFile file = files.get(i);
+            CreateResourceRequestDto metadata = metadataList.get(i);
+
+            // Determine resource type
+            ResourceType type = getResourceTypeFromFile(file);
+            String bucketName = minioService.getBucketFromResourceType(type.getValue());
+
+            // Upload file to MinIO
+            UUID id = UUID.randomUUID();
+            String fileName = id + Constants.UNDERSCORE + file.getOriginalFilename();
+            minioService.uploadFile(file, bucketName, fileName);
+
+            // Create resource in database
+            createResource(metadata, file, type, fileName);
+        }
+    }
+
+    private void createResource(CreateResourceRequestDto request, MultipartFile file,
+            ResourceType type, String fileName) {
+        Resource resource = new Resource();
+        resourceMapper.toResource(resource, request);
+        resource.setType(type);
+        resource.setPath(fileName);
+        resource.setCreatedBy(UserContextHolder.getEmail().orElse(Constants.SYSTEM));
+        resource.setUpdatedBy(UserContextHolder.getEmail().orElse(Constants.SYSTEM));
+
+        // Convert domain ResourceType to web ResourceType for utility method
+        var webResourceType = convertToWebResourceType(type);
+        resource.setDimension(ResourceUtil.getDimensions(file, webResourceType));
+        resource.setSize(ResourceUtil.getSize(file));
+
+        if (Objects.nonNull(request.getThumbnail()) &&
+                StringUtils.isNotBlank(request.getThumbnail().toString())) {
+            resource.setThumbnail(request.getThumbnail().toString());
+        }
+
+        if (type == ResourceType.VIDEO) {
+            resource.setTime(FileUtil.getVideoDuration(file));
+        }
+
+        resourceRepository.saveAndFlush(resource);
+    }
+
+    private com.endo4life.web.rest.model.ResourceType convertToWebResourceType(ResourceType type) {
+        return switch (type) {
+            case VIDEO -> com.endo4life.web.rest.model.ResourceType.VIDEO;
+            case IMAGE -> com.endo4life.web.rest.model.ResourceType.IMAGE;
+            case AVATAR -> com.endo4life.web.rest.model.ResourceType.AVATAR;
+            case THUMBNAIL -> com.endo4life.web.rest.model.ResourceType.THUMBNAIL;
+            case OTHER -> com.endo4life.web.rest.model.ResourceType.OTHER;
+            case PROCESS -> com.endo4life.web.rest.model.ResourceType.PROCESS;
+        };
+    }
+
+    private ResourceType getResourceTypeFromFile(MultipartFile file) {
+        String contentType = file.getContentType();
+        if (contentType != null) {
+            if (contentType.startsWith("video/")) {
+                return ResourceType.VIDEO;
+            } else if (contentType.startsWith("image/")) {
+                return ResourceType.IMAGE;
+            }
+        }
+        return ResourceType.OTHER;
+    }
+
+    private ResourceType getUploadTypeCreateResource(UploadType uploadType) {
         if (StringUtils.equalsIgnoreCase(uploadType.getValue(), Constants.VIDEO_RESOURCE_TYPE)) {
-            return com.endo4life.domain.document.Resource.ResourceType.VIDEO;
+            return ResourceType.VIDEO;
         }
         if (StringUtils.equalsIgnoreCase(uploadType.getValue(), Constants.IMAGE_RESOURCE_TYPE)) {
-            return com.endo4life.domain.document.Resource.ResourceType.IMAGE;
+            return ResourceType.IMAGE;
         }
         if (StringUtils.equalsIgnoreCase(uploadType.getValue(), Constants.OTHER_RESOURCE_TYPE)) {
-            return com.endo4life.domain.document.Resource.ResourceType.OTHER;
+            return ResourceType.OTHER;
         }
         return null;
     }
