@@ -1,6 +1,8 @@
 package com.endo4life.service.minio;
 
 import com.endo4life.constant.Constants;
+import com.endo4life.domain.dto.FileUploadProgressListener;
+import com.endo4life.service.notification.NotificationService;
 import io.minio.*;
 import io.minio.http.Method;
 import io.minio.messages.DeleteError;
@@ -27,6 +29,7 @@ public class MinioServiceImpl implements MinioService {
 
     private final MinioClient minioClient;
     private final MinioProperties properties;
+    private final NotificationService notificationService;
 
     @Override
     @SneakyThrows
@@ -144,9 +147,13 @@ public class MinioServiceImpl implements MinioService {
     }
 
     public String uploadChunk(MultipartFile file, String bucketName, String fileName) {
+        long totalBytes = file.getSize();
+        FileUploadProgressListener progressListener = new FileUploadProgressListener(
+                fileName, totalBytes, notificationService);
+
         List<String> partObjectNames = new ArrayList<>();
         int partNumber = 1;
-        int bufferSize = 10 * 1024 * 1024; // 10MB buffer
+        int bufferSize = 10 * 1024 * 1024; // 10MB buffer for performance
         byte[] buffer = new byte[bufferSize];
 
         try (InputStream inputStream = file.getInputStream()) {
@@ -154,6 +161,7 @@ public class MinioServiceImpl implements MinioService {
             while ((bytesRead = inputStream.read(buffer, 0, buffer.length)) != -1) {
                 String partObjectName = fileName + ".part" + partNumber;
 
+                // Only log every 5 parts or at the start to reduce I/O overhead
                 if (partNumber % 5 == 0 || partNumber == 1) {
                     log.info("Begin uploading part {}", partObjectName);
                 }
@@ -166,6 +174,7 @@ public class MinioServiceImpl implements MinioService {
                                 .build());
 
                 partObjectNames.add(partObjectName);
+                progressListener.updateProgress(bytesRead);
 
                 if (partNumber % 5 == 0 || partNumber == 1) {
                     log.info("Process part {} complete", partObjectName);
@@ -174,9 +183,11 @@ public class MinioServiceImpl implements MinioService {
             }
 
             composeObject(bucketName, fileName, partObjectNames);
+            notificationService.notifyUploadSuccess(fileName);
             return fileName;
         } catch (Exception e) {
             log.error("Error uploading file {}: {}", fileName, e.getMessage(), e);
+            notificationService.notifyUploadFailure(fileName, e.getMessage());
             return null;
         }
     }

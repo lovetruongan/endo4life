@@ -267,10 +267,12 @@ public class ResourceServiceImpl implements ResourceService {
             ResourceType type = getResourceTypeFromFile(file);
             String bucketName = minioService.getBucketFromResourceType(type.getValue());
 
-            // Upload file to MinIO
+            // Upload file to MinIO with progress tracking
             UUID id = UUID.randomUUID();
             String fileName = id + Constants.UNDERSCORE + file.getOriginalFilename();
-            minioService.uploadFile(file, bucketName, fileName);
+
+            // Use chunked upload for compressed file extraction (always has progress)
+            minioService.uploadChunk(file, bucketName, fileName);
 
             // Create resource in database
             createResource(metadata, file, type, fileName);
