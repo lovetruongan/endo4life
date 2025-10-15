@@ -1,6 +1,9 @@
 logging:
   level:
     ROOT: INFO
+    com.endo4life: DEBUG
+    com.endo4life.service: DEBUG
+    com.endo4life.web.rest: DEBUG
     org.springframework.cache: TRACE
     com.endo4life: DEBUG
     org.hibernate.SQL: ERROR

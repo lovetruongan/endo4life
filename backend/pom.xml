@@ -193,6 +193,12 @@
             <version>7.5.5</version>
         </dependency>
         
+        <!-- AspectJ for AOP Logging -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        
         <!-- Development Tools - TEMPORARILY DISABLED -->
         <!-- <dependency>
             <groupId>org.springframework.boot</groupId>
