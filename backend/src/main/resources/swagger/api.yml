@@ -827,12 +827,457 @@ paths:
               schema:
                 $ref: "#/components/schemas/IdWrapperDto"
 
+  # Tag Management APIs
+  /api/v1/tags:
+    get:
+      description: Get tags by parent and type
+      operationId: getTags
+      security: []
+      tags:
+        - "tag-v1"
+      parameters:
+        - name: parentTag
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+        - name: type
+          in: query
+          schema:
+            $ref: "#/components/schemas/TagType"
+      responses:
+        200:
+          description: Tags retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TagResponseDto"
+    post:
+      description: Create new tags
+      operationId: createTag
+      tags:
+        - "tag-v1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTagRequestDto"
+      responses:
+        201:
+          description: Tags created successfully
+    delete:
+      description: Delete tags
+      operationId: deleteTag
+      tags:
+        - "tag-v1"
+      parameters:
+        - name: tagIds
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+        - name: tagDetailIds
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+      responses:
+        204:
+          description: Tags deleted successfully
+
+  # Course Section APIs
+  /api/v1/course-sections:
+    get:
+      description: Get course sections by criteria
+      operationId: getCourseSections
+      tags:
+        - "course-section-v1"
+      parameters:
+        - name: criteria
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/CourseSectionCriteria"
+        - name: pageable
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Pageable"
+      responses:
+        200:
+          description: Course sections loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseSectionResponsePaginatedDto"
+    post:
+      description: Create a new course section
+      operationId: createCourseSection
+      tags:
+        - "course-section-v1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCourseSectionRequestDto"
+      responses:
+        201:
+          description: Course section created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+    delete:
+      description: Delete course sections by list of ids
+      operationId: deleteCourseSections
+      tags:
+        - "course-section-v1"
+      parameters:
+        - name: ids
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+      responses:
+        204:
+          description: Course sections deleted successfully
+
+  /api/v1/course-sections/{id}:
+    get:
+      description: Get course section by ID
+      operationId: getCourseSectionById
+      tags:
+        - "course-section-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Course section found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseDetailCourseSectionDto"
+    put:
+      description: Update course section
+      operationId: updateCourseSection
+      tags:
+        - "course-section-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                metadata:
+                  $ref: "#/components/schemas/UpdateCourseSectionRequestDto"
+              required:
+                - metadata
+      responses:
+        200:
+          description: Course section updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+    delete:
+      description: Delete a course section
+      operationId: deleteCourseSection
+      tags:
+        - "course-section-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: Course section deleted successfully
+
+  # User Course APIs
+  /api/v1/user/courses:
+    get:
+      description: Get all courses for user screen
+      operationId: getUserCourses
+      security: []
+      tags:
+        - "user-course-v1"
+      parameters:
+        - name: criteria
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/CourseCriteria"
+        - name: pageable
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Pageable"
+      responses:
+        200:
+          description: User courses loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserCourseResponsePaginatedDto"
+
+  /api/v1/user/courses/progress:
+    get:
+      description: Get progress of courses for user
+      operationId: getProgressCoursesUser
+      tags:
+        - "user-course-v1"
+      parameters:
+        - name: userInfoId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Progress of courses loaded successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserProgressCourseDto"
+
+  /api/v1/user/courses/progress/status:
+    get:
+      description: Get status progress of course for user
+      operationId: getStatusProgressCourseUser
+      tags:
+        - "user-course-v1"
+      parameters:
+        - name: userInfoId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: courseId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Status progress loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatusUserProgressCourseDto"
+
+  /api/v1/user/courses/{id}:
+    get:
+      description: Get user course by ID
+      operationId: getUserCourseById
+      security: []
+      tags:
+        - "user-course-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userInfoId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: User course loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponseDetailCourseDto"
+
+  # Enroll Course APIs
+  /api/v1/user/courses/{id}/enroll:
+    post:
+      description: Enroll a user into a specific course
+      operationId: enrollUserInCourse
+      tags:
+        - "enroll-course-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: "Course ID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserInfoEnrollCourseDto"
+      responses:
+        201:
+          description: User enrolled successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+
+  # User Course Lectures APIs
+  /api/v1/user/courses/{courseId}/lectures:
+    get:
+      description: Get lectures for a course the user has enrolled in
+      operationId: getUserCourseLectures
+      security: []
+      tags:
+        - "user-course-lectures-v1"
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userInfoId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Lectures retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LectureAndTestDto"
+
+  /api/v1/user/courses/lectures/{id}:
+    put:
+      description: Record lecture progress
+      operationId: recordCourseSectionData
+      tags:
+        - "user-course-lectures-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: "User progress course section ID"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecordDataUserCourseSectionDto"
+      responses:
+        201:
+          description: Progress recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+
+  # User Resource History APIs
+  /api/v1/user/resources-accessed:
+    get:
+      description: Get resources accessed by user
+      operationId: getResourcesAccessedByUserInfoIdAndType
+      tags:
+        - "user-resource-history-v1"
+      parameters:
+        - name: criteria
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/UserResourceHistoryCriteria"
+        - name: pageable
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Pageable"
+      responses:
+        200:
+          description: User resources loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResourcesAccessedResponsePaginatedDto"
+    post:
+      description: Create a resource accessed by user
+      operationId: createUserResource
+      tags:
+        - "user-resource-history-v1"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                userInfoId:
+                  type: string
+                  format: uuid
+                resourceId:
+                  type: string
+                  format: uuid
+                type:
+                  allOf:
+                    - $ref: "#/components/schemas/UserResourceType"
+              required:
+                - userInfoId
+                - resourceId
+                - type
+      responses:
+        201:
+          description: User resource created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdWrapperDto"
+
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      description: "Enter JWT Bearer token"
 
   schemas:
     # Common schemas
@@ -993,34 +1438,6 @@ components:
         - PUBLIC
         - PRIVATE
         - ARCHIVED
-
-    # Course Section schemas
-    CourseSectionResponseDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        title:
-          type: string
-        state:
-          type: string
-        thumbnail:
-          type: string
-        thumbnailUrl:
-          type: string
-        totalCredits:
-          type: integer
-        videoDuration:
-          type: integer
-        tags:
-          type: array
-          items:
-            type: string
-        tagsDetail:
-          type: array
-          items:
-            type: string
 
     # Resource schemas
     ResourceResponsePaginatedDto:
@@ -1804,3 +2221,413 @@ components:
         - VIDEO
         - IMAGE
       description: "Type of resource being discussed"
+          additionalProperties: true
+
+    # Tag schemas
+    TagType:
+      type: string
+      enum:
+        - DAMAGE_TAG
+        - ANATOMY_LOCATION_TAG
+        - HP_TAG
+        - LIGHT_TAG
+        - UPPER_GASTRO_ANATOMY_TAG
+
+    TagResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        content:
+          type: string
+        type:
+          $ref: "#/components/schemas/TagType"
+
+    CreateTagRequestDto:
+      type: object
+      properties:
+        tag:
+          type: array
+          items:
+            type: string
+        detailTag:
+          type: array
+          items:
+            type: string
+        type:
+          $ref: "#/components/schemas/TagType"
+
+    # Course Section schemas
+    CourseSectionCriteria:
+      type: object
+      properties:
+        courseId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        state:
+          $ref: "#/components/schemas/CourseState"
+
+    CourseSectionResponsePaginatedDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/CourseSectionResponseDto"
+        total:
+          type: integer
+          format: int64
+
+    CourseSectionResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        state:
+          $ref: "#/components/schemas/CourseState"
+        thumbnailUrl:
+          type: string
+        attachments:
+          type: string
+        lastUpdated:
+          type: string
+          format: date-time
+
+    CreateCourseSectionRequestDto:
+      type: object
+      properties:
+        courseId:
+          type: string
+          format: uuid
+        state:
+          $ref: "#/components/schemas/CourseState"
+        title:
+          type: string
+        attribute:
+          type: object
+          properties:
+            metadata:
+              $ref: "#/components/schemas/MetaDataCourseSectionDto"
+        totalCredits:
+          type: integer
+        tags:
+          type: array
+          items:
+            type: string
+        tagsDetail:
+          type: array
+          items:
+            type: string
+        thumbnail:
+          type: string
+          format: uuid
+        attachments:
+          type: string
+          format: uuid
+        videoDuration:
+          type: integer
+      required:
+        - courseId
+
+    UpdateCourseSectionRequestDto:
+      type: object
+      properties:
+        state:
+          $ref: "#/components/schemas/CourseState"
+        title:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        tagsDetail:
+          type: array
+          items:
+            type: string
+        totalCredits:
+          type: integer
+        attribute:
+          type: object
+          properties:
+            metadata:
+              $ref: "#/components/schemas/MetaDataCourseSectionDto"
+        thumbnail:
+          type: string
+          format: uuid
+        attachments:
+          type: string
+          format: uuid
+        videoDuration:
+          type: integer
+
+    ResponseDetailCourseSectionDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        state:
+          $ref: "#/components/schemas/CourseState"
+        title:
+          type: string
+        attribute:
+          type: object
+          properties:
+            metadata:
+              $ref: "#/components/schemas/MetaDataCourseSectionDto"
+        tags:
+          type: array
+          items:
+            type: string
+        tagsDetail:
+          type: array
+          items:
+            type: string
+        thumbnailUrl:
+          type: string
+        attachmentUrl:
+          type: string
+        attachment:
+          type: string
+        createdBy:
+          type: string
+        updatedBy:
+          type: string
+        totalCredits:
+          type: integer
+        videoDuration:
+          type: integer
+
+    MetaDataCourseSectionDto:
+      type: object
+      properties:
+        description:
+          type: string
+        mainContent:
+          type: string
+        lessonObjectives:
+          type: string
+        target:
+          type: string
+
+    # User Course schemas
+    UserCourseResponsePaginatedDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserCourseResponseDto"
+        total:
+          type: integer
+          format: int64
+
+    UserCourseResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        description:
+          type: string
+        title:
+          type: string
+        state:
+          $ref: "#/components/schemas/CourseState"
+        thumbnailUrl:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UserResponseDetailCourseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        state:
+          $ref: "#/components/schemas/CourseState"
+        title:
+          type: string
+        description:
+          type: string
+        lecturer:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        tagsDetail:
+          type: array
+          items:
+            type: string
+        thumbnailUrl:
+          type: string
+        createdBy:
+          type: string
+        updatedBy:
+          type: string
+        participantsCount:
+          type: integer
+        userRegistrationCourseId:
+          type: string
+          format: uuid
+        isEnrolledCourse:
+          type: boolean
+        createdByInfo:
+          $ref: "#/components/schemas/UserInfoDto"
+
+    UserProgressCourseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        courseId:
+          type: string
+          format: uuid
+        courseTitle:
+          type: string
+        totalLectures:
+          type: integer
+        numberLecturesCompleted:
+          type: integer
+        thumbnailUrl:
+          type: string
+
+    StatusUserProgressCourseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userInfoId:
+          type: string
+          format: uuid
+        courseId:
+          type: string
+          format: uuid
+        isCompletedEntranceTest:
+          type: boolean
+        isCompletedSurveyCourse:
+          type: boolean
+        isCompletedTotalCourseSection:
+          type: boolean
+        isCompletedFinalCourseTest:
+          type: boolean
+        isCompletedCourse:
+          type: boolean
+
+    UserInfoEnrollCourseDto:
+      type: object
+      properties:
+        userInfoId:
+          type: string
+          format: uuid
+      required:
+        - userInfoId
+
+    # User Course Lectures schemas
+    LectureAndTestDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "User progress course section ID"
+        courseSectionId:
+          type: string
+          format: uuid
+          description: "Course section ID"
+        state:
+          $ref: "#/components/schemas/CourseState"
+        title:
+          type: string
+        attribute:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        tagsDetail:
+          type: array
+          items:
+            type: string
+        attachmentUrl:
+          type: string
+        createdAt:
+          type: string
+        createdBy:
+          type: string
+        updatedBy:
+          type: string
+        totalCredits:
+          type: integer
+        videoDuration:
+          type: integer
+        totalQuestionLectureReviewTest:
+          type: integer
+        isCompletedVideoCourseSection:
+          type: boolean
+        isCompletedLectureReviewQuestion:
+          type: boolean
+        isCompletedCourseSection:
+          type: boolean
+
+    RecordDataUserCourseSectionDto:
+      type: object
+      properties:
+        totalTimeUserWatchedVideo:
+          type: integer
+          description: "Total time in seconds"
+      required:
+        - totalTimeUserWatchedVideo
+
+    # User Resource History schemas
+    UserResourceType:
+      type: string
+      enum:
+        - IMAGE
+        - VIDEO
+
+    UserResourceHistoryCriteria:
+      type: object
+      properties:
+        userInfoId:
+          type: string
+          format: uuid
+        type:
+          $ref: "#/components/schemas/UserResourceType"
+      required:
+        - userInfoId
+        - type
+
+    UserResourcesAccessedResponsePaginatedDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserResourcesAccessedResponseDto"
+        total:
+          type: integer
+          format: int64
+
+    UserResourcesAccessedResponseDto:
+      type: object
+      properties:
+        resource:
+          $ref: "#/components/schemas/ResourceResponseDto"
+        createdAt:
+          type: string
+          format: date-time

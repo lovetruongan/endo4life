@@ -16,6 +16,20 @@ import com.endo4life.web.rest.api.QuestionV1ApiController;
 import com.endo4life.web.rest.api.QuestionV1ApiDelegate;
 import com.endo4life.web.rest.api.DoctorUserConversationsV1ApiController;
 import com.endo4life.web.rest.api.DoctorUserConversationsV1ApiDelegate;
+import com.endo4life.web.rest.api.TagV1ApiController;
+import com.endo4life.web.rest.api.TagV1ApiDelegate;
+import com.endo4life.web.rest.api.CourseSectionV1ApiController;
+import com.endo4life.web.rest.api.CourseSectionV1ApiDelegate;
+import com.endo4life.web.rest.api.EnrollCourseV1ApiController;
+import com.endo4life.web.rest.api.EnrollCourseV1ApiDelegate;
+import com.endo4life.web.rest.api.UserCourseLecturesV1ApiController;
+import com.endo4life.web.rest.api.UserCourseLecturesV1ApiDelegate;
+import com.endo4life.web.rest.api.UserCourseV1ApiController;
+import com.endo4life.web.rest.api.UserCourseV1ApiDelegate;
+import com.endo4life.web.rest.api.UserResourceHistoryV1ApiController;
+import com.endo4life.web.rest.api.UserResourceHistoryV1ApiDelegate;
+import com.endo4life.web.rest.api.WebhookV1ApiController;
+import com.endo4life.web.rest.api.WebhookV1ApiDelegate;
 
 @Configuration
 public class WebConfig {
@@ -41,9 +55,8 @@ public class WebConfig {
     }
 
     @Bean
-    public com.endo4life.web.rest.api.WebhookV1ApiController webhookV1ApiController(
-            com.endo4life.web.rest.api.WebhookV1ApiDelegate delegate) {
-        return new com.endo4life.web.rest.api.WebhookV1ApiController(delegate);
+    public WebhookV1ApiController webhookV1ApiController(WebhookV1ApiDelegate delegate) {
+        return new WebhookV1ApiController(delegate);
     }
 
     @Bean
@@ -61,4 +74,37 @@ public class WebConfig {
             DoctorUserConversationsV1ApiDelegate delegate) {
         return new DoctorUserConversationsV1ApiController(delegate);
     }
+
+    @Bean
+    public TagV1ApiController tagV1ApiController(TagV1ApiDelegate delegate) {
+        return new TagV1ApiController(delegate);
+    }
+
+    @Bean
+    public CourseSectionV1ApiController courseSectionV1ApiController(CourseSectionV1ApiDelegate delegate) {
+        return new CourseSectionV1ApiController(delegate);
+    }
+
+    @Bean
+    public EnrollCourseV1ApiController enrollCourseV1ApiController(EnrollCourseV1ApiDelegate delegate) {
+        return new EnrollCourseV1ApiController(delegate);
+    }
+
+    @Bean
+    public UserCourseLecturesV1ApiController userCourseLecturesV1ApiController(
+            UserCourseLecturesV1ApiDelegate delegate) {
+        return new UserCourseLecturesV1ApiController(delegate);
+    }
+
+    @Bean
+    public UserCourseV1ApiController userCourseV1ApiController(UserCourseV1ApiDelegate delegate) {
+        return new UserCourseV1ApiController(delegate);
+    }
+
+    @Bean
+    public UserResourceHistoryV1ApiController userResourceHistoryV1ApiController(
+            UserResourceHistoryV1ApiDelegate delegate) {
+        return new UserResourceHistoryV1ApiController(delegate);
+    }
+
 }
