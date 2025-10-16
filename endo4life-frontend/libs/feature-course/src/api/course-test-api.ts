@@ -1,7 +1,7 @@
 import {
   BaseApi,
   CourseV1Api,
-  PreSignedUrlV1Api,
+  MinioV1Api,
   TestV1Api,
 } from '@endo4life/data-access';
 import {
@@ -56,7 +56,7 @@ export class CourseTestApiImpl extends BaseApi implements ICourseTestApi {
   ) {
     const transformedQuestions: Record<string, IQuestionEntity> = {};
     const config = await this.getApiConfiguration();
-    const presignApi = new PreSignedUrlV1Api(config);
+    const presignApi = new MinioV1Api(config);
     const imageToUploads = test.questionIds
       .map((questionId) => questions[questionId])
       .filter((item) => {

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import BaseApi from './base-api';
-import { PreSignedUrlV1Api, ResourceType } from '../generated';
+import { MinioV1Api, ResourceType } from '../generated';
 
 export interface IStorageApi {
   getPresignUrls(
@@ -25,7 +25,7 @@ export class StorageApiImpl extends BaseApi implements IStorageApi {
     resourceType: ResourceType = 'IMAGE',
   ): Promise<string[]> {
     const config = await this.getApiConfiguration();
-    const presignApi = new PreSignedUrlV1Api(config);
+    const presignApi = new MinioV1Api(config);
     return presignApi
       .generatePreSignedUrls({
         generatePreSignedUrlDto: {

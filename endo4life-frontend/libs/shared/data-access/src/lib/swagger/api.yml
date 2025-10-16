@@ -4,8 +4,6 @@ info:
   description: 'AI-integrated e-Learning platform for endometriosis education'
   version: 1.0.0
 servers:
-  - url: https://api.endo4life.shop
-    description: Production server
   - url: http://localhost:8080
     description: Development server
 security:
