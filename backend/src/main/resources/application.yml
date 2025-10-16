@@ -5,7 +5,6 @@ logging:
     com.endo4life.service: DEBUG
     com.endo4life.web.rest: DEBUG
     org.springframework.cache: TRACE
-    com.endo4life: DEBUG
     org.hibernate.SQL: ERROR
     org.hibernate.orm.jdbc.bind: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: DEBUG
@@ -13,9 +12,7 @@ logging:
     org.springframework.boot.devtools: ERROR
     org.springframework.web.socket: DEBUG
     org.springframework.messaging: DEBUG
-  com:
-    fasterxml:
-      jackson: DEBUG
+    com.fasterxml.jackson: DEBUG
 
 server:
   port: 8080

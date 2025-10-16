@@ -56,14 +56,20 @@ import org.apache.commons.csv.CSVRecord;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
 
-    @Qualifier("taskExecutor")
     private final Executor taskExecutor;
     private final MinioService minioService;
     private final ApplicationProperties applicationProperties;
     private ApplicationProperties.MinioConfiguration minioConfig;
+
+    public FileServiceImpl(@Qualifier("taskExecutor") Executor taskExecutor,
+                           MinioService minioService,
+                           ApplicationProperties applicationProperties) {
+        this.taskExecutor = taskExecutor;
+        this.minioService = minioService;
+        this.applicationProperties = applicationProperties;
+    }
 
     @PostConstruct
     private void init() {
