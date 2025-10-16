@@ -116,15 +116,18 @@ public class ResourceUtil {
         FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(stream);
         Java2DFrameConverter converter = new Java2DFrameConverter();
 
-        grabber.start(false);
+        grabber.start();
         BufferedImage bufferedImage = null;
-        for (int i = 0; i < grabber.getLengthInFrames(); i++) {
-            var frame = grabber.grabKeyFrame();
-            if (frame != null) {
-                bufferedImage = converter.convert(grabber.grab());
+        
+        // Try to grab the first valid frame
+        for (int i = 0; i < 100; i++) { // Try first 100 frames
+            var frame = grabber.grab();
+            if (frame != null && frame.image != null) {
+                bufferedImage = converter.convert(frame);
                 break;
             }
         }
+        
         grabber.stop();
         if (bufferedImage != null) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();

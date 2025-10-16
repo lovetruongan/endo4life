@@ -45,28 +45,56 @@ public abstract class ResourceMapper {
     public abstract ResourceResponseDto toResourceResponseDto(Resource resource);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "viewNumber", ignore = true)
-    @Mapping(target = "commentCount", ignore = true)
-    @Mapping(target = "detailTag", ignore = true)
-    @Mapping(target = "anatomyLocationTag", ignore = true)
-    @Mapping(target = "hpTag", ignore = true)
-    @Mapping(target = "lightTag", ignore = true)
-    @Mapping(target = "upperGastroAnatomyTag", ignore = true)
-    @Mapping(target = "labelPolygon", ignore = true)
-    @Mapping(target = "path", ignore = true)
-    @Mapping(target = "thumbnail", ignore = true)
-    @Mapping(target = "dimension", ignore = true)
-    @Mapping(target = "size", ignore = true)
-    @Mapping(target = "time", ignore = true)
-    @Mapping(target = "extension", ignore = true)
-    @Mapping(target = "type", ignore = true)
-    @Mapping(target = "state", ignore = true)
     public abstract void toResource(@org.mapstruct.MappingTarget Resource resource,
-            CreateResourceRequestDto createRequest);
+            UpdateResourceRequestDto updateRequest);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     public abstract void toResource(@org.mapstruct.MappingTarget Resource resource,
-            UpdateResourceRequestDto updateRequest);
+            CreateResourceRequestDto createRequest);
+
+    @org.mapstruct.AfterMapping
+    protected void updateTags(@org.mapstruct.MappingTarget Resource resource, UpdateResourceRequestDto updateRequest) {
+        if (Objects.nonNull(updateRequest.getDetailTag())) {
+            resource.setDetailTag(new java.util.ArrayList<>(updateRequest.getDetailTag()));
+        }
+        if (Objects.nonNull(updateRequest.getTag())) {
+            resource.setTag(new java.util.ArrayList<>(updateRequest.getTag()));
+        }
+        if (Objects.nonNull(updateRequest.getAnatomyLocationTag())) {
+            resource.setAnatomyLocationTag(updateRequest.getAnatomyLocationTag());
+        }
+        if (Objects.nonNull(updateRequest.getHpTag())) {
+            resource.setHpTag(new java.util.ArrayList<>(updateRequest.getHpTag()));
+        }
+        if (Objects.nonNull(updateRequest.getLightTag())) {
+            resource.setLightTag(new java.util.ArrayList<>(updateRequest.getLightTag()));
+        }
+        if (Objects.nonNull(updateRequest.getUpperGastroAnatomyTag())) {
+            resource.setUpperGastroAnatomyTag(new java.util.ArrayList<>(updateRequest.getUpperGastroAnatomyTag()));
+        }
+    }
+
+    @org.mapstruct.AfterMapping
+    protected void createTags(@org.mapstruct.MappingTarget Resource resource, CreateResourceRequestDto createRequest) {
+        if (Objects.nonNull(createRequest.getDetailTag())) {
+            resource.setDetailTag(new java.util.ArrayList<>(createRequest.getDetailTag()));
+        }
+        if (Objects.nonNull(createRequest.getTag())) {
+            resource.setTag(new java.util.ArrayList<>(createRequest.getTag()));
+        }
+        if (Objects.nonNull(createRequest.getAnatomyLocationTag())) {
+            resource.setAnatomyLocationTag(createRequest.getAnatomyLocationTag());
+        }
+        if (Objects.nonNull(createRequest.getHpTag())) {
+            resource.setHpTag(new java.util.ArrayList<>(createRequest.getHpTag()));
+        }
+        if (Objects.nonNull(createRequest.getLightTag())) {
+            resource.setLightTag(new java.util.ArrayList<>(createRequest.getLightTag()));
+        }
+        if (Objects.nonNull(createRequest.getUpperGastroAnatomyTag())) {
+            resource.setUpperGastroAnatomyTag(new java.util.ArrayList<>(createRequest.getUpperGastroAnatomyTag()));
+        }
+    }
 
     @Named("thumbnailToUrl")
     public String thumbnailToUrl(Resource resource) {
@@ -77,11 +105,7 @@ public abstract class ResourceMapper {
         if (StringUtils.isBlank(thumbnail)) {
             return null;
         }
-        if (StringUtils.equalsIgnoreCase(resource.getType().getValue(), Constants.IMAGE_RESOURCE_TYPE)) {
-            return minioService.createGetPreSignedLink(thumbnail, bucketImage);
-        } else {
-            return minioService.createGetPreSignedLink(thumbnail, bucketThumbnail);
-        }
+        return minioService.createGetPreSignedLink(thumbnail, bucketThumbnail);
     }
 
     @Named("resourcePathToUrl")

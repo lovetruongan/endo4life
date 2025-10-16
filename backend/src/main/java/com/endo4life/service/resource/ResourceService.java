@@ -29,6 +29,8 @@ public interface ResourceService {
     void createThumbnail(MultipartFile file);
 
     void removeThumbnail(String... thumbnailPaths);
+    
+    void updateResourceThumbnail(String objectKey);
 
     /**
      * Handle compressed file upload (ZIP/RAR) and extract resources

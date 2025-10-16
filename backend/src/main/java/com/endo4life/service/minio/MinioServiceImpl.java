@@ -236,6 +236,10 @@ public class MinioServiceImpl implements MinioService {
         List<String> presignedUrls = new ArrayList<>();
         for (int i = 0; i < numberOfUrls; i++) {
             String objectKey = UUID.randomUUID().toString();
+            // Add .zip extension for PROCESS bucket (for archive files)
+            if (StringUtils.equalsIgnoreCase(resourceType.getValue(), "PROCESS")) {
+                objectKey += ".zip";
+            }
             presignedUrls.add(createPutPreSignedLink(objectKey, bucket));
         }
         return presignedUrls;
@@ -270,6 +274,9 @@ public class MinioServiceImpl implements MinioService {
         }
         if (StringUtils.equalsIgnoreCase(resourceType, "AVATAR")) {
             return properties.getBucketAvatar();
+        }
+        if (StringUtils.equalsIgnoreCase(resourceType, "PROCESS")) {
+            return properties.getBucketProcess();
         }
         if (StringUtils.equalsIgnoreCase(resourceType, "OTHER")) {
             return properties.getBucketOther();

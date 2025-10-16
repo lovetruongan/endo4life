@@ -413,7 +413,12 @@ public class FileServiceImpl implements FileService {
     public void createAndUploadThumbnail(MultipartFile file,
             String dimension,
             String templateName) {
-        String thumbnailName = templateName + file.getOriginalFilename();
+        String originalName = file.getOriginalFilename();
+        // Strip extension if present (e.g., "uuid.png" -> "uuid")
+        String baseName = originalName != null && originalName.contains(".") 
+                ? originalName.substring(0, originalName.lastIndexOf("."))
+                : originalName;
+        String thumbnailName = templateName + baseName;
         MultipartFile thumbnail = FileUtil.toMultipartFile(
                 ResourceUtil.generateThumbnail(file, dimension),
                 thumbnailName,

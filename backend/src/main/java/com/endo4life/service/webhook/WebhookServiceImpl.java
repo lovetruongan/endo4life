@@ -96,13 +96,24 @@ public class WebhookServiceImpl implements WebhookService {
 
         // For videos, extract first frame as thumbnail
         // For images, use the image itself
+        byte[] imageBytes;
+        if (StringUtils.equalsIgnoreCase(evtDetail.bucket(), minioConfig.bucketVideo())) {
+            imageBytes = ResourceUtil.getFirstFrame(stream);
+        } else {
+            try {
+                imageBytes = stream.readAllBytes();
+            } catch (Exception e) {
+                log.error("Failed to read image bytes", e);
+                return;
+            }
+        }
+        
         MultipartFile frame = FileUtil.toMultipartFile(
-                StringUtils.equalsIgnoreCase(evtDetail.bucket(), minioConfig.bucketVideo())
-                        ? new ByteArrayInputStream(ResourceUtil.getFirstFrame(stream))
-                        : stream,
+                imageBytes,
                 evtDetail.objectKey(),
                 Constants.THUMBNAIL_CONTENT_TYPE);
 
+        // Generate thumbnails (resource already has thumbnail name set)
         resourceService.createThumbnail(frame);
     }
 

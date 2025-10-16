@@ -35,7 +35,14 @@ public class FileUtil {
         MultipartFile multipartFile = null;
         try {
             String newExtension = contentType.substring(contentType.lastIndexOf("/") + 1);
-            String newOriName = oriName.replace(getFileExtension(oriName), newExtension);
+            String newOriName;
+            if (oriName.contains(".")) {
+                // Has extension, replace it
+                newOriName = oriName.substring(0, oriName.lastIndexOf(".")) + "." + newExtension;
+            } else {
+                // No extension, append it
+                newOriName = oriName + "." + newExtension;
+            }
             multipartFile = new MockMultipartFile("file", newOriName, contentType, inputStream);
         } catch (IOException e) {
             log.error("Failed to parse multipart file", e);
@@ -97,10 +104,19 @@ public class FileUtil {
     }
 
     private File convertMultipartFileToFile(MultipartFile file) {
-        File convFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
-
-        try (FileOutputStream fos = new FileOutputStream(convFile)) {
-            fos.write(file.getBytes());
+        File convFile = null;
+        try {
+            // Create temp file with proper extension
+            String originalFilename = file.getOriginalFilename();
+            String extension = originalFilename != null && originalFilename.contains(".") 
+                    ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                    : ".tmp";
+            
+            convFile = File.createTempFile("video_", extension);
+            
+            try (FileOutputStream fos = new FileOutputStream(convFile)) {
+                fos.write(file.getBytes());
+            }
         } catch (IOException e) {
             log.error("Failed to convert multipart file to file", e);
         }
