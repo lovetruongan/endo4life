@@ -6,6 +6,7 @@ import { IFilter } from '@endo4life/types';
 const DEFAULT_FILTER: IFilter = {
   page: 0,
   size: 20,
+  resourceType: 'IMAGE',
   sort: {
     field: 'createdAt',
     order: 'DESC',

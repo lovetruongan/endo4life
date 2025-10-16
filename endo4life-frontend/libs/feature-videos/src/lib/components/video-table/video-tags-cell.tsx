@@ -1,10 +1,14 @@
 import React from 'react';
 
 interface VideoTagsCellProps {
-  tags: string[];
+  tags?: string[] | null;
 }
 
 export const VideoTagsCell: React.FC<VideoTagsCellProps> = ({ tags }) => {
+  if (!tags || !Array.isArray(tags)) {
+    return null;
+  }
+
   return (
     <div className="flex flex-wrap gap-2 my-2">
       {tags.map((tag, index) => (

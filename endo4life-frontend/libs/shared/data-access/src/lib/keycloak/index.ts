@@ -22,7 +22,15 @@ async function refreshToken() {
 }
 
 function isTokenExpired(minValidity: number = 0) {
-  return !!_keycloak?.isTokenExpired(minValidity);
+  if (!_keycloak || !_keycloak.tokenParsed) {
+    return true;
+  }
+  
+  const expiresIn = _keycloak.tokenParsed['exp'] 
+    ? _keycloak.tokenParsed['exp'] - Math.ceil(new Date().getTime() / 1000) 
+    : 0;
+  
+  return expiresIn < minValidity;
 }
 
 function dispose() {

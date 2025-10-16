@@ -14,7 +14,7 @@ export class ImageFilter extends BaseFilter implements IImageFilter {
     const data: ResourceCriteria = {
       tag: this.getArrayStringField('tag'),
       detailTag: this.getArrayStringField('detailTag'),
-      resourceType: this.getStringField('resourceType') as ResourceType,
+      resourceType: (this.getStringField('resourceType') as ResourceType) ?? ResourceType.Image,
       title: this.getStringField('title'),
       state: this.getStringField('state') as ResourceState,
       ids: this.getArrayStringField('ids'),

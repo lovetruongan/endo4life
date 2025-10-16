@@ -52,6 +52,13 @@ spring:
         size: 2
   application:
     name: endo4life-service
+    cors:
+      allowed-origins: "*"
+      allowed-methods: "*"
+      allowed-headers: "*"
+      exposed-headers: "Authorization,Link,X-Total-Count,X-Endo4Life-Alert,X-Endo4Life-Error,X-Endo4Life-Params"
+      allow-credentials: false
+      max-age: 1800
     keycloak-configuration:
       base-url: ${KEYCLOAK_BASE_URL:https://keycloak.mydevopsproject2023.id.vn}
       internal-url: ${KEYCLOAK_INTERNAL_URL:https://keycloak.mydevopsproject2023.id.vn}

@@ -12,11 +12,7 @@ import { Actions } from 'ahooks/lib/useToggle';
 import { ResourceState } from '@endo4life/data-access';
 import { Link } from 'react-router-dom';
 import { ADMIN_WEB_ROUTES } from '@endo4life/feature-config';
-import {
-  objectUtils,
-  stringUtils,
-  formatDate,
-} from '@endo4life/util-common';
+import { objectUtils, stringUtils, formatDate } from '@endo4life/util-common';
 
 interface IImageManagementColumnsProps {
   openToolDialog?: boolean;
@@ -173,11 +169,10 @@ function useImageManagementColumns({
         initialFlex: 0.5,
         minWidth: 100,
         headerName: t('basicInfo.updatedAt'),
-        cellRenderer: (params: ICellRendererParams<IImageEntity>) => (
-          <span className="flex">
-            {formatDate(stringUtils.defaultString(params?.data?.updatedAt))}
-          </span>
-        ),
+        cellRenderer: (params: ICellRendererParams<IImageEntity>) => {
+          const date = params?.data?.updatedAt || params?.data?.createdAt;
+          return <span className="flex">{date ? formatDate(date) : '-'}</span>;
+        },
       },
       {
         id: 9,

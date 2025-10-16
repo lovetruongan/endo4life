@@ -18,6 +18,7 @@ export interface IImageEntity extends BaseEntity<ResourceResponseDto> {
   viewNumber?: number;
   time?: number;
   createdAt?: string;
+  updatedAt?: string;
   tag?: string[];
   detailTag?: string[];
 }

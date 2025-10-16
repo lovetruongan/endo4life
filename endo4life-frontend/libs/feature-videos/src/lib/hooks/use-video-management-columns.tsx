@@ -187,9 +187,10 @@ function useVideoManagementColumns({
         flex: 0.5,
         minWidth: 100,
         headerName: t('basicInfo.updatedAt'),
-        cellRenderer: (params: ICellRendererParams<IVideoEntity>) => (
-          <span className="flex">{formatDate(params?.data?.updatedAt!)}</span>
-        ),
+        cellRenderer: (params: ICellRendererParams<IVideoEntity>) => {
+          const date = params?.data?.updatedAt || params?.data?.createdAt;
+          return <span className="flex">{date ? formatDate(date) : '-'}</span>;
+        },
       },
       {
         id: 9,

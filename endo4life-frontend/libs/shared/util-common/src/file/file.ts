@@ -11,11 +11,10 @@ export const getFileExtensionFromUrl = (
   bucket: string,
   isUpperCase: boolean = true
 ): string => {
-  return (
-    extractFileNameFromPresignedLink(url, baseUrl, 'images')
-      .split('.')[1]
-      .toUpperCase() || '_'
-  );
+  const fileName = extractFileNameFromPresignedLink(url, baseUrl, bucket);
+  const parts = fileName?.split('.');
+  const extension = parts && parts.length > 1 ? parts.pop() : '';
+  return extension ? (isUpperCase ? extension.toUpperCase() : extension) : '_';
 };
 
 export const getFileSize = (file: File): number => {
@@ -46,7 +45,12 @@ export const getFileSizeFormatted = (
   formData: any
 ): string => {
   if (!isFileValid(selectedFile)) {
-    const size = formData?.entity?.size?.split(' ');
+    const sizeStr = formData?.entity?.size;
+    if (!sizeStr) return '0 B';
+    
+    const size = sizeStr.split(' ');
+    if (size.length < 2) return sizeStr;
+    
     return Number(+size[0]!).toFixed(3) + ' ' + size[1];
   }
   return formatFileSize(getFileSize(selectedFile!));
@@ -123,11 +127,24 @@ export const extractFileNameFromPresignedLink = (
   baseUrl: string,
   bucket: string
 ) => {
+  if (!fileUrl) return '';
+  
   const bucketUrl = baseUrl + '/' + bucket + '/';
-  return fileUrl.substring(
-    fileUrl.indexOf(bucketUrl) + bucketUrl.length,
-    fileUrl.indexOf('?')
-  );
+  const bucketIndex = fileUrl.indexOf(bucketUrl);
+  
+  if (bucketIndex === -1) {
+    // If bucket URL not found, try to extract filename from the end of URL
+    const questionIndex = fileUrl.indexOf('?');
+    const endIndex = questionIndex !== -1 ? questionIndex : fileUrl.length;
+    const lastSlash = fileUrl.lastIndexOf('/', endIndex);
+    return lastSlash !== -1 ? fileUrl.substring(lastSlash + 1, endIndex) : '';
+  }
+  
+  const startIndex = bucketIndex + bucketUrl.length;
+  const questionIndex = fileUrl.indexOf('?', startIndex);
+  const endIndex = questionIndex !== -1 ? questionIndex : fileUrl.length;
+  
+  return fileUrl.substring(startIndex, endIndex);
 };
 
 export const resourceUrlToFile = async (

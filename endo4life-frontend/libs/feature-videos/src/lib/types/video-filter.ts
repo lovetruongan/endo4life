@@ -14,7 +14,7 @@ export class VideoFilter extends BaseFilter implements IVideoFilter {
     const data: ResourceCriteria = {
       tag: this.getArrayStringField('tag'),
       detailTag: this.getArrayStringField('detailTag'),
-      resourceType: ResourceType.Video,
+      resourceType: (this.getStringField('resourceType') as ResourceType) ?? ResourceType.Video,
       title: this.getStringField('title'),
       state: this.getStringField('state') as ResourceState,
       ids: this.getArrayStringField('ids'),
