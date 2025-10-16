@@ -1,8 +1,10 @@
 logging:
   level:
     ROOT: INFO
-    org.springframework.cache: TRACE
     com.endo4life: DEBUG
+    com.endo4life.service: DEBUG
+    com.endo4life.web.rest: DEBUG
+    org.springframework.cache: TRACE
     org.hibernate.SQL: ERROR
     org.hibernate.orm.jdbc.bind: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: DEBUG
@@ -10,9 +12,7 @@ logging:
     org.springframework.boot.devtools: ERROR
     org.springframework.web.socket: DEBUG
     org.springframework.messaging: DEBUG
-  com:
-    fasterxml:
-      jackson: DEBUG
+    com.fasterxml.jackson: DEBUG
 
 server:
   port: 8080
@@ -69,8 +69,8 @@ spring:
       invite-lifespan: 432000
     minio-configuration:
       endpoint: https://minio-api.mydevopsproject2023.id.vn
-      username: ${MINIO_USERNAME:admin}
-      password: ${MINIO_PASSWORD:minio123456}
+      username: ${MINIO_USERNAME:endo4life}
+      password: ${MINIO_PASSWORD:U6ZeyWQKjLMA6t31lh4xdebjkhkCs6x9}
       webhook-identifier: _
       bucket-video: videos
       bucket-image: images

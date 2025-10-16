@@ -1,12 +1,16 @@
 package com.endo4life.service.resource;
 
+import com.endo4life.web.rest.model.CreateResourceRequest;
+import com.endo4life.web.rest.model.CreateResourceRequestDto;
 import com.endo4life.web.rest.model.ResourceCriteria;
 import com.endo4life.web.rest.model.ResourceDetailResponseDto;
 import com.endo4life.web.rest.model.ResourceResponseDto;
-import com.endo4life.web.rest.model.CreateResourceRequestDto;
+import com.endo4life.web.rest.model.UpdateResourceRequestDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface ResourceService {
@@ -14,7 +18,27 @@ public interface ResourceService {
 
     ResourceDetailResponseDto getResourceById(UUID id);
 
-    UUID createResource(CreateResourceRequestDto createResourceRequestDto);
+    List<UUID> createResource(CreateResourceRequest createResourceRequest);
+
+    void updateResource(UUID id, UpdateResourceRequestDto resourceRequest);
 
     void deleteResource(UUID id);
+
+    void deleteResources(List<UUID> ids);
+
+    void createThumbnail(MultipartFile file);
+
+    void removeThumbnail(String... thumbnailPaths);
+    
+    void updateResourceThumbnail(String objectKey);
+
+    /**
+     * Handle compressed file upload (ZIP/RAR) and extract resources
+     */
+    void handleCompressedFile(MultipartFile file);
+
+    /**
+     * Handle multiple file uploads with metadata
+     */
+    void handleMultipleFile(List<MultipartFile> files, List<CreateResourceRequestDto> metadataList);
 }

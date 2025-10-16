@@ -107,6 +107,20 @@
             <version>${minio.version}</version>
         </dependency>
         
+        <!-- JavaCV for video processing -->
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>javacv-platform</artifactId>
+            <version>1.5.6</version>
+        </dependency>
+
+        <!-- Thumbnailator for image processing -->
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>0.4.20</version>
+        </dependency>
+        
         <!-- OpenAPI -->
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -158,6 +172,39 @@
             <version>4.4</version>
         </dependency>
         
+        <!-- Apache Commons Compress for ZIP/RAR handling -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.25.0</version>
+        </dependency>
+        
+        <!-- Apache Commons CSV for CSV parsing -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.10.0</version>
+        </dependency>
+        
+        <!-- Junrar for RAR file extraction -->
+        <dependency>
+            <groupId>com.github.junrar</groupId>
+            <artifactId>junrar</artifactId>
+            <version>7.5.5</version>
+        </dependency>
+        
+        <!-- AspectJ for AOP Logging -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        
+        <!-- WebSocket for real-time notifications -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+        
         <!-- Development Tools - TEMPORARILY DISABLED -->
         <!-- <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -165,6 +212,12 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency> -->
+        
+        <!-- Spring Test for MockMultipartFile -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
         
         <!-- Test Dependencies -->
         <dependency>
@@ -194,11 +247,22 @@
                     </excludes>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <configuration>
+                    <url>jdbc:postgresql://3.107.208.12:5432/elearning</url>
+                    <user>postgres</user>
+                    <password>postgres123</password>
+                </configuration>
+            </plugin>
             
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
+                    <parameters>true</parameters>
                     <generatedSourcesDirectory>target/generated-sources/openapi/src/main/java</generatedSourcesDirectory>
                     <annotationProcessorPaths>
                         <path>
@@ -223,7 +287,7 @@
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>7.3.0</version>
+                <version>7.15.0</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>

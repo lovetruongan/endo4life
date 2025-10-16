@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,7 +22,6 @@ import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 import lombok.RequiredArgsConstructor;
-import com.endo4life.security.AuthoritiesConstants;
 
 @Configuration
 @EnableWebSecurity
@@ -36,6 +36,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, final MvcRequestMatcher.Builder mvc)
             throws Exception {
         return httpSecurity
+                .cors(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(registry -> registry
@@ -50,6 +51,11 @@ public class SecurityConfiguration {
                         .requestMatchers(mvc.pattern("/api/v1/webhooks/keycloak/**")).permitAll()
                         .requestMatchers(mvc.pattern("/api/v1/test/public")).permitAll()
                         .requestMatchers(mvc.pattern("/api/public/**")).permitAll()
+                        .requestMatchers(mvc.pattern("/api/v1/minio/**")).permitAll() // MinIO endpoints
+                        .requestMatchers(mvc.pattern("/api/v1/user-courses/**")).permitAll()
+                        .requestMatchers(mvc.pattern("/api/v1/course-sections/**")).permitAll()
+                        .requestMatchers(mvc.pattern("/api/v1/user-course-lectures/**")).permitAll()
+                        .requestMatchers(mvc.pattern("/api/v1/tags")).permitAll()
                         .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
                         .requestMatchers(mvc.pattern("/v3/api-docs/**")).permitAll()
                         .anyRequest().authenticated())
