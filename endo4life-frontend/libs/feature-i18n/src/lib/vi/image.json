@@ -1,0 +1,120 @@
+{
+  "txtImageManagement": "Quản lý hình ảnh",
+  "actions": {
+    "editImage": "Chỉnh sửa chi tiết hình ảnh",
+    "deleteImage": "Xóa hình ảnh",
+    "downloadImage": "Tải về",
+    "deleteImageMutiple": "Xóa những hình ảnh được chọn",
+    "changeImage": "Thay đổi hình ảnh",
+    "cropImage": "Crop hình ảnh",
+    "addFile": "Nhập file"
+  },
+  "leading": {
+    "txtAddImage": "Thêm hình ảnh",
+    "txtExport": "Xuất khẩu",
+    "txtImport": "Nhập khẩu",
+    "txtFilter": "Bộ lọc"
+  },
+  "basicInfo": {
+    "image": "Hình ảnh",
+    "title": "Tên hình ảnh",
+    "description": "Mô tả",
+    "tag": "Tổn thương",
+    "detailTag": "Tổn thương chi tiết",
+    "viewNumber": "Lượt xem",
+    "commentCount": "Bình luận",
+    "display": "Hiển thị",
+    "createdAt": "Ngày tải lên",
+    "updatedAt": "Lần cập nhật cuối",
+    "dimension": "Kích thước",
+    "size": "Dung lượng",
+    "format": "Định dạng",
+    "state": "Hiển thị"
+  },
+  "state": {
+    "PUBLIC": "Công khai",
+    "UNLISTED": "Ẩn",
+    "DRAFT": "Nháp"
+  },
+  "imageTable": {
+    "headerActions": "Hành động"
+  },
+  "imageFilter": {
+    "inputSearchPlaceholder": "Tìm kiếm hình ảnh",
+    "selectDisplayPlaceholder": "Hiển thị"
+  },
+  "imageFilterForm": {
+    "title": "Bộ lọc",
+    "resetFilter": "Xóa bộ lọc",
+    "fromDate": "Ngày bắt đầu",
+    "toDate": "Ngày kết thúc",
+    "placeholders": {
+      "tag": "Chọn nhãn",
+      "detailTag": "Chọn nhãn chi tiết"
+    }
+  },
+  "imageStateForm": {
+    "subtitle": "Chỉnh sửa chế độ hiển thị hình ảnh"
+  },
+  "imageStateDialog": {
+    "status": {
+      "success": "Cập nhật giá trị hiển thị thành công!",
+      "error": "Cập nhật giá trị hiển thị thất bại! Vui lòng thử lại."
+    }
+  },
+  "imageDeleteMultipleConfirmDialog": {
+    "confirmationMessage": "Bạn có chắc muốn xóa {{count}} hình ảnh này?",
+    "cannotRestore": "Những hình ảnh đã xoá sẽ không thể khôi phục lại.",
+    "status": {
+      "success": "Xóa {{count}} hình ảnh thành công",
+      "error": "Lỗi khi xóa nhiều hình ảnh"
+    }
+  },
+  "imageDeleteConfirmDialog": {
+    "title": "Xoá hình ảnh",
+    "confirmationMessage": "Bạn có chắc muốn xoá hình ảnh này?",
+    "cannotRestore": "Hình ảnh đã xoá sẽ không thể khôi phục lại.",
+    "status": {
+      "success": "Xoá hình ảnh thành công",
+      "error": "Xoá hình ảnh thất bại"
+    }
+  },
+  "imageDetailForm": {
+    "title": "Chỉnh sửa hình ảnh",
+    "status": {
+      "success": "Cập nhật thông tin hình ảnh thành công!",
+      "error": "Cập nhật thất bại! Vui lòng thử lại."
+    }
+  },
+  "imageCreateForm": {
+    "title": "Thêm mới hình ảnh",
+    "status": {
+      "success": "Tạo hình ảnh thành công!",
+      "error": "Tạo thất bại! Vui lòng thử lại."
+    }
+  },
+  "imageImportForm": {
+    "title": "Nhập file thao tác",
+    "subtitle": "Hoàn thành các thông tin dưới đây để tạo file",
+    "status": {
+      "success": "Tạo hình ảnh thành công!",
+      "error": "Tạo thất bại! Vui lòng thử lại."
+    },
+    "importFiles": "Tải lên các file ảnh và video của bạn"
+  },
+  "imageImportZipModal": {
+    "compressedFileRequired": "Cần tải lên ít nhất một file nén",
+    "onlyOneZipAllowed": "Chỉ được upload duy nhất 1 file zip",
+    "uploadZip": "Tải lên file zip của bạn"
+  },
+  "imageCropping": {
+    "loadingCropFrame": "Đang tải frame crop ...",
+    "processing": "Đang xử lý...",
+    "preview": "Xem trước",
+    "createCrop": "Tạo crop"
+  },
+  "errors": {
+    "invalidImageId": "ID hình ảnh không hợp lệ!",
+    "insufficientInfo": "Thiếu thông tin cần thiết!"
+  }
+}

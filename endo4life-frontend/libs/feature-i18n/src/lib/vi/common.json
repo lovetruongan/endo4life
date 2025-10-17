@@ -1,0 +1,72 @@
+{
+  "txtLoading": "Đang tải dữ liệu...",
+  "txtNoResult": "Xin lỗi, không tìm thấy kết quả bạn yêu cầu.",
+  "txtDelete": "Xoá",
+  "txtSave": "Lưu",
+  "txtRecordsSelected": "{{total}} bản ghi đã chọn.",
+  "txtSelected": "Đã chọn",
+  "txtSaved": "Đã lưu",
+  "txtSuccess": "Thành công",
+  "txtCancel": "Huỷ",
+  "txtBack": "Trở về",
+  "txtAgree": "Đồng ý",
+  "txtSubmit": "Cập nhật",
+  "txtApply": "Áp dụng",
+  "txtConfirm": "Xác nhận",
+  "txtDownload": "Tải về",
+  "txtRefresh": "Tải lại",
+  "txtSend": "Gửi",
+  "txtRequiredField": "{{field_name}} là bắt buộc",
+  "txtInvalidFormatField": "{{field_name}} không đúng định dạng",
+  "txtUneditableField": "Bạn không thề chỉnh sửa thông tin này",
+  "txtSearch": "Tìm kiếm",
+  "txtViewAll": "Xem tất cả",
+  "txtNoSearchResults": "Không tìm thấy kết quả cho <strong>{{search}}</strong>",
+  "txtNoSearchResultsShort": "Không tìm thấy kết quả",
+  "txtOthers": "Khác",
+  "txtViewRecent": "đã xem gần đây",
+  "navigation": {
+    "sectionContentLabel": "Nội dung",
+    "txtMenuItemImage": "Hình ảnh",
+    "txtMenuItemVideo": "Video",
+    "txtMenuItemCourse": "Khoá học",
+    "txtMenuItemUser": "Người dùng",
+    "txtMenuItemQ&A": "Câu hỏi",
+    "txtMenuItemDocument": "Tài liệu đóng góp",
+    "txtMenuItemComment": "Nhận xét",
+    "userManagement": "Quản lý người dùng",
+    "resourceManagement": "Quản lý nội dung",
+    "commentViewing": "Xem nhận xét",
+    "txtHome": "Trang chủ",
+    "txtResources": "Kho dữ liệu số",
+    "txtMyLibrary": "Thư viện của tôi",
+    "txtAboutUs": "Về chúng tôi"
+  },
+  "account": {
+    "txtAccount": "Tài khoản",
+    "txtProfile": "Thông tin tài khoản",
+    "txtLogout": "Đăng xuất",
+    "txtSetting": "Cài đặt",
+    "txtStudent": "Trang người dùng",
+    "txtAdmin": "Trang quản trị viên"
+  },
+  "notification": {
+    "txtNotification": "Thông báo",
+    "txtViewAll": "Xem tất cả"
+  },
+  "table": {
+    "txtSetup": "Cài đặt bảng",
+    "tools": {
+      "txtArrangementAndVisibility": "Sắp xếp và ẩn/hiện các cột",
+      "txtAllFieldsDeselectedWarning": "Cần có ít nhất một cột được hiển thị"
+    }
+  },
+  "pagination": {
+    "txtLabel": "Hiển thị {{RANGE}} kết quả"
+  },
+  "filter": {
+    "txtFilter": "Bộ lọc",
+    "txtNewest": "Mới nhất",
+    "txtMostPopular": "Phổ biến nhất"
+  }
+}

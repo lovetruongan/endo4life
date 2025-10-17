@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/@openapitools/openapi-generator-cli/config.schema.json",
+  "spaces": 2,
+  "generator-cli": {
+    "version": "7.3.0",
+    "generators": {
+      "v3.0": {
+        "generatorName": "typescript-axios",
+        "output": "./src/lib/generated",
+        "inputSpec": "./src/openapi-spec.yml",
+        "skipValidateSpec": true,
+        "additionalProperties": {
+          "npmName": "@endo4life/data-access-generated",
+          "supportsES6": true,
+          "withNodeImports": true,
+          "withSeparateModelsAndApi": true
+        }
+      }
+    }
+  }
+}

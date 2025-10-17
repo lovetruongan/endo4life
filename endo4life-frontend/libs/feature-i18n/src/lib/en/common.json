@@ -1,0 +1,64 @@
+{
+  "txtLoading": "Loading...",
+  "txtNoResult": "Sorry! No result found.",
+  "txtDelete": "Delete",
+  "txtSave": "Save",
+  "txtRecordsSelected": "{{total}} records selected.",
+  "txtSaved": "Saved",
+  "txtSuccess": "Success",
+  "txtCancel": "Cancel",
+  "txtAgree": "OK",
+  "txtConfirm": "Confirm",
+  "txtRequiredField": "{{field_name}} is required",
+  "txtUneditableField": "You cannot edit this information",
+  "txtSearch": "Search",
+  "txtViewAll": "View All",
+  "txtNoSearchResults": "No results found <strong>{{search}}</strong>",
+  "txtNoSearchResultsShort": "No results found",
+  "txtOthers": "Others",
+  "txtViewRecent": "viewed recently",
+  "navigation": {
+    "sectionContentLabel": "Content",
+    "txtMenuItemImage": "Image",
+    "txtMenuItemVideo": "Video",
+    "txtMenuItemCourse": "Course",
+    "txtMenuItemUser": "User",
+    "txtMenuItemQ&A": "Q&A",
+    "txtMenuItemDocument": "Document",
+    "txtMenuItemComment": "Comment",
+    "userManagement": "User Management",
+    "resourceManagement": "Resource Management",
+    "commentViewing": "View comment",
+    "txtHome": "Home",
+    "txtResources": "Resources",
+    "txtMyLibrary": "My Library",
+    "txtAboutUs": "About Us"
+  },
+  "account": {
+    "txtAccount": "Account",
+    "txtProfile": "Profile",
+    "txtLogout": "Logout",
+    "txtSetting": "Setting",
+    "txtStudent": "Student Page",
+    "txtAdmin": "Admin Page"
+  },
+  "notification": {
+    "txtNotification": "Notification",
+    "txtViewAll": "View All"
+  },
+  "table": {
+    "txtSetup": "Setup table",
+    "tools": {
+      "txtArrangementAndVisibility": "Rearrange and change visibility of columns",
+      "txtAllFieldsDeselectedWarning": "At least one displayed column is required"
+    }
+  },
+  "pagination": {
+    "txtLabel": "Displaying {{RANGE}} result(s)"
+  },
+  "filter": {
+    "txtFilter": "Filter",
+    "txtNewest": "Newest",
+    "txtMostPopular": "Most popular"
+  }
+}

@@ -1,0 +1,106 @@
+.container {
+  /* margin-bottom: 0.5rem; */
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 8px;
+}
+
+.labelText {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.required {
+  font-size: 0.875rem;
+  color: #f56565;
+}
+
+.flexAuto {
+  flex: 1 1 auto;
+}
+
+.charCount {
+  font-size: 0.875rem;
+  color: #4a5568;
+}
+
+.inputWrapper {
+  position: relative;
+}
+
+.input {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  border-width: 1px;
+  border-color: #cbd5e0;
+  border-radius: 0.375rem;
+  width: 100%;
+}
+
+.inputHeight {
+  height: 2.25rem;
+}
+
+.inputWidth {
+  width: 100%;
+}
+
+.rounded {
+  border-radius: 0.375rem;
+}
+
+.borderSlate {
+  border-color: #d1d5db;
+}
+
+.px2 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.py1 {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.focusRing {
+  box-shadow: none;
+}
+
+.borderRed {
+  border-color: #f56565;
+}
+
+.pr10 {
+  padding-right: 2.5rem;
+}
+
+.clearButton,
+.passwordButton {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.right3 {
+  right: 0.75rem;
+}
+
+.topHalf {
+  top: 50%;
+}
+
+.errorText {
+  font-size: 0.875rem;
+  color: #f56565;
+}
+
+.hintText {
+  font-size: 0.875rem;
+  color: #4a5568;
+}

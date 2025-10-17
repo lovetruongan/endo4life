@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* You can add global styles to this file, and also import other style files */
+:root {
+  --animate-duration: 0.2s;
+  --color-accent-50: #fdf5f3;
+  --color-accent-100: #ffe1d4;
+  --color-accent-200: #ffc3ab;
+  --color-accent-300: #f4927c;
+  --color-accent-400: #ff7d59;
+  --color-accent-500: #ff5630;
+  --color-accent-600: #da4928;
+  --color-accent-700: #b13317;
+  --color-accent-800: #8c1106;
+  --color-accent-900: #660803;
+
+  --color-background-0: #ffffff;
+  --color-background-50: #f9fafc;
+  --color-background-100: #f3f7f9;
+  --color-background-200: #eaf1f4;
+  --color-background-300: #d1dbdf;
+  --color-background-400: #888c96;
+  --color-background-500: #8e9aab;
+  --color-background-600: #677385;
+  --color-background-700: #53616d;
+  --color-background-800: #23262f;
+  --color-background-900: #1e1f20;
+
+  --color-error-50: #fff2f0;
+  --color-error-100: #ffedeb;
+  --color-error-200: #ffc8c2;
+  --color-error-300: #ffa099;
+  --color-error-400: #ff7570;
+  --color-error-500: #ff4747;
+  --color-error-600: #d93237;
+  --color-error-700: #b3202a;
+  --color-error-800: #8c121e;
+  --color-error-900: #660c18;
+
+  /* --color-secondary-50: #fafeff;
+  --color-secondary-100: #edf8f9;
+  --color-secondary-200: #e1f4f6;
+  --color-secondary-300: #d4edef;
+  --color-secondary-400: #42d8e3;
+  --color-secondary-500: #1cc3d6;
+  --color-secondary-600: #17b2c4;
+  --color-secondary-700: #0c91a0;
+  --color-secondary-800: #005063;
+  --color-secondary-900: #002f3d; */
+
+  --color-secondary: #5dada9;
+  --color-secondary-50: #f3faf9;
+  --color-secondary-100: #d8efec;
+  --color-secondary-200: #ebfaf3;
+  --color-secondary-300: #7ed4aa;
+  --color-secondary-400: #3d8f8c;
+  --color-secondary-500: #5dada9;
+  --color-secondary-600: #2f7271;
+  --color-secondary-700: #295c5c;
+  --color-secondary-800: #244b4b;
+  --color-secondary-900: #223f3f;
+  --color-secondary-950: #0f2224;
+
+  --color-primary: #2b224c;
+  --color-primary-50: #f0f1fd;
+  --color-primary-100: #e3e5fc;
+  --color-primary-200: #cccef9;
+  --color-primary-300: #adaef4;
+  --color-primary-400: #928ced;
+  --color-primary-500: #7f70e4;
+  --color-primary-600: #7055d6;
+  --color-primary-700: #6146bc;
+  --color-primary-800: #4f3b98;
+  --color-primary-900: #423679;
+  --color-primary-950: #2b224c;
+
+  --color-tertiary: #f57c00;
+  --color-tertiary-50: #fffaec;
+  --color-tertiary-100: #fff4d3;
+  --color-tertiary-200: #ffe6a5;
+  --color-tertiary-300: #ffd26d;
+  --color-tertiary-400: #ffb332;
+  --color-tertiary-500: #ff990a;
+  --color-tertiary-600: #f57c00;
+  --color-tertiary-700: #cc5e02;
+  --color-tertiary-800: #a1490b;
+  --color-tertiary-900: #823d0c;
+
+  --color-success-50: #edfff3;
+  --color-success-100: #c0fad6;
+  --color-success-200: #91edb7;
+  --color-success-300: #65e09d;
+  --color-success-400: #3dd486;
+  --color-success-500: #1ac774;
+  --color-success-600: #0da15e;
+  --color-success-700: #047a49;
+  --color-success-800: #005434;
+  --color-success-900: #002e1e;
+
+  --color-warning-50: #fff7e6;
+  --color-warning-100: #ffe0a3;
+  --color-warning-200: #ffce7a;
+  --color-warning-300: #ffba52;
+  --color-warning-400: #f79d28;
+  --color-warning-500: #ea7e00;
+  --color-warning-600: #c46200;
+  --color-warning-700: #9e4a00;
+  --color-warning-800: #783400;
+  --color-warning-900: #522100;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scrollbar-width: thin;
+}

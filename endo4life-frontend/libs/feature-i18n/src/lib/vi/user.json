@@ -1,0 +1,124 @@
+{
+  "txtUserManagement": "Quản lý người dùng",
+  "txtUpdatedSuccessfully": "Cập nhật tài khoản thành công",
+  "txtUpdatedUnsuccessfully": "Cập nhật tài khoản thất bại",
+  "userDetailTitle": "Thông tin tài khoản",
+  "userUpdateAction": "Cập nhật",
+  "userDeleteAccount": "Xoá tài khoản",
+  "userCreateAccount": "Tạo tài khoản",
+  "basicInfo": {
+    "title": "Thông tin cơ bản",
+    "subTitle": "Những thông tin cơ bản về tài khoản của bạn",
+    "avatar": "Ảnh đại diện",
+    "invalidAvatarImage": "Ảnh không hợp lệ, hãy thử lại",
+    "invalidFileType": "File chứng chỉ không phải là file pdf, hãy thử lại",
+    "changeAvatarAction": "Đổi ảnh đại diện",
+    "uploadFileAction": "Tải chứng chỉ lên",
+    "username": "Username",
+    "fullName": "Họ và tên",
+    "firstName": "Tên",
+    "lastName": "Họ và tên đệm",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "confirmPassword": "Xác thực mật khẩu",
+    "phoneNumber": "Số điện thoại",
+    "role": "Vai trò",
+    "state": "Trạng thái hiển thị",
+    "certificate": "Chứng chỉ",
+    "noFilesUploaded": "Chưa có tệp nào được tải lên"
+  },
+  "actions": {
+    "txtRemoveUser": "Xoá người dùng",
+    "txtRemoveUserMutiple": "Xóa những người dùng được chọn",
+    "txtEditUser": "Chỉnh sửa người dùng"
+  },
+  "accountStatus": {
+    "title": "Trạng thái tài khoản",
+    "subTitle": "Trạng thái tài khoản bao gồm vai trò và tình trạng của tài khoản",
+    "role": "Vai trò",
+    "isActive": "Trạng thái"
+  },
+  "accountSecurity": {
+    "title": "Bảo mật",
+    "subTitle": "Mật khẩu và những thông tin quan trọng khác",
+    "password": "Mật khẩu",
+    "passwordPlaceholder": "Nhập mật khẩu",
+    "changePassAction": "Đổi mật khẩu",
+    "invalidPasswordMatch": "Mật khẩu chưa khớp"
+  },
+  "roles": {
+    "ADMIN": "Quản trị viên",
+    "COORDINATOR": "Điều phối viên",
+    "CUSTOMER": "Người dùng",
+    "SPECIALIST": "Chuyên gia"
+  },
+  "state": {
+    "ACTIVE": "Kích hoạt",
+    "PENDING": "Chờ kích hoạt",
+    "INACTIVE": "Không hoạt động nữa"
+  },
+  "deleteForm": {
+    "invalidUserId": "ID người dùng không hợp lệ",
+    "mustNotBlankPassword": "Mật khẩu không được để trống",
+    "successfullyDeleteUser": "Xoá tài khoản thành công",
+    "unsuccessfullyDeleteUser": "Xoá tài khoản người dùng thất bại",
+    "passwordRequiredToDelete": "Nhập mật khẩu để thực hiện xoá"
+  },
+  "deleteDialog": {
+    "confirmationMessage": "Bạn có chắc muốn xóa người dùng này?",
+    "confirmationMessageMultiple": "Bạn có chắc muốn xóa {{count}} người dùng này?",
+    "cannotRestore": "Những người dùng đã xoá sẽ không thể khôi phục lại."
+  },
+  "inviteForm": {
+    "title": "Mời người dùng",
+    "emailFieldLabel": "Email",
+    "emailFieldPlaceholder": "example@gmail.com",
+    "roleFieldLabel": "Vai trò",
+    "roleFieldPlaceholder": "Chọn vai trò",
+    "statusFieldLabel": "Trạng thái",
+    "statusFieldPlaceholder": "Chọn trạng thái",
+    "successfullyInviteUser": "Mời người dùng thành công!",
+    "unsuccessfullyInviteUser": "Mời người dùng thất bại! Tài khoản này đã có."
+  },
+  "createForm": {
+    "title": "Tạo tài khoản",
+    "subtitle": "Hoàn thành các thông tin dưới đây để tạo tài khoản mới",
+    "status": {
+      "success": "Tạo người dùng thành công!",
+      "error": "Tạo thất bại! Vui lòng thử lại."
+    }
+  },
+  "updateForm": {
+    "title": "Cập nhật tài khoản",
+    "subtitle": "Hoàn thành các thông tin dưới đây để cập nhật tài khoản",
+    "status": {
+      "success": "Cập nhật người dùng thành công!",
+      "error": "Cập nhât thất bại! Vui lòng thử lại."
+    }
+  },
+  "userFilter": {
+    "selectStatePlaceholder": "Trạng thái",
+    "selectRolePlaceholder": "Vai trò",
+    "inputSearchPlaceholder": "Tìm kiếm người dùng"
+  },
+  "userTable": {
+    "txtLoadingData": "Đang tải dữ liệu...",
+    "txtNoResults": "Không có dữ liệu",
+    "headerDisplayName": "Họ và tên",
+    "headerEmail": "Email",
+    "headerRole": "Vai trò",
+    "headerPhoneNumber": "Số điện thoại",
+    "headerIsActive": "Trạng thái",
+    "headerCreatedAt": "Ngày tạo",
+    "headerActions": "Hành động",
+    "txtUserCount": "người dùng"
+  },
+  "leading": {
+    "txtAddUser": "Thêm người dùng",
+    "txtExport": "Xuất khẩu",
+    "txtInviteUser": "Mời người dùng"
+  },
+  "errors": {
+    "insufficientInfo": "Thiếu thông tin cần thiết!"
+  }
+}

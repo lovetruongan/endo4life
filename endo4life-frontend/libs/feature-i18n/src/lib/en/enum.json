@@ -1,0 +1,6 @@
+{
+  "entityStatus": {
+    "DRAFT": "Draft",
+    "PUBLISHED": "Published"
+  }
+}

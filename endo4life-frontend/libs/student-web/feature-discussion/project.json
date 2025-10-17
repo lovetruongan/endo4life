@@ -1,0 +1,9 @@
+{
+  "name": "feature-discussion",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/student-web/feature-discussion/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project feature-discussion --web",
+  "targets": {}
+}

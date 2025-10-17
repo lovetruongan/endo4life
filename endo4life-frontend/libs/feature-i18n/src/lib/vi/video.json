@@ -1,0 +1,119 @@
+{
+  "txtVideoManagement": "Quản lý video",
+  "actions": {
+    "editVideo": "Chỉnh sửa chi tiết video",
+    "deleteVideo": "Xóa video",
+    "downloadVideo": "Tải về",
+    "deleteVideoMutiple": "Xóa những video được chọn",
+    "changeVideo": "Thay đổi video",
+    "cropVideo": "Crop video",
+    "addFile": "Nhập file"
+  },
+  "leading": {
+    "txtAddVideo": "Thêm video",
+    "txtExport": "Xuất khẩu",
+    "txtImport": "Nhập khẩu",
+    "txtFilter": "Bộ lọc"
+  },
+  "basicInfo": {
+    "video": "Video",
+    "title": "Tên video",
+    "description": "Mô tả",
+    "tag": "Tổn thương",
+    "detailTag": "Tổn thương chi tiết",
+    "viewNumber": "Lượt xem",
+    "commentCount": "Bình luận",
+    "display": "Hiển thị",
+    "createdAt": "Ngày tải lên",
+    "updatedAt": "Lần cập nhật cuối",
+    "dimension": "Kích thước",
+    "size": "Dung lượng",
+    "format": "Định dạng",
+    "state": "Hiển thị"
+  },
+  "state": {
+    "PUBLIC": "Công khai",
+    "UNLISTED": "Ẩn",
+    "DRAFT": "Nháp"
+  },
+  "videoTable": {
+    "headerActions": "Hành động"
+  },
+  "videoFilter": {
+    "inputSearchPlaceholder": "Tìm kiếm video",
+    "selectDisplayPlaceholder": "Hiển thị"
+  },
+  "videoFilterForm": {
+    "title": "Bộ lọc",
+    "resetFilter": "Xóa bộ lọc",
+    "fromDate": "Ngày bắt đầu",
+    "toDate": "Ngày kết thúc",
+    "placeholders": {
+      "tag": "Chọn nhãn",
+      "detailTag": "Chọn nhãn chi tiết"
+    }
+  },
+  "videoStateForm": {
+    "subtitle": "Chỉnh sửa chế độ hiển thị video"
+  },
+  "videoStateDialog": {
+    "status": {
+      "success": "Cập nhật giá trị hiển thị thành công!",
+      "error": "Cập nhật giá trị hiển thị thất bại! Vui lòng thử lại."
+    }
+  },
+  "videoDeleteMultipleConfirmDialog": {
+    "confirmationMessage": "Bạn có chắc muốn xóa {{count}} video này?",
+    "cannotRestore": "Những video đã xoá sẽ không thể khôi phục lại.",
+    "status": {
+      "success": "Xóa {{count}} video thành công",
+      "error": "Lỗi khi xóa nhiều video"
+    }
+  },
+  "videoDeleteConfirmDialog": {
+    "title": "Xoá video",
+    "confirmationMessage": "Bạn có chắc muốn xoá video này?",
+    "cannotRestore": "Video đã xoá sẽ không thể khôi phục lại.",
+    "status": {
+      "success": "Xoá video thành công",
+      "error": "Xoá video thất bại"
+    }
+  },
+  "videoDetailForm": {
+    "title": "Chỉnh sửa video",
+    "status": {
+      "success": "Cập nhật thông tin video thành công!",
+      "error": "Cập nhật thất bại! Vui lòng thử lại."
+    }
+  },
+  "videoCreateForm": {
+    "title": "Thêm mới video",
+    "status": {
+      "success": "Tạo video thành công!",
+      "error": "Tạo thất bại! Vui lòng thử lại."
+    }
+  },
+  "videoImportForm": {
+    "title": "Nhập file thao tác",
+    "subtitle": "Hoàn thành các thông tin dưới đây để tạo file",
+    "status": {
+      "success": "Tạo video thành công!",
+      "error": "Tạo thất bại! Vui lòng thử lại."
+    }
+  },
+  "videoImportZipModal": {
+    "compressedFileRequired": "Cần tải lên một file nén",
+    "onlyOneZipAllowed": "Chỉ được upload duy nhất 1 file zip",
+    "uploadZip": "Tải lên file zip của bạn"
+  },
+  "videoCropping": {
+    "loadingCropFrame": "Đang tải frame crop ...",
+    "processing": "Đang xử lý...",
+    "preview": "Xem trước",
+    "createCrop": "Tạo crop"
+  },
+  "errors": {
+    "invalidVideoId": "ID video không hợp lệ!",
+    "insufficientInfo": "Thiếu thông tin cần thiết!"
+  }
+}

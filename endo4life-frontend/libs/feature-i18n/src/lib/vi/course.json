@@ -1,0 +1,63 @@
+{
+  "txtCourseManagement": "Quản lý khoá học",
+  "actions": {
+    "txtEditCourse": "Sửa khoá học",
+    "txtRemoveCourse": "Xoá khoá học"
+  },
+  "courseTable": {
+    "course": "Khoá học",
+    "title": "Tên",
+    "state": "Trạng thái",
+    "headerActions": "Hành động",
+    "lastUpdated": "Lần cập nhật cuối"
+  },
+  "courseSectionTable": {
+    "course": "Bài giảng",
+    "title": "Tên bài giảng",
+    "mainContent": "Nội dung chính",
+    "description": "Mô tả",
+    "lessonObjectives": "Yêu cầu cần đạt",
+    "state": "Trạng thái",
+    "totalCredits": "Tổng số tín chỉ",
+    "target": "Mục tiêu bài giảng",
+    "headerActions": "Hành động",
+    "lastUpdated": "Lần cập nhật cuối",
+    "tag": "Tổn thương",
+    "detailTag": "Tổn thương chi tiết",
+    "video": "Video bài giảng",
+    "thumbnail": "Ảnh thumbnail"
+  },
+  "courseFilter": {
+    "selectStatePlaceholder": "Trạng thái",
+    "inputSearchPlaceholder": "Tìm kiếm khoá học"
+  },
+  "basicInfo": {
+    "title": "Tên khoá học",
+    "courseSection": "Tên bài giảng",
+    "description": "Mô tả",
+    "lecturer": "Tên tác giả",
+    "state": "Trạng thái",
+    "tag": "Tổn thương",
+    "detailTag": "Tổn thương chi tiết",
+    "thumbnail": "Ảnh thumbnail"
+  },
+  "lectureInfo": {
+    "title": "Tên bài giảng",
+    "tag": "Tổn thương",
+    "detailTag": "Tổn thương chi tiết"
+  },
+  "state": {
+    "PUBLIC": "Công khai",
+    "UNLISTED": "Ẩn",
+    "DRAFT": "Nháp"
+  },
+  "filterForm": {
+    "title": "Bộ lọc"
+  },
+  "leading": {
+    "txtAddCourse": "Thêm khoá học",
+    "txtExport": "Xuất khẩu",
+    "txtImport": "Nhập khẩu",
+    "txtFilter": "Bộ lọc"
+  }
+}
