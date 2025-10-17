@@ -126,7 +126,7 @@ export function VideoCreateForm({ loading, onSubmit }: IVideoCreateFormProps) {
       element.href = fileUrl;
       element.download = extractFileNameFromPresignedLink(
         fileUrl,
-        EnvConfig.ElearningServiceUrl,
+        EnvConfig.Endo4LifeServiceUrl,
         'videos',
       );
       document.body.appendChild(element);

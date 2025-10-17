@@ -30,7 +30,7 @@ export interface ICourseApi {
 
 export class CourseApiImpl extends BaseApi implements ICourseApi {
   constructor() {
-    super(EnvConfig.ElearningServiceUrl);
+    super(EnvConfig.Endo4LifeServiceUrl);
   }
   async getCourses(
     filter: IFilter,

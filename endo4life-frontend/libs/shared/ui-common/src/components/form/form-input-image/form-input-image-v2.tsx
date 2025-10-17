@@ -44,7 +44,7 @@ export function FormInputImageV2({
   const [, setShowPasteArea] = useState(!value);
   const [isDragging, setIsDragging] = useState(false);
   const [cropForm, setCropForm] = useState<'square' | 'circle' | 'oval'>(
-    'square'
+    'square',
   );
   const [croppedImage, setCroppingFile] = useState<File>({} as File);
 
@@ -63,7 +63,7 @@ export function FormInputImageV2({
         onChange(file);
       }
     },
-    [onChange, setPreviewSource, setPreviewVisible]
+    [onChange, setPreviewSource, setPreviewVisible],
   );
 
   const handleDragOver = useCallback((event: DragEvent<Element>) => {
@@ -78,7 +78,7 @@ export function FormInputImageV2({
       event.stopPropagation();
       setIsDragging(false);
     },
-    [setIsDragging]
+    [setIsDragging],
   );
 
   const handleDrop = useCallback(
@@ -107,7 +107,7 @@ export function FormInputImageV2({
       setShowPasteArea,
       setPreviewVisible,
       setPreviewSource,
-    ]
+    ],
   );
 
   const handlePaste: ClipboardEventHandler<HTMLDivElement> = useCallback(
@@ -134,7 +134,7 @@ export function FormInputImageV2({
         }
       }
     },
-    [onChange, setShowPasteArea]
+    [onChange, setShowPasteArea],
   );
 
   const handleCropFormChange = (cropForm: 'square' | 'circle' | 'oval') => {
@@ -162,8 +162,8 @@ export function FormInputImageV2({
               ? value.name
               : extractFileNameFromPresignedLink(
                   resourceUrl || '',
-                  EnvConfig.ElearningServiceUrl,
-                  'images'
+                  EnvConfig.Endo4LifeServiceUrl,
+                  'images',
                 )
           }
           cropForm={cropForm}
@@ -196,7 +196,7 @@ export function FormInputImageV2({
             'border-background-300 bg-neutral-background-layer-1': !isDragging,
             'justify-center': !isCropping,
           },
-          className
+          className,
         )}
         onPaste={handlePaste}
       >

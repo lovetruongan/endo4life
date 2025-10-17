@@ -43,7 +43,7 @@ export interface ICourseTestApi {
 
 export class CourseTestApiImpl extends BaseApi implements ICourseTestApi {
   constructor() {
-    super(EnvConfig.ElearningServiceUrl);
+    super(EnvConfig.Endo4LifeServiceUrl);
   }
   async uploadFile(presignedUrl: string, file: File) {
     return axios.put(presignedUrl, file, {

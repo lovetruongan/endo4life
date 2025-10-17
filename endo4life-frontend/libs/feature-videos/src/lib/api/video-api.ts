@@ -24,7 +24,7 @@ export interface IVideoApi {
 
 export class VideoApiImpl extends BaseApi implements IVideoApi {
   constructor() {
-    super(EnvConfig.ElearningServiceUrl);
+    super(EnvConfig.Endo4LifeServiceUrl);
   }
 
   async getVideos(filter: IFilter): Promise<IPaginatedResponse<IVideoEntity>> {

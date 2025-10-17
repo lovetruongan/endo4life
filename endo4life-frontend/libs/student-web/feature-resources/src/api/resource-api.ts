@@ -21,7 +21,7 @@ export interface IResourceApi {
 
 export class ResourceApiImpl extends BaseApi implements IResourceApi {
   constructor() {
-    super(EnvConfig.ElearningServiceUrl);
+    super(EnvConfig.Endo4LifeServiceUrl);
   }
 
   async getResources(

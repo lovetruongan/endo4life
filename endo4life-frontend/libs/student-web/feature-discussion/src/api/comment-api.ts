@@ -10,7 +10,7 @@ export interface ICommentApi {
 
 export class CommentApiIml extends BaseApi implements ICommentApi {
   constructor() {
-    super(EnvConfig.ElearningServiceUrl);
+    super(EnvConfig.Endo4LifeServiceUrl);
   }
 
   async getComments(

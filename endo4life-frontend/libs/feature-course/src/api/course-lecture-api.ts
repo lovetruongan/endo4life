@@ -9,7 +9,7 @@ export interface ICourseLectureApi {
 
 export class CourseLectureApiImpl extends BaseApi implements ICourseLectureApi {
   constructor() {
-    super(EnvConfig.ElearningServiceUrl);
+    super(EnvConfig.Endo4LifeServiceUrl);
   }
   getLectures(courseId: string): Promise<ICourseLectureEntity[]> {
     throw new Error('Method not implemented.');

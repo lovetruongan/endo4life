@@ -1556,6 +1556,12 @@ export interface RecordDataUserCourseSectionDto {
 export interface ResourceCriteria {
     /**
      * 
+     * @type {Array<string>}
+     * @memberof ResourceCriteria
+     */
+    'ids'?: Array<string>;
+    /**
+     * 
      * @type {string}
      * @memberof ResourceCriteria
      */
@@ -1578,6 +1584,84 @@ export interface ResourceCriteria {
      * @memberof ResourceCriteria
      */
     'tags'?: Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof ResourceCriteria
+     */
+    'fromDate'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ResourceCriteria
+     */
+    'toDate'?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ResourceCriteria
+     */
+    'tag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ResourceCriteria
+     */
+    'detailTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ResourceCriteria
+     */
+    'endoscopyTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ResourceCriteria
+     */
+    'lightTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ResourceCriteria
+     */
+    'hpTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ResourceCriteria
+     */
+    'locationUpperTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ResourceCriteria
+     */
+    'searchWords'?: Array<string>;
+    /**
+     * 
+     * @type {number}
+     * @memberof ResourceCriteria
+     */
+    'commentCountTo'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ResourceCriteria
+     */
+    'commentCountFrom'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ResourceCriteria
+     */
+    'viewNumberTo'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ResourceCriteria
+     */
+    'viewNumberFrom'?: number;
 }
 
 
@@ -2676,6 +2760,93 @@ export interface UserProgressCourseDto {
 /**
  * 
  * @export
+ * @interface UserResourceDetailResponseDto
+ */
+export interface UserResourceDetailResponseDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResourceDetailResponseDto
+     */
+    'id'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResourceDetailResponseDto
+     */
+    'title'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResourceDetailResponseDto
+     */
+    'resourceUrl'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResourceDetailResponseDto
+     */
+    'dimension'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResourceDetailResponseDto
+     */
+    'description'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResourceDetailResponseDto
+     */
+    'extension'?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UserResourceDetailResponseDto
+     */
+    'tag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UserResourceDetailResponseDto
+     */
+    'detailTag'?: Array<string>;
+    /**
+     * 
+     * @type {number}
+     * @memberof UserResourceDetailResponseDto
+     */
+    'time'?: number;
+    /**
+     * 
+     * @type {ResourceType}
+     * @memberof UserResourceDetailResponseDto
+     */
+    'type'?: ResourceType;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResourceDetailResponseDto
+     */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResourceDetailResponseDto
+     */
+    'createdBy'?: string;
+    /**
+     * 
+     * @type {UserInfoDto}
+     * @memberof UserResourceDetailResponseDto
+     */
+    'createdByInfo'?: UserInfoDto;
+}
+
+
+/**
+ * 
+ * @export
  * @interface UserResourceHistoryCriteria
  */
 export interface UserResourceHistoryCriteria {
@@ -2694,6 +2865,94 @@ export interface UserResourceHistoryCriteria {
 }
 
 
+/**
+ * 
+ * @export
+ * @interface UserResourceResponseDto
+ */
+export interface UserResourceResponseDto {
+    /**
+     * ID of the resource
+     * @type {string}
+     * @memberof UserResourceResponseDto
+     */
+    'id'?: string;
+    /**
+     * Title of the resource
+     * @type {string}
+     * @memberof UserResourceResponseDto
+     */
+    'title'?: string;
+    /**
+     * URL of thumbnail
+     * @type {string}
+     * @memberof UserResourceResponseDto
+     */
+    'thumbnailUrl'?: string;
+    /**
+     * 
+     * @type {ResourceType}
+     * @memberof UserResourceResponseDto
+     */
+    'type'?: ResourceType;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResourceResponseDto
+     */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResourceResponseDto
+     */
+    'createdBy'?: string;
+    /**
+     * 
+     * @type {UserInfoDto}
+     * @memberof UserResourceResponseDto
+     */
+    'createdByInfo'?: UserInfoDto;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UserResourceResponseDto
+     */
+    'tag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UserResourceResponseDto
+     */
+    'detailTag'?: Array<string>;
+    /**
+     * 
+     * @type {number}
+     * @memberof UserResourceResponseDto
+     */
+    'time'?: number;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface UserResourceResponsePaginatedDto
+ */
+export interface UserResourceResponsePaginatedDto {
+    /**
+     * 
+     * @type {Array<UserResourceResponseDto>}
+     * @memberof UserResourceResponsePaginatedDto
+     */
+    'data'?: Array<UserResourceResponseDto>;
+    /**
+     * 
+     * @type {number}
+     * @memberof UserResourceResponsePaginatedDto
+     */
+    'total'?: number;
+}
 /**
  * 
  * @export
@@ -7948,6 +8207,229 @@ export class UserResourceHistoryV1Api extends BaseAPI {
      */
     public getResourcesAccessedByUserInfoIdAndType(requestParameters: UserResourceHistoryV1ApiGetResourcesAccessedByUserInfoIdAndTypeRequest = {}, options?: RawAxiosRequestConfig) {
         return UserResourceHistoryV1ApiFp(this.configuration).getResourcesAccessedByUserInfoIdAndType(requestParameters.criteria, requestParameters.pageable, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * UserResourceV1Api - axios parameter creator
+ * @export
+ */
+export const UserResourceV1ApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Get resource by ID for students/users
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserResourceById: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getUserResourceById', 'id', id)
+            const localVarPath = `/api/v1/user/resources/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get list resources for students/users
+         * @param {ResourceCriteria} [criteria] 
+         * @param {Pageable} [pageable] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserResources: async (criteria?: ResourceCriteria, pageable?: Pageable, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/user/resources`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (criteria !== undefined) {
+                for (const [key, value] of Object.entries(criteria)) {
+                    localVarQueryParameter[key] = value;
+                }
+            }
+
+            if (pageable !== undefined) {
+                for (const [key, value] of Object.entries(pageable)) {
+                    localVarQueryParameter[key] = value;
+                }
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * UserResourceV1Api - functional programming interface
+ * @export
+ */
+export const UserResourceV1ApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = UserResourceV1ApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Get resource by ID for students/users
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getUserResourceById(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserResourceDetailResponseDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getUserResourceById(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserResourceV1Api.getUserResourceById']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Get list resources for students/users
+         * @param {ResourceCriteria} [criteria] 
+         * @param {Pageable} [pageable] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getUserResources(criteria?: ResourceCriteria, pageable?: Pageable, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserResourceResponsePaginatedDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getUserResources(criteria, pageable, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserResourceV1Api.getUserResources']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * UserResourceV1Api - factory interface
+ * @export
+ */
+export const UserResourceV1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = UserResourceV1ApiFp(configuration)
+    return {
+        /**
+         * Get resource by ID for students/users
+         * @param {UserResourceV1ApiGetUserResourceByIdRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserResourceById(requestParameters: UserResourceV1ApiGetUserResourceByIdRequest, options?: RawAxiosRequestConfig): AxiosPromise<UserResourceDetailResponseDto> {
+            return localVarFp.getUserResourceById(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get list resources for students/users
+         * @param {UserResourceV1ApiGetUserResourcesRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserResources(requestParameters: UserResourceV1ApiGetUserResourcesRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<UserResourceResponsePaginatedDto> {
+            return localVarFp.getUserResources(requestParameters.criteria, requestParameters.pageable, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * Request parameters for getUserResourceById operation in UserResourceV1Api.
+ * @export
+ * @interface UserResourceV1ApiGetUserResourceByIdRequest
+ */
+export interface UserResourceV1ApiGetUserResourceByIdRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserResourceV1ApiGetUserResourceById
+     */
+    readonly id: string
+}
+
+/**
+ * Request parameters for getUserResources operation in UserResourceV1Api.
+ * @export
+ * @interface UserResourceV1ApiGetUserResourcesRequest
+ */
+export interface UserResourceV1ApiGetUserResourcesRequest {
+    /**
+     * 
+     * @type {ResourceCriteria}
+     * @memberof UserResourceV1ApiGetUserResources
+     */
+    readonly criteria?: ResourceCriteria
+
+    /**
+     * 
+     * @type {Pageable}
+     * @memberof UserResourceV1ApiGetUserResources
+     */
+    readonly pageable?: Pageable
+}
+
+/**
+ * UserResourceV1Api - object-oriented interface
+ * @export
+ * @class UserResourceV1Api
+ * @extends {BaseAPI}
+ */
+export class UserResourceV1Api extends BaseAPI {
+    /**
+     * Get resource by ID for students/users
+     * @param {UserResourceV1ApiGetUserResourceByIdRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserResourceV1Api
+     */
+    public getUserResourceById(requestParameters: UserResourceV1ApiGetUserResourceByIdRequest, options?: RawAxiosRequestConfig) {
+        return UserResourceV1ApiFp(this.configuration).getUserResourceById(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get list resources for students/users
+     * @param {UserResourceV1ApiGetUserResourcesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserResourceV1Api
+     */
+    public getUserResources(requestParameters: UserResourceV1ApiGetUserResourcesRequest = {}, options?: RawAxiosRequestConfig) {
+        return UserResourceV1ApiFp(this.configuration).getUserResources(requestParameters.criteria, requestParameters.pageable, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

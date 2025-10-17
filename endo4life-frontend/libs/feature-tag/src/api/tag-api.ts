@@ -10,7 +10,7 @@ export interface ITagApi {
 
 export class TagApiImpl extends BaseApi implements ITagApi {
   constructor() {
-    super(EnvConfig.ElearningServiceUrl);
+    super(EnvConfig.Endo4LifeServiceUrl);
   }
 
   async getTags(parentTags: string[]): Promise<ITagEntity[]> {

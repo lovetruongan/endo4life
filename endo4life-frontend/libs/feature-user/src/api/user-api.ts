@@ -30,7 +30,7 @@ export interface IUserApi {
 
 export class UserApiImpl extends BaseApi implements IUserApi {
   constructor() {
-    super(EnvConfig.ElearningServiceUrl);
+    super(EnvConfig.Endo4LifeServiceUrl);
   }
 
   async getUsers(filter: IFilter): Promise<IPaginatedResponse<IUserEntity>> {

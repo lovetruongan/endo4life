@@ -98,7 +98,7 @@ export function ImageDetailForm({ loading, formData, onSubmit }: Props) {
       element.href = window.URL.createObjectURL(await response.blob());
       element.download = extractFileNameFromPresignedLink(
         formData.resourceUrl,
-        EnvConfig.ElearningServiceUrl,
+        EnvConfig.Endo4LifeServiceUrl,
         'images',
       );
       document.body.appendChild(element);
@@ -209,7 +209,7 @@ export function ImageDetailForm({ loading, formData, onSubmit }: Props) {
                 <InfoCard
                   label={t('image:basicInfo.createdAt')}
                   content={getFileFormat(
-                    EnvConfig.ElearningServiceUrl,
+                    EnvConfig.Endo4LifeServiceUrl,
                     selectedFile,
                     formData,
                   )}
@@ -234,7 +234,7 @@ export function ImageDetailForm({ loading, formData, onSubmit }: Props) {
                         )
                       : getFileExtensionFromUrl(
                           formData?.resourceUrl || '',
-                          EnvConfig.ElearningServiceUrl,
+                          EnvConfig.Endo4LifeServiceUrl,
                           'images',
                         )
                   }

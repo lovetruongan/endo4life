@@ -1,9 +1,11 @@
-openapi: '3.0.3'
+openapi: "3.0.3"
 info:
-  title: 'Endo4Life APIs'
-  description: 'AI-integrated e-Learning platform for endometriosis education'
+  title: "Endo4Life APIs"
+  description: "AI-integrated e-Learning platform for endometriosis education"
   version: 1.0.0
 servers:
+  - url: https://api.endo4life.shop
+    description: Production server
   - url: http://localhost:8080
     description: Development server
 security:
@@ -16,14 +18,14 @@ paths:
       operationId: actuatorHealth
       security: []
       tags:
-        - 'actuator'
+        - "actuator"
       responses:
         200:
           description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HealthResponseDto'
+                $ref: "#/components/schemas/HealthResponseDto"
 
   # Course Management APIs
   /api/v1/courses:
@@ -31,50 +33,50 @@ paths:
       description: Get courses by criteria
       operationId: getCourses
       tags:
-        - 'course-v1'
+        - "course-v1"
       parameters:
         - name: criteria
           in: query
           required: false
           schema:
-            $ref: '#/components/schemas/CourseCriteria'
+            $ref: "#/components/schemas/CourseCriteria"
         - name: pageable
           in: query
           required: false
           schema:
-            $ref: '#/components/schemas/Pageable'
+            $ref: "#/components/schemas/Pageable"
       responses:
         200:
           description: Courses loaded successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CourseResponsePaginatedDto'
+                $ref: "#/components/schemas/CourseResponsePaginatedDto"
     post:
       description: Create a new course
       operationId: createCourse
       tags:
-        - 'course-v1'
+        - "course-v1"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateCourseRequestDto'
+              $ref: "#/components/schemas/CreateCourseRequestDto"
       responses:
         201:
           description: Course created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdWrapperDto'
+                $ref: "#/components/schemas/IdWrapperDto"
 
   /api/v1/courses/{id}:
     get:
       description: Get course by ID
       operationId: getCourseById
       tags:
-        - 'course-v1'
+        - "course-v1"
       parameters:
         - name: id
           in: path
@@ -88,14 +90,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CourseDetailResponseDto'
+                $ref: "#/components/schemas/CourseDetailResponseDto"
         404:
           description: Course not found
     put:
       description: Update course
       operationId: updateCourse
       tags:
-        - 'course-v1'
+        - "course-v1"
       parameters:
         - name: id
           in: path
@@ -108,19 +110,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateCourseRequestDto'
+              $ref: "#/components/schemas/UpdateCourseRequestDto"
       responses:
         200:
           description: Course updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CourseDetailResponseDto'
+                $ref: "#/components/schemas/CourseDetailResponseDto"
     delete:
       description: Delete course
       operationId: deleteCourse
       tags:
-        - 'course-v1'
+        - "course-v1"
       parameters:
         - name: id
           in: path
@@ -138,36 +140,36 @@ paths:
       description: Get resources by criteria
       operationId: getResources
       tags:
-        - 'resource-v1'
+        - "resource-v1"
       parameters:
         - name: criteria
           in: query
           required: false
           schema:
-            $ref: '#/components/schemas/ResourceCriteria'
+            $ref: "#/components/schemas/ResourceCriteria"
         - name: pageable
           in: query
           required: false
           schema:
-            $ref: '#/components/schemas/Pageable'
+            $ref: "#/components/schemas/Pageable"
       responses:
         200:
           description: Resources loaded successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResourceResponsePaginatedDto'
+                $ref: "#/components/schemas/ResourceResponsePaginatedDto"
     post:
       description: Create resource(s) after uploading to MinIO
       operationId: createResource
       tags:
-        - 'resource-v1'
+        - "resource-v1"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateResourceRequest'
+              $ref: "#/components/schemas/CreateResourceRequest"
       responses:
         200:
           description: Resources created successfully
@@ -182,7 +184,7 @@ paths:
       description: Delete resources by list of ids
       operationId: deleteResources
       tags:
-        - 'resource-v1'
+        - "resource-v1"
       parameters:
         - name: id
           in: query
@@ -201,7 +203,7 @@ paths:
       description: Get resource by ID
       operationId: getResourceById
       tags:
-        - 'resource-v1'
+        - "resource-v1"
       parameters:
         - name: id
           in: path
@@ -215,14 +217,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResourceDetailResponseDto'
+                $ref: "#/components/schemas/ResourceDetailResponseDto"
         404:
           description: Resource not found
     put:
       description: Update an existing resource
       operationId: updateResource
       tags:
-        - 'resource-v1'
+        - "resource-v1"
       parameters:
         - name: id
           in: path
@@ -234,7 +236,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateResourceRequestDto'
+              $ref: "#/components/schemas/UpdateResourceRequestDto"
       responses:
         204:
           description: Resource updated successfully
@@ -242,7 +244,7 @@ paths:
       description: Delete a resource by ID
       operationId: deleteResource
       tags:
-        - 'resource-v1'
+        - "resource-v1"
       parameters:
         - name: id
           in: path
@@ -258,7 +260,7 @@ paths:
   /api/v1/tests:
     get:
       summary: Get a list of tests
-      tags: ['test-v1']
+      tags: ["test-v1"]
       operationId: getTests
       parameters:
         - in: query
@@ -268,36 +270,36 @@ paths:
             format: uuid
           description: Filter by course ID
       responses:
-        '200':
+        "200":
           description: A list of tests
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TestResponseDto'
+                  $ref: "#/components/schemas/TestResponseDto"
     post:
       summary: Create a new test
-      tags: ['test-v1']
+      tags: ["test-v1"]
       operationId: createTest
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateTestRequestDto'
+              $ref: "#/components/schemas/CreateTestRequestDto"
       responses:
-        '201':
+        "201":
           description: Test created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdWrapperDto'
+                $ref: "#/components/schemas/IdWrapperDto"
 
   /api/v1/tests/{id}:
     get:
       summary: Get a test by ID
-      tags: ['test-v1']
+      tags: ["test-v1"]
       operationId: getTestById
       parameters:
         - name: id
@@ -307,15 +309,15 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: The test details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TestDetailResponseDto'
+                $ref: "#/components/schemas/TestDetailResponseDto"
     put:
       summary: Update a test
-      tags: ['test-v1']
+      tags: ["test-v1"]
       operationId: updateTest
       parameters:
         - name: id
@@ -329,13 +331,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateTestRequestDto'
+              $ref: "#/components/schemas/UpdateTestRequestDto"
       responses:
-        '204':
+        "204":
           description: Test updated successfully
     delete:
       summary: Delete a test
-      tags: ['test-v1']
+      tags: ["test-v1"]
       operationId: deleteTest
       parameters:
         - name: id
@@ -345,14 +347,14 @@ paths:
             type: string
             format: uuid
       responses:
-        '204':
+        "204":
           description: Test deleted successfully
 
   # Question Management APIs
   /api/v1/tests/{testId}/questions:
     get:
       summary: Get all questions for a test
-      tags: ['question-v1']
+      tags: ["question-v1"]
       operationId: getQuestionsByTestId
       parameters:
         - name: testId
@@ -362,17 +364,17 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: A list of questions
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/QuestionResponseDto'
+                  $ref: "#/components/schemas/QuestionResponseDto"
     post:
       summary: Create a new question for a test
-      tags: ['question-v1']
+      tags: ["question-v1"]
       operationId: createQuestion
       parameters:
         - name: testId
@@ -386,19 +388,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateQuestionRequestDto'
+              $ref: "#/components/schemas/CreateQuestionRequestDto"
       responses:
-        '201':
+        "201":
           description: Question created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdWrapperDto'
+                $ref: "#/components/schemas/IdWrapperDto"
 
   /api/v1/questions/{id}:
     get:
       summary: Get a question by ID
-      tags: ['question-v1']
+      tags: ["question-v1"]
       operationId: getQuestionById
       parameters:
         - name: id
@@ -408,15 +410,15 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: The question details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/QuestionResponseDto'
+                $ref: "#/components/schemas/QuestionResponseDto"
     put:
       summary: Update a question
-      tags: ['question-v1']
+      tags: ["question-v1"]
       operationId: updateQuestion
       parameters:
         - name: id
@@ -430,13 +432,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateQuestionRequestDto'
+              $ref: "#/components/schemas/UpdateQuestionRequestDto"
       responses:
-        '204':
+        "204":
           description: Question updated successfully
     delete:
       summary: Delete a question
-      tags: ['question-v1']
+      tags: ["question-v1"]
       operationId: deleteQuestion
       parameters:
         - name: id
@@ -446,7 +448,7 @@ paths:
             type: string
             format: uuid
       responses:
-        '204':
+        "204":
           description: Question deleted successfully
 
   # User Management APIs
@@ -455,30 +457,30 @@ paths:
       description: Get users by criteria
       operationId: getUsers
       tags:
-        - 'user-v1'
+        - "user-v1"
       parameters:
         - name: criteria
           in: query
           required: false
           schema:
-            $ref: '#/components/schemas/UserInfoCriteria'
+            $ref: "#/components/schemas/UserInfoCriteria"
         - name: pageable
           in: query
           required: false
           schema:
-            $ref: '#/components/schemas/Pageable'
+            $ref: "#/components/schemas/Pageable"
       responses:
         200:
           description: Users loaded successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponsePaginatedDto'
+                $ref: "#/components/schemas/UserResponsePaginatedDto"
     post:
       description: Create a new user
       operationId: createUser
       tags:
-        - 'user-v1'
+        - "user-v1"
       requestBody:
         required: true
         content:
@@ -489,11 +491,11 @@ paths:
                 - user
               properties:
                 user:
-                  $ref: '#/components/schemas/CreateUserRequestDto'
+                  $ref: "#/components/schemas/CreateUserRequestDto"
                 avatar:
                   type: string
                   format: binary
-                  description: 'Profile image'
+                  description: "Profile image"
                 certificate:
                   type: array
                   items:
@@ -505,14 +507,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdWrapperDto'
+                $ref: "#/components/schemas/IdWrapperDto"
 
   /api/v1/users/{id}:
     get:
       description: Get user by ID
       operationId: getUserById
       tags:
-        - 'user-v1'
+        - "user-v1"
       parameters:
         - name: id
           in: path
@@ -526,14 +528,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponseDto'
+                $ref: "#/components/schemas/UserResponseDto"
         404:
           description: User not found
     put:
       description: Update user
       operationId: updateUser
       tags:
-        - 'user-v1'
+        - "user-v1"
       parameters:
         - name: id
           in: path
@@ -551,7 +553,7 @@ paths:
                 - user
               properties:
                 user:
-                  $ref: '#/components/schemas/UpdateUserRequestDto'
+                  $ref: "#/components/schemas/UpdateUserRequestDto"
                 avatar:
                   type: string
                   format: binary
@@ -571,7 +573,7 @@ paths:
       description: Delete user
       operationId: deleteUser
       tags:
-        - 'user-v1'
+        - "user-v1"
       parameters:
         - name: id
           in: path
@@ -593,34 +595,34 @@ paths:
       description: Get current user info
       operationId: getCurrentUserInfo
       tags:
-        - 'user-v1'
+        - "user-v1"
       responses:
         200:
           description: Current user info
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponseDto'
+                $ref: "#/components/schemas/UserResponseDto"
 
   /api/v1/users/invite:
     post:
       description: Invite a new user
       operationId: inviteUser
       tags:
-        - 'user-v1'
+        - "user-v1"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InviteUserRequestDto'
+              $ref: "#/components/schemas/InviteUserRequestDto"
       responses:
         201:
           description: User invited successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdWrapperDto'
+                $ref: "#/components/schemas/IdWrapperDto"
 
   # Webhook APIs
   /api/v1/webhooks/minio:
@@ -629,13 +631,13 @@ paths:
       operationId: subscribeMinioEvent
       security: []
       tags:
-        - 'webhook-v1'
+        - "webhook-v1"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/WebhookMinIOEventDto'
+              $ref: "#/components/schemas/WebhookMinIOEventDto"
       responses:
         200:
           description: Webhook processed successfully
@@ -646,13 +648,13 @@ paths:
       operationId: subscribeKeycloakEvent
       security: []
       tags:
-        - 'webhook-v1'
+        - "webhook-v1"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/WebhookKeycloakRequestDto'
+              $ref: "#/components/schemas/WebhookKeycloakRequestDto"
       responses:
         200:
           description: Webhook processed successfully
@@ -664,13 +666,13 @@ paths:
       operationId: generatePreSignedUrls
       security: []
       tags:
-        - 'minio-v1'
+        - "minio-v1"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GeneratePreSignedUrlDto'
+              $ref: "#/components/schemas/GeneratePreSignedUrlDto"
       responses:
         200:
           description: Pre-signed URLs generated successfully
@@ -687,50 +689,50 @@ paths:
       description: Get doctor-user conversations by resource
       operationId: getDoctorUserConversations
       tags:
-        - 'doctor-user-conversations-v1'
+        - "doctor-user-conversations-v1"
       parameters:
         - name: criteria
           in: query
           required: false
           schema:
-            $ref: '#/components/schemas/DoctorUserConversationCriteria'
+            $ref: "#/components/schemas/DoctorUserConversationCriteria"
         - name: pageable
           in: query
           required: false
           schema:
-            $ref: '#/components/schemas/Pageable'
+            $ref: "#/components/schemas/Pageable"
       responses:
         200:
           description: Conversations loaded successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DoctorUserConversationResponsePaginatedDto'
+                $ref: "#/components/schemas/DoctorUserConversationResponsePaginatedDto"
     post:
       description: Create a conversation/question between doctor and user (questioner auto-filled from JWT)
       operationId: createConversationDoctorAndUser
       tags:
-        - 'doctor-user-conversations-v1'
+        - "doctor-user-conversations-v1"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateDoctorUserConversationDto'
+              $ref: "#/components/schemas/CreateDoctorUserConversationDto"
       responses:
         201:
           description: Doctor-User Conversation created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdWrapperDto'
+                $ref: "#/components/schemas/IdWrapperDto"
 
   /api/v1/doctor-user-conversations/{id}:
     get:
       description: Get conversation by ID with replies
       operationId: getDoctorUserConversationById
       tags:
-        - 'doctor-user-conversations-v1'
+        - "doctor-user-conversations-v1"
       parameters:
         - name: id
           in: path
@@ -744,12 +746,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DoctorUserConversationResponseDto'
+                $ref: "#/components/schemas/DoctorUserConversationResponseDto"
     put:
       description: Update conversation (admin/assignee only)
       operationId: updateDoctorUserConversation
       tags:
-        - 'doctor-user-conversations-v1'
+        - "doctor-user-conversations-v1"
       parameters:
         - name: id
           in: path
@@ -762,7 +764,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateDoctorUserConversationDto'
+              $ref: "#/components/schemas/UpdateDoctorUserConversationDto"
       responses:
         204:
           description: Conversation updated successfully
@@ -770,7 +772,7 @@ paths:
       description: Delete conversation (admin only)
       operationId: deleteDoctorUserConversation
       tags:
-        - 'doctor-user-conversations-v1'
+        - "doctor-user-conversations-v1"
       parameters:
         - name: id
           in: path
@@ -787,43 +789,43 @@ paths:
       description: Get all comments with criteria
       operationId: getComments
       tags:
-        - 'comment-v1'
+        - "comment-v1"
       parameters:
         - name: criteria
           in: query
           required: false
           schema:
-            $ref: '#/components/schemas/CommentCriteria'
+            $ref: "#/components/schemas/CommentCriteria"
         - name: pageable
           in: query
           required: false
           schema:
-            $ref: '#/components/schemas/Pageable'
+            $ref: "#/components/schemas/Pageable"
       responses:
         200:
           description: Comments loaded successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CommentResponsePaginatedDto'
+                $ref: "#/components/schemas/CommentResponsePaginatedDto"
     post:
       description: Create a new comment
       operationId: createComment
       tags:
-        - 'comment-v1'
+        - "comment-v1"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateCommentRequestDto'
+              $ref: "#/components/schemas/CreateCommentRequestDto"
       responses:
         201:
           description: Comment created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdWrapperDto'
+                $ref: "#/components/schemas/IdWrapperDto"
 
   # Tag Management APIs
   /api/v1/tags:
@@ -832,7 +834,7 @@ paths:
       operationId: getTags
       security: []
       tags:
-        - 'tag-v1'
+        - "tag-v1"
       parameters:
         - name: parentTag
           in: query
@@ -844,7 +846,7 @@ paths:
         - name: type
           in: query
           schema:
-            $ref: '#/components/schemas/TagType'
+            $ref: "#/components/schemas/TagType"
       responses:
         200:
           description: Tags retrieved successfully
@@ -853,18 +855,18 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TagResponseDto'
+                  $ref: "#/components/schemas/TagResponseDto"
     post:
       description: Create new tags
       operationId: createTag
       tags:
-        - 'tag-v1'
+        - "tag-v1"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateTagRequestDto'
+              $ref: "#/components/schemas/CreateTagRequestDto"
       responses:
         201:
           description: Tags created successfully
@@ -872,7 +874,7 @@ paths:
       description: Delete tags
       operationId: deleteTag
       tags:
-        - 'tag-v1'
+        - "tag-v1"
       parameters:
         - name: tagIds
           in: query
@@ -898,48 +900,48 @@ paths:
       description: Get course sections by criteria
       operationId: getCourseSections
       tags:
-        - 'course-section-v1'
+        - "course-section-v1"
       parameters:
         - name: criteria
           in: query
           required: false
           schema:
-            $ref: '#/components/schemas/CourseSectionCriteria'
+            $ref: "#/components/schemas/CourseSectionCriteria"
         - name: pageable
           in: query
           required: false
           schema:
-            $ref: '#/components/schemas/Pageable'
+            $ref: "#/components/schemas/Pageable"
       responses:
         200:
           description: Course sections loaded successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CourseSectionResponsePaginatedDto'
+                $ref: "#/components/schemas/CourseSectionResponsePaginatedDto"
     post:
       description: Create a new course section
       operationId: createCourseSection
       tags:
-        - 'course-section-v1'
+        - "course-section-v1"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateCourseSectionRequestDto'
+              $ref: "#/components/schemas/CreateCourseSectionRequestDto"
       responses:
         201:
           description: Course section created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdWrapperDto'
+                $ref: "#/components/schemas/IdWrapperDto"
     delete:
       description: Delete course sections by list of ids
       operationId: deleteCourseSections
       tags:
-        - 'course-section-v1'
+        - "course-section-v1"
       parameters:
         - name: ids
           in: query
@@ -958,7 +960,7 @@ paths:
       description: Get course section by ID
       operationId: getCourseSectionById
       tags:
-        - 'course-section-v1'
+        - "course-section-v1"
       parameters:
         - name: id
           in: path
@@ -972,12 +974,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResponseDetailCourseSectionDto'
+                $ref: "#/components/schemas/ResponseDetailCourseSectionDto"
     put:
       description: Update course section
       operationId: updateCourseSection
       tags:
-        - 'course-section-v1'
+        - "course-section-v1"
       parameters:
         - name: id
           in: path
@@ -992,7 +994,7 @@ paths:
               type: object
               properties:
                 metadata:
-                  $ref: '#/components/schemas/UpdateCourseSectionRequestDto'
+                  $ref: "#/components/schemas/UpdateCourseSectionRequestDto"
               required:
                 - metadata
       responses:
@@ -1001,12 +1003,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdWrapperDto'
+                $ref: "#/components/schemas/IdWrapperDto"
     delete:
       description: Delete a course section
       operationId: deleteCourseSection
       tags:
-        - 'course-section-v1'
+        - "course-section-v1"
       parameters:
         - name: id
           in: path
@@ -1025,32 +1027,32 @@ paths:
       operationId: getUserCourses
       security: []
       tags:
-        - 'user-course-v1'
+        - "user-course-v1"
       parameters:
         - name: criteria
           in: query
           required: false
           schema:
-            $ref: '#/components/schemas/CourseCriteria'
+            $ref: "#/components/schemas/CourseCriteria"
         - name: pageable
           in: query
           required: false
           schema:
-            $ref: '#/components/schemas/Pageable'
+            $ref: "#/components/schemas/Pageable"
       responses:
         200:
           description: User courses loaded successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserCourseResponsePaginatedDto'
+                $ref: "#/components/schemas/UserCourseResponsePaginatedDto"
 
   /api/v1/user/courses/progress:
     get:
       description: Get progress of courses for user
       operationId: getProgressCoursesUser
       tags:
-        - 'user-course-v1'
+        - "user-course-v1"
       parameters:
         - name: userInfoId
           in: query
@@ -1066,14 +1068,14 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UserProgressCourseDto'
+                  $ref: "#/components/schemas/UserProgressCourseDto"
 
   /api/v1/user/courses/progress/status:
     get:
       description: Get status progress of course for user
       operationId: getStatusProgressCourseUser
       tags:
-        - 'user-course-v1'
+        - "user-course-v1"
       parameters:
         - name: userInfoId
           in: query
@@ -1093,7 +1095,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StatusUserProgressCourseDto'
+                $ref: "#/components/schemas/StatusUserProgressCourseDto"
 
   /api/v1/user/courses/{id}:
     get:
@@ -1101,7 +1103,7 @@ paths:
       operationId: getUserCourseById
       security: []
       tags:
-        - 'user-course-v1'
+        - "user-course-v1"
       parameters:
         - name: id
           in: path
@@ -1121,7 +1123,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponseDetailCourseDto'
+                $ref: "#/components/schemas/UserResponseDetailCourseDto"
 
   # Enroll Course APIs
   /api/v1/user/courses/{id}/enroll:
@@ -1129,7 +1131,7 @@ paths:
       description: Enroll a user into a specific course
       operationId: enrollUserInCourse
       tags:
-        - 'enroll-course-v1'
+        - "enroll-course-v1"
       parameters:
         - name: id
           in: path
@@ -1137,20 +1139,20 @@ paths:
           schema:
             type: string
             format: uuid
-          description: 'Course ID'
+          description: "Course ID"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserInfoEnrollCourseDto'
+              $ref: "#/components/schemas/UserInfoEnrollCourseDto"
       responses:
         201:
           description: User enrolled successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdWrapperDto'
+                $ref: "#/components/schemas/IdWrapperDto"
 
   # User Course Lectures APIs
   /api/v1/user/courses/{courseId}/lectures:
@@ -1159,7 +1161,7 @@ paths:
       operationId: getUserCourseLectures
       security: []
       tags:
-        - 'user-course-lectures-v1'
+        - "user-course-lectures-v1"
       parameters:
         - name: courseId
           in: path
@@ -1181,14 +1183,14 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/LectureAndTestDto'
+                  $ref: "#/components/schemas/LectureAndTestDto"
 
   /api/v1/user/courses/lectures/{id}:
     put:
       description: Record lecture progress
       operationId: recordCourseSectionData
       tags:
-        - 'user-course-lectures-v1'
+        - "user-course-lectures-v1"
       parameters:
         - name: id
           in: path
@@ -1196,20 +1198,67 @@ paths:
           schema:
             type: string
             format: uuid
-          description: 'User progress course section ID'
+          description: "User progress course section ID"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RecordDataUserCourseSectionDto'
+              $ref: "#/components/schemas/RecordDataUserCourseSectionDto"
       responses:
         201:
           description: Progress recorded successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdWrapperDto'
+                $ref: "#/components/schemas/IdWrapperDto"
+
+  # User Resource APIs (Student-facing)
+  /api/v1/user/resources:
+    get:
+      description: Get list resources for students/users
+      operationId: getUserResources
+      tags:
+        - "user-resource-v1"
+      parameters:
+        - name: criteria
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/ResourceCriteria"
+        - name: pageable
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Pageable"
+      responses:
+        200:
+          description: All resources for users loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResourceResponsePaginatedDto"
+
+  /api/v1/user/resources/{id}:
+    get:
+      description: Get resource by ID for students/users
+      operationId: getUserResourceById
+      tags:
+        - "user-resource-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Resource loaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResourceDetailResponseDto"
 
   # User Resource History APIs
   /api/v1/user/resources-accessed:
@@ -1217,30 +1266,30 @@ paths:
       description: Get resources accessed by user
       operationId: getResourcesAccessedByUserInfoIdAndType
       tags:
-        - 'user-resource-history-v1'
+        - "user-resource-history-v1"
       parameters:
         - name: criteria
           in: query
           required: false
           schema:
-            $ref: '#/components/schemas/UserResourceHistoryCriteria'
+            $ref: "#/components/schemas/UserResourceHistoryCriteria"
         - name: pageable
           in: query
           required: false
           schema:
-            $ref: '#/components/schemas/Pageable'
+            $ref: "#/components/schemas/Pageable"
       responses:
         200:
           description: User resources loaded successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResourcesAccessedResponsePaginatedDto'
+                $ref: "#/components/schemas/UserResourcesAccessedResponsePaginatedDto"
     post:
       description: Create a resource accessed by user
       operationId: createUserResource
       tags:
-        - 'user-resource-history-v1'
+        - "user-resource-history-v1"
       requestBody:
         required: true
         content:
@@ -1256,7 +1305,7 @@ paths:
                   format: uuid
                 type:
                   allOf:
-                    - $ref: '#/components/schemas/UserResourceType'
+                    - $ref: "#/components/schemas/UserResourceType"
               required:
                 - userInfoId
                 - resourceId
@@ -1267,7 +1316,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdWrapperDto'
+                $ref: "#/components/schemas/IdWrapperDto"
 
 components:
   securitySchemes:
@@ -1275,7 +1324,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: 'Enter JWT Bearer token'
+      description: "Enter JWT Bearer token"
 
   schemas:
     # Common schemas
@@ -1320,7 +1369,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/CourseResponseDto'
+            $ref: "#/components/schemas/CourseResponseDto"
         total:
           type: integer
           format: int64
@@ -1338,7 +1387,7 @@ components:
         lecturer:
           type: string
         state:
-          $ref: '#/components/schemas/CourseState'
+          $ref: "#/components/schemas/CourseState"
         rating:
           type: number
           format: double
@@ -1369,13 +1418,13 @@ components:
 
     CourseDetailResponseDto:
       allOf:
-        - $ref: '#/components/schemas/CourseResponseDto'
+        - $ref: "#/components/schemas/CourseResponseDto"
         - type: object
           properties:
             courseSections:
               type: array
               items:
-                $ref: '#/components/schemas/CourseSectionResponseDto'
+                $ref: "#/components/schemas/CourseSectionResponseDto"
 
     CreateCourseRequestDto:
       type: object
@@ -1391,7 +1440,7 @@ components:
         lecturer:
           type: string
         state:
-          $ref: '#/components/schemas/CourseState'
+          $ref: "#/components/schemas/CourseState"
         tags:
           type: array
           items:
@@ -1411,7 +1460,7 @@ components:
         lecturer:
           type: string
         state:
-          $ref: '#/components/schemas/CourseState'
+          $ref: "#/components/schemas/CourseState"
         tags:
           type: array
           items:
@@ -1427,7 +1476,7 @@ components:
         title:
           type: string
         state:
-          $ref: '#/components/schemas/CourseState'
+          $ref: "#/components/schemas/CourseState"
 
     CourseState:
       type: string
@@ -1444,7 +1493,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/ResourceResponseDto'
+            $ref: "#/components/schemas/ResourceResponseDto"
         total:
           type: integer
           format: int64
@@ -1460,9 +1509,9 @@ components:
         description:
           type: string
         type:
-          $ref: '#/components/schemas/ResourceType'
+          $ref: "#/components/schemas/ResourceType"
         state:
-          $ref: '#/components/schemas/ResourceState'
+          $ref: "#/components/schemas/ResourceState"
         thumbnail:
           type: string
         thumbnailUrl:
@@ -1481,7 +1530,7 @@ components:
 
     ResourceDetailResponseDto:
       allOf:
-        - $ref: '#/components/schemas/ResourceResponseDto'
+        - $ref: "#/components/schemas/ResourceResponseDto"
         - type: object
           properties:
             path:
@@ -1497,15 +1546,95 @@ components:
             time:
               type: integer
 
+    UserResourceResponsePaginatedDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserResourceResponseDto"
+        total:
+          type: integer
+          format: int64
+
+    UserResourceResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "ID of the resource"
+        title:
+          type: string
+          description: "Title of the resource"
+        thumbnailUrl:
+          type: string
+          description: "URL of thumbnail"
+        type:
+          $ref: "#/components/schemas/ResourceType"
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByInfo:
+          $ref: "#/components/schemas/UserInfoDto"
+        tag:
+          type: array
+          items:
+            type: string
+        detailTag:
+          type: array
+          items:
+            type: string
+        time:
+          type: integer
+
+    UserResourceDetailResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        resourceUrl:
+          type: string
+        dimension:
+          type: string
+        description:
+          type: string
+        extension:
+          type: string
+        tag:
+          type: array
+          items:
+            type: string
+        detailTag:
+          type: array
+          items:
+            type: string
+        time:
+          type: integer
+        type:
+          $ref: "#/components/schemas/ResourceType"
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByInfo:
+          $ref: "#/components/schemas/UserInfoDto"
+
     CreateResourceRequest:
       type: object
       properties:
         type:
-          $ref: '#/components/schemas/UploadType'
+          $ref: "#/components/schemas/UploadType"
         metadata:
           type: array
           items:
-            $ref: '#/components/schemas/CreateResourceRequestDto'
+            $ref: "#/components/schemas/CreateResourceRequestDto"
       required:
         - type
 
@@ -1528,12 +1657,12 @@ components:
           format: uuid
         title:
           type: string
-          description: 'Title of the resource'
+          description: "Title of the resource"
         description:
           type: string
-          description: 'Description of the resource'
+          description: "Description of the resource"
         state:
-          $ref: '#/components/schemas/ResourceState'
+          $ref: "#/components/schemas/ResourceState"
         tag:
           type: array
           items:
@@ -1567,7 +1696,7 @@ components:
         description:
           type: string
         state:
-          $ref: '#/components/schemas/ResourceState'
+          $ref: "#/components/schemas/ResourceState"
         tag:
           type: array
           items:
@@ -1602,16 +1731,63 @@ components:
     ResourceCriteria:
       type: object
       properties:
+        ids:
+          type: array
+          items:
+            type: string
+            format: uuid
         title:
           type: string
         type:
-          $ref: '#/components/schemas/ResourceType'
+          $ref: "#/components/schemas/ResourceType"
         state:
-          $ref: '#/components/schemas/ResourceState'
+          $ref: "#/components/schemas/ResourceState"
         tags:
           type: array
           items:
             type: string
+        fromDate:
+          type: string
+          format: date-time
+        toDate:
+          type: string
+          format: date-time
+        tag:
+          type: array
+          items:
+            type: string
+        detailTag:
+          type: array
+          items:
+            type: string
+        endoscopyTag:
+          type: array
+          items:
+            type: string
+        lightTag:
+          type: array
+          items:
+            type: string
+        hpTag:
+          type: array
+          items:
+            type: string
+        locationUpperTag:
+          type: array
+          items:
+            type: string
+        searchWords:
+          type: array
+          items:
+            type: string
+        commentCountTo:
+          type: integer
+        commentCountFrom:
+          type: integer
+        viewNumberTo:
+          type: integer
+        viewNumberFrom:
+          type: integer
 
     ResourceType:
       type: string
@@ -1638,7 +1814,7 @@ components:
         - numberOfUrls
       properties:
         resourceType:
-          $ref: '#/components/schemas/ResourceType'
+          $ref: "#/components/schemas/ResourceType"
         numberOfUrls:
           type: integer
           minimum: 1
@@ -1651,7 +1827,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/UserResponseDto'
+            $ref: "#/components/schemas/UserResponseDto"
         total:
           type: integer
           format: int64
@@ -1676,9 +1852,9 @@ components:
         phoneNumber:
           type: string
         state:
-          $ref: '#/components/schemas/UserInfoState'
+          $ref: "#/components/schemas/UserInfoState"
         role:
-          $ref: '#/components/schemas/UserInfoRole'
+          $ref: "#/components/schemas/UserInfoRole"
         avatarPath:
           type: string
         avatarLink:
@@ -1717,9 +1893,9 @@ components:
         phoneNumber:
           type: string
         role:
-          $ref: '#/components/schemas/UserInfoRole'
+          $ref: "#/components/schemas/UserInfoRole"
         state:
-          $ref: '#/components/schemas/UserInfoState'
+          $ref: "#/components/schemas/UserInfoState"
         password:
           type: string
           minLength: 8
@@ -1734,9 +1910,9 @@ components:
         phoneNumber:
           type: string
         role:
-          $ref: '#/components/schemas/UserInfoRole'
+          $ref: "#/components/schemas/UserInfoRole"
         state:
-          $ref: '#/components/schemas/UserInfoState'
+          $ref: "#/components/schemas/UserInfoState"
 
     InviteUserRequestDto:
       type: object
@@ -1754,7 +1930,7 @@ components:
         lastName:
           type: string
         role:
-          $ref: '#/components/schemas/UserInfoRole'
+          $ref: "#/components/schemas/UserInfoRole"
 
     UserInfoCriteria:
       type: object
@@ -1766,9 +1942,9 @@ components:
           items:
             type: string
         role:
-          $ref: '#/components/schemas/UserInfoRole'
+          $ref: "#/components/schemas/UserInfoRole"
         state:
-          $ref: '#/components/schemas/UserInfoState'
+          $ref: "#/components/schemas/UserInfoState"
         fromDate:
           type: string
           format: date-time
@@ -1825,13 +2001,13 @@ components:
 
     TestDetailResponseDto:
       allOf:
-        - $ref: '#/components/schemas/TestResponseDto'
+        - $ref: "#/components/schemas/TestResponseDto"
         - type: object
           properties:
             questions:
               type: array
               items:
-                $ref: '#/components/schemas/QuestionResponseDto'
+                $ref: "#/components/schemas/QuestionResponseDto"
 
     CreateTestRequestDto:
       type: object
@@ -1875,7 +2051,7 @@ components:
         description:
           type: string
         type:
-          $ref: '#/components/schemas/QuestionType'
+          $ref: "#/components/schemas/QuestionType"
         answers:
           type: object # Or string, depending on your answer structure
           description: "JSON structure for answers, e.g., { options: [], correctAnswer: '' }"
@@ -1884,7 +2060,7 @@ components:
         attachments:
           type: array
           items:
-            $ref: '#/components/schemas/QuestionAttachmentResponseDto'
+            $ref: "#/components/schemas/QuestionAttachmentResponseDto"
 
     CreateQuestionRequestDto:
       type: object
@@ -1897,7 +2073,7 @@ components:
         description:
           type: string
         type:
-          $ref: '#/components/schemas/QuestionType'
+          $ref: "#/components/schemas/QuestionType"
         answers:
           type: object
         orderIndex:
@@ -1905,7 +2081,7 @@ components:
         attachments:
           type: array
           items:
-            $ref: '#/components/schemas/QuestionAttachmentCreateDto'
+            $ref: "#/components/schemas/QuestionAttachmentCreateDto"
 
     UpdateQuestionRequestDto:
       type: object
@@ -1915,7 +2091,7 @@ components:
         description:
           type: string
         type:
-          $ref: '#/components/schemas/QuestionType'
+          $ref: "#/components/schemas/QuestionType"
         answers:
           type: object
         orderIndex:
@@ -1923,7 +2099,7 @@ components:
         attachments:
           type: array
           items:
-            $ref: '#/components/schemas/QuestionAttachmentCreateDto'
+            $ref: "#/components/schemas/QuestionAttachmentCreateDto"
 
     QuestionAttachmentCreateDto:
       type: object
@@ -1934,23 +2110,23 @@ components:
         objectKey:
           type: string
           format: uuid
-          description: 'MinIO object key (UUID)'
+          description: "MinIO object key (UUID)"
         bucket:
           type: string
-          description: 'MinIO bucket name'
+          description: "MinIO bucket name"
         fileName:
           type: string
         fileType:
           type: string
         fileSize:
           type: integer
-          description: 'File size in bytes'
+          description: "File size in bytes"
         width:
           type: integer
-          description: 'Image width in pixels'
+          description: "Image width in pixels"
         height:
           type: integer
-          description: 'Image height in pixels'
+          description: "Image height in pixels"
 
     QuestionAttachmentResponseDto:
       type: object
@@ -1964,16 +2140,16 @@ components:
           type: string
         fileSize:
           type: integer
-          description: 'File size in bytes'
+          description: "File size in bytes"
         width:
           type: integer
-          description: 'Image width in pixels'
+          description: "Image width in pixels"
         height:
           type: integer
-          description: 'Image height in pixels'
+          description: "Image height in pixels"
         fileUrl:
           type: string
-          description: 'Pre-signed URL to access the attachment'
+          description: "Pre-signed URL to access the attachment"
 
     QuestionType:
       type: string
@@ -2033,7 +2209,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/CommentResponseDto'
+            $ref: "#/components/schemas/CommentResponseDto"
         total:
           type: integer
           format: int64
@@ -2046,7 +2222,7 @@ components:
           format: uuid
         content:
           type: string
-          description: 'Comment content'
+          description: "Comment content"
         attachments:
           type: array
           items:
@@ -2054,14 +2230,14 @@ components:
         createdBy:
           type: string
         createdByInfo:
-          $ref: '#/components/schemas/UserInfoDto'
+          $ref: "#/components/schemas/UserInfoDto"
         createdAt:
           type: string
           format: date-time
         replies:
           type: array
           items:
-            $ref: '#/components/schemas/CommentResponseDto'
+            $ref: "#/components/schemas/CommentResponseDto"
 
     CreateCommentRequestDto:
       type: object
@@ -2094,17 +2270,17 @@ components:
         resourceId:
           type: string
           format: uuid
-          description: 'Filter by resource ID'
+          description: "Filter by resource ID"
         questionerId:
           type: string
           format: uuid
-          description: 'Filter by questioner user ID'
+          description: "Filter by questioner user ID"
         assigneeId:
           type: string
           format: uuid
-          description: 'Filter by assigned doctor ID'
+          description: "Filter by assigned doctor ID"
         state:
-          $ref: '#/components/schemas/DoctorUserConversationState'
+          $ref: "#/components/schemas/DoctorUserConversationState"
 
     DoctorUserConversationResponsePaginatedDto:
       type: object
@@ -2112,7 +2288,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/DoctorUserConversationResponseDto'
+            $ref: "#/components/schemas/DoctorUserConversationResponseDto"
         total:
           type: integer
           format: int64
@@ -2124,30 +2300,30 @@ components:
           type: string
           format: uuid
         type:
-          $ref: '#/components/schemas/DoctorUserConversationType'
+          $ref: "#/components/schemas/DoctorUserConversationType"
         state:
-          $ref: '#/components/schemas/DoctorUserConversationState'
+          $ref: "#/components/schemas/DoctorUserConversationState"
         content:
           type: string
-          description: 'Question or answer content'
+          description: "Question or answer content"
         attachmentUrls:
           type: array
           items:
             type: string
-          description: 'Array of presigned URLs for attached images'
+          description: "Array of presigned URLs for attached images"
         resourceId:
           type: string
           format: uuid
         questionerInfo:
-          $ref: '#/components/schemas/UserInfoDto'
-          description: 'User who asked the question'
+          $ref: "#/components/schemas/UserInfoDto"
+          description: "User who asked the question"
         assigneeInfo:
-          $ref: '#/components/schemas/UserInfoDto'
-          description: 'Doctor assigned to answer'
+          $ref: "#/components/schemas/UserInfoDto"
+          description: "Doctor assigned to answer"
         parentId:
           type: string
           format: uuid
-          description: 'Parent conversation ID for replies'
+          description: "Parent conversation ID for replies"
         createdAt:
           type: string
           format: date-time
@@ -2157,36 +2333,36 @@ components:
         replies:
           type: array
           items:
-            $ref: '#/components/schemas/DoctorUserConversationResponseDto'
-          description: 'Nested replies to this conversation'
+            $ref: "#/components/schemas/DoctorUserConversationResponseDto"
+          description: "Nested replies to this conversation"
 
     CreateDoctorUserConversationDto:
       type: object
       properties:
         state:
-          $ref: '#/components/schemas/DoctorUserConversationState'
+          $ref: "#/components/schemas/DoctorUserConversationState"
         type:
-          $ref: '#/components/schemas/DoctorUserConversationType'
+          $ref: "#/components/schemas/DoctorUserConversationType"
         resourceId:
           type: string
           format: uuid
-          description: 'Resource (video/image) this conversation is about'
+          description: "Resource (video/image) this conversation is about"
         assigneeId:
           type: string
           format: uuid
-          description: 'Optional: Doctor to assign the question to'
+          description: "Optional: Doctor to assign the question to"
         parentId:
           type: string
           format: uuid
-          description: 'Optional: Parent conversation ID for replies'
+          description: "Optional: Parent conversation ID for replies"
         content:
           type: string
-          description: 'Question or answer content'
+          description: "Question or answer content"
         attachmentUrls:
           type: array
           items:
             type: string
-          description: 'Array of MinIO object keys for attachments (uploaded via presigned URLs)'
+          description: "Array of MinIO object keys for attachments (uploaded via presigned URLs)"
       required:
         - state
         - type
@@ -2197,28 +2373,28 @@ components:
       type: object
       properties:
         state:
-          $ref: '#/components/schemas/DoctorUserConversationState'
+          $ref: "#/components/schemas/DoctorUserConversationState"
         content:
           type: string
-          description: 'Updated content'
+          description: "Updated content"
         assigneeId:
           type: string
           format: uuid
-          description: 'Reassign to different doctor'
+          description: "Reassign to different doctor"
 
     DoctorUserConversationState:
       type: string
       enum:
         - PUBLIC
         - DRAFT
-      description: 'PUBLIC = visible to all users, DRAFT = not yet published'
+      description: "PUBLIC = visible to all users, DRAFT = not yet published"
 
     DoctorUserConversationType:
       type: string
       enum:
         - VIDEO
         - IMAGE
-      description: 'Type of resource being discussed'
+      description: "Type of resource being discussed"
 
     # Tag schemas
     TagType:
@@ -2239,7 +2415,7 @@ components:
         content:
           type: string
         type:
-          $ref: '#/components/schemas/TagType'
+          $ref: "#/components/schemas/TagType"
 
     CreateTagRequestDto:
       type: object
@@ -2253,7 +2429,7 @@ components:
           items:
             type: string
         type:
-          $ref: '#/components/schemas/TagType'
+          $ref: "#/components/schemas/TagType"
 
     # Course Section schemas
     CourseSectionCriteria:
@@ -2265,7 +2441,7 @@ components:
         title:
           type: string
         state:
-          $ref: '#/components/schemas/CourseState'
+          $ref: "#/components/schemas/CourseState"
 
     CourseSectionResponsePaginatedDto:
       type: object
@@ -2273,7 +2449,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/CourseSectionResponseDto'
+            $ref: "#/components/schemas/CourseSectionResponseDto"
         total:
           type: integer
           format: int64
@@ -2287,7 +2463,7 @@ components:
         title:
           type: string
         state:
-          $ref: '#/components/schemas/CourseState'
+          $ref: "#/components/schemas/CourseState"
         thumbnailUrl:
           type: string
         attachments:
@@ -2303,14 +2479,14 @@ components:
           type: string
           format: uuid
         state:
-          $ref: '#/components/schemas/CourseState'
+          $ref: "#/components/schemas/CourseState"
         title:
           type: string
         attribute:
           type: object
           properties:
             metadata:
-              $ref: '#/components/schemas/MetaDataCourseSectionDto'
+              $ref: "#/components/schemas/MetaDataCourseSectionDto"
         totalCredits:
           type: integer
         tags:
@@ -2336,7 +2512,7 @@ components:
       type: object
       properties:
         state:
-          $ref: '#/components/schemas/CourseState'
+          $ref: "#/components/schemas/CourseState"
         title:
           type: string
         tags:
@@ -2353,7 +2529,7 @@ components:
           type: object
           properties:
             metadata:
-              $ref: '#/components/schemas/MetaDataCourseSectionDto'
+              $ref: "#/components/schemas/MetaDataCourseSectionDto"
         thumbnail:
           type: string
           format: uuid
@@ -2370,14 +2546,14 @@ components:
           type: string
           format: uuid
         state:
-          $ref: '#/components/schemas/CourseState'
+          $ref: "#/components/schemas/CourseState"
         title:
           type: string
         attribute:
           type: object
           properties:
             metadata:
-              $ref: '#/components/schemas/MetaDataCourseSectionDto'
+              $ref: "#/components/schemas/MetaDataCourseSectionDto"
         tags:
           type: array
           items:
@@ -2420,7 +2596,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/UserCourseResponseDto'
+            $ref: "#/components/schemas/UserCourseResponseDto"
         total:
           type: integer
           format: int64
@@ -2436,7 +2612,7 @@ components:
         title:
           type: string
         state:
-          $ref: '#/components/schemas/CourseState'
+          $ref: "#/components/schemas/CourseState"
         thumbnailUrl:
           type: string
         createdAt:
@@ -2453,7 +2629,7 @@ components:
           type: string
           format: uuid
         state:
-          $ref: '#/components/schemas/CourseState'
+          $ref: "#/components/schemas/CourseState"
         title:
           type: string
         description:
@@ -2482,7 +2658,7 @@ components:
         isEnrolledCourse:
           type: boolean
         createdByInfo:
-          $ref: '#/components/schemas/UserInfoDto'
+          $ref: "#/components/schemas/UserInfoDto"
 
     UserProgressCourseDto:
       type: object
@@ -2541,13 +2717,13 @@ components:
         id:
           type: string
           format: uuid
-          description: 'User progress course section ID'
+          description: "User progress course section ID"
         courseSectionId:
           type: string
           format: uuid
-          description: 'Course section ID'
+          description: "Course section ID"
         state:
-          $ref: '#/components/schemas/CourseState'
+          $ref: "#/components/schemas/CourseState"
         title:
           type: string
         attribute:
@@ -2586,7 +2762,7 @@ components:
       properties:
         totalTimeUserWatchedVideo:
           type: integer
-          description: 'Total time in seconds'
+          description: "Total time in seconds"
       required:
         - totalTimeUserWatchedVideo
 
@@ -2604,7 +2780,7 @@ components:
           type: string
           format: uuid
         type:
-          $ref: '#/components/schemas/UserResourceType'
+          $ref: "#/components/schemas/UserResourceType"
       required:
         - userInfoId
         - type
@@ -2615,7 +2791,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/UserResourcesAccessedResponseDto'
+            $ref: "#/components/schemas/UserResourcesAccessedResponseDto"
         total:
           type: integer
           format: int64
@@ -2624,7 +2800,7 @@ components:
       type: object
       properties:
         resource:
-          $ref: '#/components/schemas/ResourceResponseDto'
+          $ref: "#/components/schemas/ResourceResponseDto"
         createdAt:
           type: string
           format: date-time

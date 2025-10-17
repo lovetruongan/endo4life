@@ -162,7 +162,7 @@ export function FormInputImage({
               ? value.name
               : extractFileNameFromPresignedLink(
                   resourceUrl || '',
-                  EnvConfig.ElearningServiceUrl,
+                  EnvConfig.Endo4LifeServiceUrl,
                   'images',
                 )
           }

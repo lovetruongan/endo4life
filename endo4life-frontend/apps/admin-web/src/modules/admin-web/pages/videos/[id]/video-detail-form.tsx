@@ -126,7 +126,7 @@ export function VideoDetailForm({
       element.href = formData.resourceUrl;
       element.download = extractFileNameFromPresignedLink(
         formData.resourceUrl,
-        EnvConfig.ElearningServiceUrl,
+        EnvConfig.Endo4LifeServiceUrl,
         'videos',
       );
       document.body.appendChild(element);
@@ -276,7 +276,7 @@ export function VideoDetailForm({
                         )
                       : getFileExtensionFromUrl(
                           formData?.resourceUrl || '',
-                          EnvConfig.ElearningServiceUrl,
+                          EnvConfig.Endo4LifeServiceUrl,
                           'images',
                         )
                   }

@@ -108,7 +108,7 @@ export function ImageCreateForm({ loading, onSubmit }: IImageCreateFormProps) {
       element.href = fileUrl;
       element.download = extractFileNameFromPresignedLink(
         fileUrl,
-        EnvConfig.ElearningServiceUrl,
+        EnvConfig.Endo4LifeServiceUrl,
         'images',
       );
       document.body.appendChild(element);

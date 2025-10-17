@@ -26,7 +26,7 @@ export interface IImageApi {
 
 export class ImageApiImpl extends BaseApi implements IImageApi {
   constructor() {
-    super(EnvConfig.ElearningServiceUrl);
+    super(EnvConfig.Endo4LifeServiceUrl);
   }
 
   async getImages(filter: IFilter): Promise<IPaginatedResponse<IImageEntity>> {

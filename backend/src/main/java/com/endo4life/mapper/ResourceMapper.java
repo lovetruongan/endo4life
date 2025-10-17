@@ -1,12 +1,13 @@
 package com.endo4life.mapper;
 
-import com.endo4life.constant.Constants;
 import com.endo4life.domain.document.Resource;
 import com.endo4life.service.minio.MinioService;
 import com.endo4life.web.rest.model.CreateResourceRequestDto;
 import com.endo4life.web.rest.model.ResourceDetailResponseDto;
 import com.endo4life.web.rest.model.ResourceResponseDto;
 import com.endo4life.web.rest.model.UpdateResourceRequestDto;
+import com.endo4life.web.rest.model.UserResourceDetailResponseDto;
+import com.endo4life.web.rest.model.UserResourceResponseDto;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -43,6 +44,22 @@ public abstract class ResourceMapper {
     @Mapping(target = "thumbnailUrl", source = "resource", qualifiedByName = "thumbnailToUrl")
     @Mapping(target = "tags", ignore = true)
     public abstract ResourceResponseDto toResourceResponseDto(Resource resource);
+
+    @Mapping(target = "createdAt", source = "createdAt", qualifiedByName = "toOffsetDateTime")
+    @Mapping(target = "thumbnailUrl", source = "resource", qualifiedByName = "thumbnailToUrl")
+    @Mapping(target = "createdByInfo", ignore = true)
+    @Mapping(target = "tag", source = "tag")
+    @Mapping(target = "detailTag", source = "detailTag")
+    @Mapping(target = "time", ignore = true)
+    public abstract UserResourceResponseDto toUserResourceResponseDto(Resource resource);
+
+    @Mapping(target = "createdAt", source = "createdAt", qualifiedByName = "toOffsetDateTime")
+    @Mapping(target = "resourceUrl", source = "resource", qualifiedByName = "resourcePathToUrl")
+    @Mapping(target = "createdByInfo", ignore = true)
+    @Mapping(target = "tag", source = "tag")
+    @Mapping(target = "detailTag", source = "detailTag")
+    @Mapping(target = "time", ignore = true)
+    public abstract UserResourceDetailResponseDto toUserResourceDetailResponseDto(Resource resource);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     public abstract void toResource(@org.mapstruct.MappingTarget Resource resource,

@@ -20,8 +20,8 @@ export class ResourceFilter extends BaseFilter implements IResourceFilter {
     const data: ResourceCriteria = {
       ids: this.getArrayStringField('ids'),
       title: this.getStringField('title'),
-      state: this.getStringField('state') as ResourceState,
-      resourceType: this.getStringField('resourceType') as ResourceType,
+      state: (this.getStringField('state') || 'PUBLIC') as ResourceState,
+      type: this.getStringField('resourceType') as ResourceType,
       fromDate: this.getStringField('fromDate'),
       toDate: this.getStringField('toDate'),
       tag: this.getArrayStringField('tag'),
@@ -30,7 +30,7 @@ export class ResourceFilter extends BaseFilter implements IResourceFilter {
       lightTag: this.getArrayStringField('lightTag'),
       hpTag: this.getArrayStringField('hpTag'),
       locationUpperTag: this.getArrayStringField('locationUpperTag'),
-      searchWords: this.getSearch(),
+      searchWords: this.getSearch() ? [this.getSearch() as string] : undefined,
     };
 
     const commentOperator = this.getStringField('commentOperator');

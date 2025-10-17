@@ -28,7 +28,7 @@ export interface ICourseSectionApi {
 
 export class CourseSectionApiImpl extends BaseApi implements ICourseSectionApi {
   constructor() {
-    super(EnvConfig.ElearningServiceUrl);
+    super(EnvConfig.Endo4LifeServiceUrl);
   }
 
   async getCourseSections(
