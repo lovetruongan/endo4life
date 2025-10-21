@@ -1,14 +1,10 @@
-import { BaseApi, CommentV1Api, IdWrapperDto, StorageApiImpl } from "@endo4life/data-access";
+import { BaseApi, CommentV1Api, IdWrapperDto, StorageApiImpl, CommentResponseDto } from "@endo4life/data-access";
 import { EnvConfig } from "@endo4life/feature-config";
 import { DEFAULT_PAGINATION, IFilter } from "@endo4life/types";
-import { CommentFilter, CommentMapper, ICommentCreateFormData } from "../types";
+import { CommentFilter, CommentMapper, ICommentCreateFormData, ICommentUpdateFormData } from "../types";
 import { objectUtils } from "@endo4life/util-common";
 
-export interface ICommentApi {
-
-}
-
-export class CommentApiIml extends BaseApi implements ICommentApi {
+export class CommentApiIml extends BaseApi {
   constructor() {
     super(EnvConfig.Endo4LifeServiceUrl);
   }
@@ -47,6 +43,22 @@ export class CommentApiIml extends BaseApi implements ICommentApi {
     const config = await this.getApiConfiguration();
     const api = new CommentV1Api(config);
     const result = await api.createComment(CommentMapper.getInstance().toCreateCommentRequest(data));
+    return result.data;
+  }
+
+  async updateComment(id: string, data: ICommentUpdateFormData): Promise<CommentResponseDto> {
+    if (data.attachments && data.attachments.length) {
+      const storageApi = new StorageApiImpl(this.getBasePath());
+      for (let i = 0; i < data.attachments.length; i++) {
+        data.attachments[i].id = await storageApi.uploadFile(
+          objectUtils.defaultObject(data.attachments[i].file),
+          'IMAGE',
+        );
+      }
+    }
+    const config = await this.getApiConfiguration();
+    const api = new CommentV1Api(config);
+    const result = await api.updateComment(CommentMapper.getInstance().toUpdateCommentRequest(id, data));
     return result.data;
   }
 }

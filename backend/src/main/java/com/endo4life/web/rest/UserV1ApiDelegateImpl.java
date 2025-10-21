@@ -64,6 +64,12 @@ public class UserV1ApiDelegateImpl implements UserV1ApiDelegate {
     }
 
     @Override
+    public ResponseEntity<UserResponseDto> getUserInfo() {
+        UserResponseDto userResponseDto = userInfoService.getCurrentUserInfo();
+        return ResponseEntity.ok(userResponseDto);
+    }
+
+    @Override
     public ResponseEntity<UserResponseDto> getUserById(UUID id) {
         UserResponseDto userResponseDto = userInfoService.getUserById(id);
         return ResponseEntity.ok(userResponseDto);

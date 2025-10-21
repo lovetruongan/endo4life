@@ -15,8 +15,10 @@ import { localUuid } from '@endo4life/util-common';
 import { MediaGallery, mediaGalleryUtils } from '@endo4life/ui-common';
 import { IMediaGalleryItem } from '@endo4life/types';
 import { useToggle } from 'ahooks';
-import TypeIt from "typeit-react";
-import { useResourceCreateContext, useResourceDetailContext } from '@endo4life/feature-resources';
+import {
+  useResourceCreateContext,
+  useResourceDetailContext,
+} from '@endo4life/feature-resources';
 
 interface IDiscussionFormInputProps {
   parentId?: string;
@@ -38,7 +40,7 @@ export const DiscussionFormInput = ({
     attachments: [],
     [entityField]: entityIdValue,
     parentId: parentId,
-    content: "",
+    content: '',
     userInfoId: userProfile?.id,
   };
 
@@ -49,27 +51,35 @@ export const DiscussionFormInput = ({
       defaultValues: DEFAULT_FORM_VALUE,
     });
 
-  const attachments = watch("attachments");
+  const attachments = watch('attachments');
 
-  const onRemovePreviewClick = useCallback((item: IMediaGalleryItem) => {
-    if (Number.isNaN(item.id)) return;
-    const newAttachments = attachments.filter((_, idx) => idx !== Number(item.id));
-    setValue("attachments", newAttachments);
-  }, [attachments]);
+  const onRemovePreviewClick = useCallback(
+    (item: IMediaGalleryItem) => {
+      if (Number.isNaN(item.id)) return;
+      const newAttachments = attachments.filter(
+        (_, idx) => idx !== Number(item.id),
+      );
+      setValue('attachments', newAttachments);
+    },
+    [attachments, setValue],
+  );
 
-  const onFormSubmit = useCallback((formData: ICommentCreateFormData) => {
-    if (onSubmit) {
-      onSubmit(formData);
-    }
-  }, [onSubmit, setValue]);
+  const onFormSubmit = useCallback(
+    (formData: ICommentCreateFormData) => {
+      if (onSubmit) {
+        onSubmit(formData);
+      }
+    },
+    [onSubmit],
+  );
 
   useEffect(() => {
     if (typing) {
       const timer = setTimeout(() => typingToggle.setLeft(), 5000);
       return () => clearTimeout(timer);
     }
-  }, [typing]);
-  
+  }, [typing, typingToggle]);
+
   return (
     <form
       id={`comment-create-form-${parentId || 'root'}`}
@@ -78,7 +88,7 @@ export const DiscussionFormInput = ({
       onSubmit={(event: React.FormEvent) => {
         event.preventDefault();
         typingToggle.setLeft();
-        handleSubmit(formData => onFormSubmit(formData))();
+        handleSubmit((formData) => onFormSubmit(formData))();
         reset();
       }}
     >
@@ -100,7 +110,7 @@ export const DiscussionFormInput = ({
                     type="text"
                     key={name}
                     value={value}
-                    onChange={event => {
+                    onChange={(event) => {
                       const value = event.target.value;
                       onChange(event);
                       if (value) {
@@ -115,12 +125,14 @@ export const DiscussionFormInput = ({
             />
             {typing && (
               <div className="min-w-20">
-                <TypeIt><span className="text-xs text-gray-500">Đang nhập...</span></TypeIt>
+                <span className="text-xs text-gray-500">Đang nhập...</span>
               </div>
             )}
             {loading && (
               <div className="min-w-32">
-                <TypeIt><span className="text-xs text-gray-500">Đang gửi bình luận...</span></TypeIt>
+                <span className="text-xs text-gray-500">
+                  Đang gửi bình luận...
+                </span>
               </div>
             )}
             <Tooltip title="Đính kèm tệp">
@@ -144,23 +156,28 @@ export const DiscussionFormInput = ({
                       key={name}
                       accept="image/png, image/gif, image/jpeg, image/jpg"
                       className="absolute top-0 left-0 w-0 h-0 opacity-0"
-                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      onChange={(
+                        event: React.ChangeEvent<HTMLInputElement>,
+                      ) => {
                         const files = event.target.files;
                         if (!files || files.length === 0) return;
 
-                        onChange(Array.from(files).map(file => ({
-                          id: localUuid(),
-                          src: URL.createObjectURL(file),
-                          fileName: file.name,
-                          fileSize: file.size,
-                          extension: file.type,
-                          file: file,
-                        })));
-                        if (inputFileRef.current) inputFileRef.current.value = "";
+                        onChange(
+                          Array.from(files).map((file) => ({
+                            id: localUuid(),
+                            src: URL.createObjectURL(file),
+                            fileName: file.name,
+                            fileSize: file.size,
+                            extension: file.type,
+                            file: file,
+                          })),
+                        );
+                        if (inputFileRef.current)
+                          inputFileRef.current.value = '';
                       }}
                     />
                   )}
-                />  
+                />
               </IconButton>
             </Tooltip>
             <Tooltip title="Gửi bình luận">
@@ -175,7 +192,11 @@ export const DiscussionFormInput = ({
             </Tooltip>
           </div>
           {!!attachments.length && (
-            <div className={clsx("flex items-end h-full gap-2 p-3 bg-[#efefef] rounded-lg")}>
+            <div
+              className={clsx(
+                'flex items-end h-full gap-2 p-3 bg-[#efefef] rounded-lg',
+              )}
+            >
               <MediaGallery
                 data={mediaGalleryUtils.fromInputAttachments(attachments)}
                 hasRemoveIcon={true}

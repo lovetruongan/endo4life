@@ -2185,6 +2185,25 @@ export interface TestResponseDto {
 /**
  * 
  * @export
+ * @interface UpdateCommentRequestDto
+ */
+export interface UpdateCommentRequestDto {
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UpdateCommentRequestDto
+     */
+    'attachments'?: Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateCommentRequestDto
+     */
+    'content': string;
+}
+/**
+ * 
+ * @export
  * @interface UpdateCourseRequestDto
  */
 export interface UpdateCourseRequestDto {
@@ -3436,6 +3455,43 @@ export const CommentV1ApiAxiosParamCreator = function (configuration?: Configura
             };
         },
         /**
+         * Delete a comment by ID
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteComment: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('deleteComment', 'id', id)
+            const localVarPath = `/api/v1/comments/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get all comments with criteria
          * @param {CommentCriteria} [criteria] 
          * @param {Pageable} [pageable] 
@@ -3482,6 +3538,49 @@ export const CommentV1ApiAxiosParamCreator = function (configuration?: Configura
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Update a comment by ID
+         * @param {string} id 
+         * @param {UpdateCommentRequestDto} updateCommentRequestDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateComment: async (id: string, updateCommentRequestDto: UpdateCommentRequestDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('updateComment', 'id', id)
+            // verify required parameter 'updateCommentRequestDto' is not null or undefined
+            assertParamExists('updateComment', 'updateCommentRequestDto', updateCommentRequestDto)
+            const localVarPath = `/api/v1/comments/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateCommentRequestDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -3505,6 +3604,18 @@ export const CommentV1ApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Delete a comment by ID
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteComment(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteComment(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CommentV1Api.deleteComment']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Get all comments with criteria
          * @param {CommentCriteria} [criteria] 
          * @param {Pageable} [pageable] 
@@ -3515,6 +3626,19 @@ export const CommentV1ApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getComments(criteria, pageable, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CommentV1Api.getComments']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Update a comment by ID
+         * @param {string} id 
+         * @param {UpdateCommentRequestDto} updateCommentRequestDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateComment(id: string, updateCommentRequestDto: UpdateCommentRequestDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CommentResponseDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateComment(id, updateCommentRequestDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CommentV1Api.updateComment']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -3537,6 +3661,15 @@ export const CommentV1ApiFactory = function (configuration?: Configuration, base
             return localVarFp.createComment(requestParameters.createCommentRequestDto, options).then((request) => request(axios, basePath));
         },
         /**
+         * Delete a comment by ID
+         * @param {CommentV1ApiDeleteCommentRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteComment(requestParameters: CommentV1ApiDeleteCommentRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteComment(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Get all comments with criteria
          * @param {CommentV1ApiGetCommentsRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -3544,6 +3677,15 @@ export const CommentV1ApiFactory = function (configuration?: Configuration, base
          */
         getComments(requestParameters: CommentV1ApiGetCommentsRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<CommentResponsePaginatedDto> {
             return localVarFp.getComments(requestParameters.criteria, requestParameters.pageable, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Update a comment by ID
+         * @param {CommentV1ApiUpdateCommentRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateComment(requestParameters: CommentV1ApiUpdateCommentRequest, options?: RawAxiosRequestConfig): AxiosPromise<CommentResponseDto> {
+            return localVarFp.updateComment(requestParameters.id, requestParameters.updateCommentRequestDto, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -3560,6 +3702,20 @@ export interface CommentV1ApiCreateCommentRequest {
      * @memberof CommentV1ApiCreateComment
      */
     readonly createCommentRequestDto: CreateCommentRequestDto
+}
+
+/**
+ * Request parameters for deleteComment operation in CommentV1Api.
+ * @export
+ * @interface CommentV1ApiDeleteCommentRequest
+ */
+export interface CommentV1ApiDeleteCommentRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof CommentV1ApiDeleteComment
+     */
+    readonly id: string
 }
 
 /**
@@ -3584,6 +3740,27 @@ export interface CommentV1ApiGetCommentsRequest {
 }
 
 /**
+ * Request parameters for updateComment operation in CommentV1Api.
+ * @export
+ * @interface CommentV1ApiUpdateCommentRequest
+ */
+export interface CommentV1ApiUpdateCommentRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof CommentV1ApiUpdateComment
+     */
+    readonly id: string
+
+    /**
+     * 
+     * @type {UpdateCommentRequestDto}
+     * @memberof CommentV1ApiUpdateComment
+     */
+    readonly updateCommentRequestDto: UpdateCommentRequestDto
+}
+
+/**
  * CommentV1Api - object-oriented interface
  * @export
  * @class CommentV1Api
@@ -3602,6 +3779,17 @@ export class CommentV1Api extends BaseAPI {
     }
 
     /**
+     * Delete a comment by ID
+     * @param {CommentV1ApiDeleteCommentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CommentV1Api
+     */
+    public deleteComment(requestParameters: CommentV1ApiDeleteCommentRequest, options?: RawAxiosRequestConfig) {
+        return CommentV1ApiFp(this.configuration).deleteComment(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Get all comments with criteria
      * @param {CommentV1ApiGetCommentsRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -3610,6 +3798,17 @@ export class CommentV1Api extends BaseAPI {
      */
     public getComments(requestParameters: CommentV1ApiGetCommentsRequest = {}, options?: RawAxiosRequestConfig) {
         return CommentV1ApiFp(this.configuration).getComments(requestParameters.criteria, requestParameters.pageable, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Update a comment by ID
+     * @param {CommentV1ApiUpdateCommentRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CommentV1Api
+     */
+    public updateComment(requestParameters: CommentV1ApiUpdateCommentRequest, options?: RawAxiosRequestConfig) {
+        return CommentV1ApiFp(this.configuration).updateComment(requestParameters.id, requestParameters.updateCommentRequestDto, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -8612,6 +8811,39 @@ export const UserV1ApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
+         * Get current user info
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserInfo: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/users/info`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get users by criteria
          * @param {UserInfoCriteria} [criteria] 
          * @param {Pageable} [pageable] 
@@ -8823,6 +9055,17 @@ export const UserV1ApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Get current user info
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getUserInfo(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserResponseDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getUserInfo(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserV1Api.getUserInfo']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Get users by criteria
          * @param {UserInfoCriteria} [criteria] 
          * @param {Pageable} [pageable] 
@@ -8907,6 +9150,14 @@ export const UserV1ApiFactory = function (configuration?: Configuration, basePat
          */
         getUserById(requestParameters: UserV1ApiGetUserByIdRequest, options?: RawAxiosRequestConfig): AxiosPromise<UserResponseDto> {
             return localVarFp.getUserById(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get current user info
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserInfo(options?: RawAxiosRequestConfig): AxiosPromise<UserResponseDto> {
+            return localVarFp.getUserInfo(options).then((request) => request(axios, basePath));
         },
         /**
          * Get users by criteria
@@ -9126,6 +9377,16 @@ export class UserV1Api extends BaseAPI {
      */
     public getUserById(requestParameters: UserV1ApiGetUserByIdRequest, options?: RawAxiosRequestConfig) {
         return UserV1ApiFp(this.configuration).getUserById(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get current user info
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserV1Api
+     */
+    public getUserInfo(options?: RawAxiosRequestConfig) {
+        return UserV1ApiFp(this.configuration).getUserInfo(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

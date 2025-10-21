@@ -20,6 +20,7 @@ import com.endo4life.web.rest.errors.BadRequestException;
 import com.endo4life.web.rest.model.CommentCriteria;
 import com.endo4life.web.rest.model.CommentResponseDto;
 import com.endo4life.web.rest.model.CreateCommentRequestDto;
+import com.endo4life.web.rest.model.UpdateCommentRequestDto;
 import com.endo4life.web.rest.model.UserInfoDto;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -63,17 +64,17 @@ public class CommentServiceImpl implements CommentService {
         if (Objects.nonNull(courseId)) {
             commentEntity.setCourse(
                     courseRepository.findById(createCommentRequestDto.getCourseId())
-                            .orElseThrow(() -> new BadRequestException("Course not found with id {}", courseId)));
+                            .orElseThrow(() -> new BadRequestException("Course not found with id {0}", courseId)));
         }
         UUID resourceId = createCommentRequestDto.getResourceId();
         if (Objects.nonNull(resourceId)) {
             commentEntity.setResource(
                     resourceRepository.findById(createCommentRequestDto.getResourceId())
-                            .orElseThrow(() -> new BadRequestException("Resource not found with id {}", resourceId)));
+                            .orElseThrow(() -> new BadRequestException("Resource not found with id {0}", resourceId)));
         }
 
         UserInfo userInfoEntity = userInfoRepository.findById(createCommentRequestDto.getUserInfoId())
-                .orElseThrow(() -> new BadRequestException("UserInfo not found with id {}",
+                .orElseThrow(() -> new BadRequestException("UserInfo not found with id {0}",
                         createCommentRequestDto.getUserInfoId()));
         commentEntity.setUser(userInfoEntity);
         if (CollectionUtils.isNotEmpty(createCommentRequestDto.getAttachments())) {
@@ -82,12 +83,19 @@ public class CommentServiceImpl implements CommentService {
         UUID parentId = createCommentRequestDto.getParentId();
         if (Objects.nonNull(parentId)) {
             Comment comment = commentRepository.findById(parentId)
-                    .orElseThrow(() -> new BadRequestException("CommentEntity not found with id {}", parentId));
+                    .orElseThrow(() -> new BadRequestException("CommentEntity not found with id {0}", parentId));
             commentEntity.setParentComment(comment);
         }
         commentEntity.setCreatedBy(UserContextHolder.getEmail().orElse(Constants.SYSTEM));
         commentEntity.setUpdatedBy(UserContextHolder.getEmail().orElse(Constants.SYSTEM));
         commentRepository.save(commentEntity);
+
+        // Increment comment count only for top-level comments (not replies)
+        if (Objects.isNull(parentId) && Objects.nonNull(commentEntity.getResource())) {
+            commentEntity.getResource().incrementCommentCount();
+            resourceRepository.save(commentEntity.getResource());
+        }
+
         return commentEntity.getId();
     }
 
@@ -141,5 +149,40 @@ public class CommentServiceImpl implements CommentService {
         userInfoDto.setAvatarUrl(
                 minioService.createGetPreSignedLink(userInfoEntity.getAvatarPath(), minioConfig.bucketAvatar()));
         return userInfoDto;
+    }
+
+    @Override
+    public CommentResponseDto updateComment(UUID id, UpdateCommentRequestDto updateCommentRequestDto) {
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("Comment not found with id {0}", id));
+
+        // Update content
+        if (StringUtils.isNotBlank(updateCommentRequestDto.getContent())) {
+            comment.setContent(updateCommentRequestDto.getContent());
+        }
+
+        // Update attachments if provided
+        if (CollectionUtils.isNotEmpty(updateCommentRequestDto.getAttachments())) {
+            comment.setAttachments(updateCommentRequestDto.getAttachments());
+        }
+
+        comment.setUpdatedBy(UserContextHolder.getEmail().orElse(Constants.SYSTEM));
+        Comment updatedComment = commentRepository.save(comment);
+
+        return commentMapper.toCommentResponseDto(updatedComment);
+    }
+
+    @Override
+    public void deleteComment(UUID id) {
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("Comment not found with id {0}", id));
+
+        // Decrement comment count only for top-level comments (not replies)
+        if (Objects.isNull(comment.getParentComment()) && Objects.nonNull(comment.getResource())) {
+            comment.getResource().decrementCommentCount();
+            resourceRepository.save(comment.getResource());
+        }
+
+        commentRepository.delete(comment);
     }
 }

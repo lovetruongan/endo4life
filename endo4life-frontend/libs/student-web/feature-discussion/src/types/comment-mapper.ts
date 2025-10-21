@@ -1,11 +1,13 @@
-import { CommentResponseDto, CommentV1ApiCreateCommentRequest, IdWrapperDto } from "@endo4life/data-access";
+import { CommentResponseDto, CommentV1ApiCreateCommentRequest, CommentV1ApiUpdateCommentRequest, IdWrapperDto } from "@endo4life/data-access";
 import { ICommentEntity } from "./comment-entity";
-import { objectUtils, stringUtils } from "@endo4life/util-common";
+import { stringUtils } from "@endo4life/util-common";
 import { ICommentCreateFormData } from "./comment-create-form-data";
+import { ICommentUpdateFormData } from "./comment-update-form-data";
 
 export interface ICommentMapper {
   fromDto(dto: CommentResponseDto): ICommentEntity;
   toCreateCommentRequest(formData: ICommentCreateFormData): CommentV1ApiCreateCommentRequest;
+  toUpdateCommentRequest(id: string, formData: ICommentUpdateFormData): CommentV1ApiUpdateCommentRequest;
 }
 
 export class CommentMapper implements ICommentMapper {
@@ -29,7 +31,7 @@ export class CommentMapper implements ICommentMapper {
       id: dto.id,
       content: dto.content,
       attachments: dto.attachments,
-      comment: dto.comment ? this.fromDto(objectUtils.defaultObject(dto.comment)) : undefined,
+      replies: dto.replies ? dto.replies.map(reply => this.fromDto(reply)) : undefined,
       createdAt: dto.createdAt,
       createdBy: dto.createdBy,
     }
@@ -44,6 +46,16 @@ export class CommentMapper implements ICommentMapper {
         parentId: formData.parentId,
         content: formData.content,
         userInfoId: formData.userInfoId,
+      }
+    }
+  }
+
+  toUpdateCommentRequest(id: string, formData: ICommentUpdateFormData): CommentV1ApiUpdateCommentRequest {
+    return {
+      id,
+      updateCommentRequestDto: {
+        attachments: formData.attachments?.map(attachment => stringUtils.defaultString(attachment?.id)),
+        content: formData.content,
       }
     }
   }

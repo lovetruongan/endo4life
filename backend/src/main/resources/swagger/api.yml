@@ -604,6 +604,20 @@ paths:
               schema:
                 $ref: "#/components/schemas/UserResponseDto"
 
+  /api/v1/users/info:
+    get:
+      operationId: getUserInfo
+      description: Get current user info
+      tags:
+        - "user-v1"
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponseDto"
+
   /api/v1/users/invite:
     post:
       description: Invite a new user
@@ -826,6 +840,48 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/IdWrapperDto"
+
+  /api/v1/comments/{id}:
+    put:
+      description: Update a comment by ID
+      operationId: updateComment
+      tags:
+        - "comment-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCommentRequestDto"
+      responses:
+        200:
+          description: Comment updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentResponseDto"
+    delete:
+      description: Delete a comment by ID
+      operationId: deleteComment
+      tags:
+        - "comment-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: Comment deleted successfully
 
   # Tag Management APIs
   /api/v1/tags:
@@ -2263,6 +2319,18 @@ components:
       required:
         - content
         - userInfoId
+
+    UpdateCommentRequestDto:
+      type: object
+      properties:
+        attachments:
+          type: array
+          items:
+            type: string
+        content:
+          type: string
+      required:
+        - content
     # Doctor and User Conversation schemas
     DoctorUserConversationCriteria:
       type: object
