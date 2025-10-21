@@ -941,6 +941,18 @@ export interface CreateUserRequestDto {
      * @memberof CreateUserRequestDto
      */
     'password': string;
+    /**
+     * MinIO object key for avatar (uploaded via presigned URL)
+     * @type {string}
+     * @memberof CreateUserRequestDto
+     */
+    'avatar'?: string;
+    /**
+     * List of certificate object keys (uploaded via presigned URL)
+     * @type {Array<string>}
+     * @memberof CreateUserRequestDto
+     */
+    'certificates'?: Array<string>;
 }
 
 
@@ -2523,6 +2535,24 @@ export interface UpdateUserRequestDto {
      * @memberof UpdateUserRequestDto
      */
     'state'?: UserInfoState;
+    /**
+     * MinIO object key for avatar (uploaded via presigned URL)
+     * @type {string}
+     * @memberof UpdateUserRequestDto
+     */
+    'avatar'?: string;
+    /**
+     * List of certificate object keys to delete
+     * @type {Array<string>}
+     * @memberof UpdateUserRequestDto
+     */
+    'deleteCertificatePaths'?: Array<string>;
+    /**
+     * List of new certificate object keys (uploaded via presigned URL)
+     * @type {Array<string>}
+     * @memberof UpdateUserRequestDto
+     */
+    'newCertificates'?: Array<string>;
 }
 
 
@@ -2663,6 +2693,12 @@ export interface UserInfoCriteria {
  * @interface UserInfoDto
  */
 export interface UserInfoDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserInfoDto
+     */
+    'id'?: string;
     /**
      * 
      * @type {string}
@@ -8642,15 +8678,13 @@ export const UserV1ApiAxiosParamCreator = function (configuration?: Configuratio
     return {
         /**
          * Create a new user
-         * @param {CreateUserRequestDto} user 
-         * @param {File} [avatar] Profile image
-         * @param {Array<File>} [certificate] 
+         * @param {CreateUserRequestDto} createUserRequestDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createUser: async (user: CreateUserRequestDto, avatar?: File, certificate?: Array<File>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'user' is not null or undefined
-            assertParamExists('createUser', 'user', user)
+        createUser: async (createUserRequestDto: CreateUserRequestDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createUserRequestDto' is not null or undefined
+            assertParamExists('createUser', 'createUserRequestDto', createUserRequestDto)
             const localVarPath = `/api/v1/users`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -8662,34 +8696,19 @@ export const UserV1ApiAxiosParamCreator = function (configuration?: Configuratio
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
-            const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
 
             // authentication bearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
 
-            if (user !== undefined) { 
-                localVarFormParams.append('user', new Blob([JSON.stringify(user)], { type: "application/json", }));
-            }
     
-            if (avatar !== undefined) { 
-                localVarFormParams.append('avatar', avatar as any);
-            }
-                if (certificate) {
-                certificate.forEach((element) => {
-                    localVarFormParams.append('certificate', element as any);
-                })
-            }
+            localVarHeaderParameter['Content-Type'] = 'application/json';
 
-    
-    
-            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = localVarFormParams;
+            localVarRequestOptions.data = serializeDataIfNeeded(createUserRequestDto, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -8932,18 +8951,15 @@ export const UserV1ApiAxiosParamCreator = function (configuration?: Configuratio
         /**
          * Update user
          * @param {string} id 
-         * @param {UpdateUserRequestDto} user 
-         * @param {File} [avatar] 
-         * @param {Array<string>} [deleteCertificatePaths] 
-         * @param {Array<File>} [newCertificates] 
+         * @param {UpdateUserRequestDto} updateUserRequestDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateUser: async (id: string, user: UpdateUserRequestDto, avatar?: File, deleteCertificatePaths?: Array<string>, newCertificates?: Array<File>, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateUser: async (id: string, updateUserRequestDto: UpdateUserRequestDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             assertParamExists('updateUser', 'id', id)
-            // verify required parameter 'user' is not null or undefined
-            assertParamExists('updateUser', 'user', user)
+            // verify required parameter 'updateUserRequestDto' is not null or undefined
+            assertParamExists('updateUser', 'updateUserRequestDto', updateUserRequestDto)
             const localVarPath = `/api/v1/users/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -8956,38 +8972,19 @@ export const UserV1ApiAxiosParamCreator = function (configuration?: Configuratio
             const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
-            const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
 
             // authentication bearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
 
-            if (user !== undefined) { 
-                localVarFormParams.append('user', new Blob([JSON.stringify(user)], { type: "application/json", }));
-            }
     
-            if (avatar !== undefined) { 
-                localVarFormParams.append('avatar', avatar as any);
-            }
-                if (deleteCertificatePaths) {
-                localVarFormParams.append('deleteCertificatePaths', deleteCertificatePaths.join(COLLECTION_FORMATS.csv));
-            }
+            localVarHeaderParameter['Content-Type'] = 'application/json';
 
-                if (newCertificates) {
-                newCertificates.forEach((element) => {
-                    localVarFormParams.append('newCertificates', element as any);
-                })
-            }
-
-    
-    
-            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = localVarFormParams;
+            localVarRequestOptions.data = serializeDataIfNeeded(updateUserRequestDto, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -9006,14 +9003,12 @@ export const UserV1ApiFp = function(configuration?: Configuration) {
     return {
         /**
          * Create a new user
-         * @param {CreateUserRequestDto} user 
-         * @param {File} [avatar] Profile image
-         * @param {Array<File>} [certificate] 
+         * @param {CreateUserRequestDto} createUserRequestDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createUser(user: CreateUserRequestDto, avatar?: File, certificate?: Array<File>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IdWrapperDto>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createUser(user, avatar, certificate, options);
+        async createUser(createUserRequestDto: CreateUserRequestDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IdWrapperDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createUser(createUserRequestDto, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['UserV1Api.createUser']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -9093,15 +9088,12 @@ export const UserV1ApiFp = function(configuration?: Configuration) {
         /**
          * Update user
          * @param {string} id 
-         * @param {UpdateUserRequestDto} user 
-         * @param {File} [avatar] 
-         * @param {Array<string>} [deleteCertificatePaths] 
-         * @param {Array<File>} [newCertificates] 
+         * @param {UpdateUserRequestDto} updateUserRequestDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateUser(id: string, user: UpdateUserRequestDto, avatar?: File, deleteCertificatePaths?: Array<string>, newCertificates?: Array<File>, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateUser(id, user, avatar, deleteCertificatePaths, newCertificates, options);
+        async updateUser(id: string, updateUserRequestDto: UpdateUserRequestDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateUser(id, updateUserRequestDto, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['UserV1Api.updateUser']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -9123,7 +9115,7 @@ export const UserV1ApiFactory = function (configuration?: Configuration, basePat
          * @throws {RequiredError}
          */
         createUser(requestParameters: UserV1ApiCreateUserRequest, options?: RawAxiosRequestConfig): AxiosPromise<IdWrapperDto> {
-            return localVarFp.createUser(requestParameters.user, requestParameters.avatar, requestParameters.certificate, options).then((request) => request(axios, basePath));
+            return localVarFp.createUser(requestParameters.createUserRequestDto, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete user
@@ -9184,7 +9176,7 @@ export const UserV1ApiFactory = function (configuration?: Configuration, basePat
          * @throws {RequiredError}
          */
         updateUser(requestParameters: UserV1ApiUpdateUserRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.updateUser(requestParameters.id, requestParameters.user, requestParameters.avatar, requestParameters.deleteCertificatePaths, requestParameters.newCertificates, options).then((request) => request(axios, basePath));
+            return localVarFp.updateUser(requestParameters.id, requestParameters.updateUserRequestDto, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -9200,21 +9192,7 @@ export interface UserV1ApiCreateUserRequest {
      * @type {CreateUserRequestDto}
      * @memberof UserV1ApiCreateUser
      */
-    readonly user: CreateUserRequestDto
-
-    /**
-     * Profile image
-     * @type {File}
-     * @memberof UserV1ApiCreateUser
-     */
-    readonly avatar?: File
-
-    /**
-     * 
-     * @type {Array<File>}
-     * @memberof UserV1ApiCreateUser
-     */
-    readonly certificate?: Array<File>
+    readonly createUserRequestDto: CreateUserRequestDto
 }
 
 /**
@@ -9305,28 +9283,7 @@ export interface UserV1ApiUpdateUserRequest {
      * @type {UpdateUserRequestDto}
      * @memberof UserV1ApiUpdateUser
      */
-    readonly user: UpdateUserRequestDto
-
-    /**
-     * 
-     * @type {File}
-     * @memberof UserV1ApiUpdateUser
-     */
-    readonly avatar?: File
-
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof UserV1ApiUpdateUser
-     */
-    readonly deleteCertificatePaths?: Array<string>
-
-    /**
-     * 
-     * @type {Array<File>}
-     * @memberof UserV1ApiUpdateUser
-     */
-    readonly newCertificates?: Array<File>
+    readonly updateUserRequestDto: UpdateUserRequestDto
 }
 
 /**
@@ -9344,7 +9301,7 @@ export class UserV1Api extends BaseAPI {
      * @memberof UserV1Api
      */
     public createUser(requestParameters: UserV1ApiCreateUserRequest, options?: RawAxiosRequestConfig) {
-        return UserV1ApiFp(this.configuration).createUser(requestParameters.user, requestParameters.avatar, requestParameters.certificate, options).then((request) => request(this.axios, this.basePath));
+        return UserV1ApiFp(this.configuration).createUser(requestParameters.createUserRequestDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -9419,7 +9376,7 @@ export class UserV1Api extends BaseAPI {
      * @memberof UserV1Api
      */
     public updateUser(requestParameters: UserV1ApiUpdateUserRequest, options?: RawAxiosRequestConfig) {
-        return UserV1ApiFp(this.configuration).updateUser(requestParameters.id, requestParameters.user, requestParameters.avatar, requestParameters.deleteCertificatePaths, requestParameters.newCertificates, options).then((request) => request(this.axios, this.basePath));
+        return UserV1ApiFp(this.configuration).updateUser(requestParameters.id, requestParameters.updateUserRequestDto, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

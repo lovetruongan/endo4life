@@ -42,6 +42,7 @@ export default function ProfileMenu({ opened }: IProfileMenu) {
         <div className="flex items-center gap-3 px-4 py-2 cursor-pointer">
           <Avatar
             alt="avatar"
+            src={userProfile?.avatarLink}
             sx={{
               width: '36px',
               height: '36px',

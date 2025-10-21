@@ -1,21 +1,41 @@
 package com.endo4life.mapper;
 
 import com.endo4life.domain.document.DoctorUserConversations;
+import com.endo4life.service.minio.MinioService;
+import com.endo4life.config.ApplicationProperties;
 import com.endo4life.web.rest.model.CreateDoctorUserConversationDto;
 import com.endo4life.web.rest.model.DoctorUserConversationResponseDto;
 import com.endo4life.web.rest.model.UpdateDoctorUserConversationDto;
 import com.endo4life.web.rest.model.UserInfoDto;
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
+import jakarta.annotation.PostConstruct;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
 @Mapper(componentModel = SPRING, uses = { DateTimeMapper.class })
+@Slf4j
 public abstract class DoctorUserConversationMapper {
+
+    @Autowired
+    protected MinioService minioService;
+
+    @Autowired
+    protected ApplicationProperties applicationProperties;
+
+    protected ApplicationProperties.MinioConfiguration minioConfig;
+
+    @PostConstruct
+    private void init() {
+        this.minioConfig = applicationProperties.minioConfiguration();
+    }
 
     @Mapping(target = "questioner", ignore = true) // Set from JWT in service
     @Mapping(target = "assignee", ignore = true) // Set from assigneeId in service
@@ -57,10 +77,25 @@ public abstract class DoctorUserConversationMapper {
             return null;
         }
         UserInfoDto dto = new UserInfoDto();
+        dto.setId(userInfo.getId());
         dto.setFirstName(userInfo.getFirstName());
         dto.setLastName(userInfo.getLastName());
         dto.setEmail(userInfo.getEmail());
-        // TODO: Add avatarUrl conversion if needed
+
+        // Generate avatarUrl presigned URL if avatar path exists
+        if (StringUtils.isNotBlank(userInfo.getAvatarPath())) {
+            try {
+                String avatarUrl = minioService.createGetPreSignedLink(
+                        userInfo.getAvatarPath(),
+                        minioConfig.bucketAvatar());
+                if (StringUtils.isNotBlank(avatarUrl)) {
+                    dto.setAvatarUrl(avatarUrl);
+                }
+            } catch (Exception e) {
+                log.error("Failed to generate avatar presigned URL for: {}", userInfo.getAvatarPath(), e);
+            }
+        }
+
         return dto;
     }
 }

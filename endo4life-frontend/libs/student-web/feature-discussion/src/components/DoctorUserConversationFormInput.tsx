@@ -13,6 +13,7 @@ import { localUuid } from '@endo4life/util-common';
 import { MediaGallery, mediaGalleryUtils } from '@endo4life/ui-common';
 import { IMediaGalleryItem } from '@endo4life/types';
 import { useToggle } from 'ahooks';
+import { useAuthContext } from '@endo4life/feature-auth';
 import {
   useResourceCreateContext,
   useResourceDetailContext,
@@ -27,6 +28,7 @@ export const DoctorUserConversationFormInput = ({
   parentId,
   onSubmit,
 }: IDoctorUserConversationFormInputProps) => {
+  const { userProfile } = useAuthContext();
   const { loading } = useResourceCreateContext();
   const { entityField, entityIdValue, resource } = useResourceDetailContext();
   const formRef = useRef<HTMLFormElement>(null);
@@ -92,9 +94,14 @@ export const DoctorUserConversationFormInput = ({
     >
       <div className="flex gap-2">
         <Avatar
-          src="https://static.tvtropes.org/pmwiki/pub/images/samsprattblues.png"
+          src={(userProfile as any)?.avatarLink}
           sx={{ width: 36, height: 36 }}
-        />
+        >
+          {!(userProfile as any)?.avatarLink &&
+            (userProfile?.firstName?.charAt(0) ||
+              userProfile?.lastName?.charAt(0) ||
+              userProfile?.email?.charAt(0)?.toUpperCase())}
+        </Avatar>
         <div className="flex flex-col w-full gap-1">
           <div className="flex items-center pr-4 border rounded-lg bg-[#efefef]">
             <Controller

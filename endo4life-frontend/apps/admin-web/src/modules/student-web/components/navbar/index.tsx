@@ -37,7 +37,7 @@ export default function Navbar() {
       <div className="w-full px-5 py-4">
         <Link to={STUDENT_WEB_ROUTES.ROOT}>
           <img
-            alt='logo'
+            alt="logo"
             src="/images/logo.png"
             className="flex-none w-10 h-10"
             title="imageinput"
@@ -86,17 +86,23 @@ export default function Navbar() {
           onClick={onClickMenu}
           className={clsx(
             'flex items-center h-10 gap-3 text-sm text-black rounded hover:bg-slate-100 w-full',
-            { 'bg-slate-100': menuOpened }
+            { 'bg-slate-100': menuOpened },
           )}
         >
           <Avatar
             alt="avatar"
+            src={userProfile?.avatarLink}
             sx={{
               bgcolor: '#ccc',
               width: '28px',
               height: '28px',
             }}
-          />
+          >
+            {!userProfile?.avatarLink &&
+              (userProfile?.firstName?.charAt(0) ||
+                userProfile?.lastName?.charAt(0) ||
+                userProfile?.email?.charAt(0)?.toUpperCase())}
+          </Avatar>
           <span className="text-left">
             {userProfile?.lastName} {userProfile?.firstName}
           </span>

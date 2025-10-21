@@ -6,6 +6,8 @@ import {
   UserV1Api,
   UserResponseDto,
   BaseApi,
+  ResourceType,
+  StorageApiImpl,
 } from '@endo4life/data-access';
 import { EnvConfig } from '@endo4life/feature-config';
 import { Avatar, Button, TextField, CircularProgress } from '@mui/material';
@@ -128,6 +130,31 @@ export default function MyProfilePage() {
       setLoading(true);
 
       try {
+        let avatarObjectKey: string | undefined;
+
+        // Step 1: Upload avatar to MinIO if changed
+        if (avatarFile) {
+          const storageApi = new StorageApiImpl(
+            EnvConfig.Endo4LifeServiceUrl || 'http://localhost:8080',
+          );
+
+          try {
+            avatarObjectKey = await storageApi.uploadFile(
+              avatarFile,
+              ResourceType.Avatar,
+            );
+          } catch (uploadError) {
+            console.error('Error uploading avatar:', uploadError);
+            toast.error('Không thể tải lên ảnh đại diện. Vui lòng thử lại.', {
+              position: 'top-right',
+              autoClose: 3000,
+            });
+            setLoading(false);
+            return;
+          }
+        }
+
+        // Step 2: Update user with object key
         const helper = new UserApiHelper();
         const api = await helper.getUserApi();
 
@@ -137,12 +164,12 @@ export default function MyProfilePage() {
           phoneNumber: formData.phoneNumber,
           role: userInfo.role as UserInfoRole,
           state: userInfo.state as UserInfoState,
+          avatar: avatarObjectKey, // Send UUID object key instead of File
         };
 
         await api.updateUser({
           id: userInfo.id,
-          user: updateData,
-          avatar: avatarFile || undefined,
+          updateUserRequestDto: updateData,
         });
 
         toast.success('Cập nhật thông tin thành công!', {
@@ -150,7 +177,7 @@ export default function MyProfilePage() {
           autoClose: 2000,
         });
 
-        // Reload user info
+        // Reload user info to get new avatar presigned URL
         const response = await api.getUserById({ id: userInfo.id });
         setUserInfo(response.data);
         setAvatarPreview(response.data.avatarLink || null);

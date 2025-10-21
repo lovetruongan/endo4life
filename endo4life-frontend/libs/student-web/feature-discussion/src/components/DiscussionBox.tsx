@@ -41,15 +41,25 @@ export function DiscussionBox({
     >
       {/* avatar */}
       <Avatar
-        src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.flaticon.com%2Ffree-icon%2Fuser_3237472&psig=AOvVaw2FRSFHjkL-MFBpuip_GWSJ&ust=1731146097760000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCLDEwfq7zIkDFQAAAAAdAAAAABAR"
+        src={discuss.createdByInfo?.avatarUrl}
         sx={{ width: 36, height: 36 }}
-      />
+      >
+        {!discuss.createdByInfo?.avatarUrl &&
+          (discuss.createdByInfo?.firstName?.charAt(0) ||
+            discuss.createdByInfo?.lastName?.charAt(0) ||
+            discuss.createdBy?.charAt(0)?.toUpperCase())}
+      </Avatar>
       {/* comment content section */}
       <div className="flex flex-col w-full gap-2">
         {/* comment box */}
         <div className="bg-[#efefef] rounded-xl py-3 px-4 gap-1 flex flex-col">
           <div className="flex items-center gap-2">
-            <span className="font-semibold">{discuss.createdBy}</span>
+            <span className="font-semibold">
+              {discuss.createdByInfo
+                ? `${discuss.createdByInfo.firstName || ''} ${discuss.createdByInfo.lastName || ''}`.trim() ||
+                  discuss.createdBy
+                : discuss.createdBy}
+            </span>
             <span className="text-xs text-neutral-500">
               {moment(discuss.createdAt).fromNow()}
             </span>

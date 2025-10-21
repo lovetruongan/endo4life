@@ -484,23 +484,9 @@ paths:
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
-              type: object
-              required:
-                - user
-              properties:
-                user:
-                  $ref: "#/components/schemas/CreateUserRequestDto"
-                avatar:
-                  type: string
-                  format: binary
-                  description: "Profile image"
-                certificate:
-                  type: array
-                  items:
-                    type: string
-                    format: binary
+              $ref: "#/components/schemas/CreateUserRequestDto"
       responses:
         201:
           description: User created successfully
@@ -546,26 +532,9 @@ paths:
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
-              type: object
-              required:
-                - user
-              properties:
-                user:
-                  $ref: "#/components/schemas/UpdateUserRequestDto"
-                avatar:
-                  type: string
-                  format: binary
-                deleteCertificatePaths:
-                  type: array
-                  items:
-                    type: string
-                newCertificates:
-                  type: array
-                  items:
-                    type: string
-                    format: binary
+              $ref: "#/components/schemas/UpdateUserRequestDto"
       responses:
         204:
           description: User updated successfully
@@ -1955,6 +1924,16 @@ components:
         password:
           type: string
           minLength: 8
+        avatar:
+          type: string
+          format: uuid
+          description: "MinIO object key for avatar (uploaded via presigned URL)"
+        certificates:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: "List of certificate object keys (uploaded via presigned URL)"
 
     UpdateUserRequestDto:
       type: object
@@ -1969,6 +1948,21 @@ components:
           $ref: "#/components/schemas/UserInfoRole"
         state:
           $ref: "#/components/schemas/UserInfoState"
+        avatar:
+          type: string
+          format: uuid
+          description: "MinIO object key for avatar (uploaded via presigned URL)"
+        deleteCertificatePaths:
+          type: array
+          items:
+            type: string
+          description: "List of certificate object keys to delete"
+        newCertificates:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: "List of new certificate object keys (uploaded via presigned URL)"
 
     InviteUserRequestDto:
       type: object
@@ -2027,6 +2021,9 @@ components:
     UserInfoDto:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
         firstName:
           type: string
         lastName:

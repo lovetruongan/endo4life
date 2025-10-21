@@ -24,7 +24,19 @@ import {
 } from '@endo4life/feature-config';
 import { stringUtils } from '@endo4life/util-common';
 
-export type IUserProfile = KeycloakProfile;
+export interface KeycloakUserProfile extends KeycloakProfile {
+  [key: string]: unknown;
+  username?: string;
+  email?: string;
+  phoneNumber?: string;
+  isActive?: boolean;
+  roles?: string[];
+  userId?: string;
+  name?: string;
+  avatarLink?: string;
+}
+
+export type IUserProfile = KeycloakUserProfile;
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -44,16 +56,6 @@ interface AuthProviderProps {
   children?: ReactNode;
 }
 
-export interface KeycloakUserProfile extends KeycloakProfile {
-  [key: string]: unknown;
-  username?: string;
-  email?: string;
-  phoneNumber?: string;
-  isActive?: boolean;
-  roles?: string[];
-  userId?: string;
-  name?: string;
-}
 export function AuthProvider({ children }: AuthProviderProps) {
   const [keycloak, setKeycloak] = useState<Keycloak>();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -94,6 +96,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       roles: [stringUtils.defaultString(userInfo?.data?.role?.toString())],
       userId: newUserProfile.id,
       id: userInfo?.data?.id,
+      avatarLink: userInfo?.data?.avatarLink,
       isActive:
         userInfo?.data?.status === UserInfoState.Inactive.toString()
           ? false
@@ -216,6 +219,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       role: profile.role,
       lastName: profile.lastName,
       firstName: profile.firstName,
+      avatarLink: profile.avatarLink,
     });
   };
 

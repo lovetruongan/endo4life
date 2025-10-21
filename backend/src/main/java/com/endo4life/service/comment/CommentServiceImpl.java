@@ -143,11 +143,21 @@ public class CommentServiceImpl implements CommentService {
 
     private UserInfoDto convertToUserInfoDto(UserInfo userInfoEntity) {
         UserInfoDto userInfoDto = new UserInfoDto();
+        userInfoDto.setId(userInfoEntity.getId());
         userInfoDto.setFirstName(userInfoEntity.getFirstName());
         userInfoDto.setLastName(userInfoEntity.getLastName());
         userInfoDto.setEmail(userInfoEntity.getEmail());
-        userInfoDto.setAvatarUrl(
-                minioService.createGetPreSignedLink(userInfoEntity.getAvatarPath(), minioConfig.bucketAvatar()));
+
+        // Set avatar URL only if avatar path exists
+        if (StringUtils.isNotBlank(userInfoEntity.getAvatarPath())) {
+            String avatarUrl = minioService.createGetPreSignedLink(
+                    userInfoEntity.getAvatarPath(),
+                    minioConfig.bucketAvatar());
+            if (StringUtils.isNotBlank(avatarUrl)) {
+                userInfoDto.setAvatarUrl(avatarUrl);
+            }
+        }
+
         return userInfoDto;
     }
 

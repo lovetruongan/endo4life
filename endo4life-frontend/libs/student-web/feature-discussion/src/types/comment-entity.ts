@@ -6,4 +6,10 @@ export interface ICommentEntity extends BaseEntity<CommentResponseDto> {
   content?: string;
   attachments?: string[];
   replies?: ICommentEntity[];
+  createdByInfo?: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    avatarUrl?: string;
+  };
 }

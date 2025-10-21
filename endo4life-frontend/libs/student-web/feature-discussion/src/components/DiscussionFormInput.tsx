@@ -94,9 +94,14 @@ export const DiscussionFormInput = ({
     >
       <div className="flex gap-2">
         <Avatar
-          src="https://static.tvtropes.org/pmwiki/pub/images/samsprattblues.png"
+          src={(userProfile as any)?.avatarLink}
           sx={{ width: 36, height: 36 }}
-        />
+        >
+          {!(userProfile as any)?.avatarLink &&
+            (userProfile?.firstName?.charAt(0) ||
+              userProfile?.lastName?.charAt(0) ||
+              userProfile?.email?.charAt(0)?.toUpperCase())}
+        </Avatar>
         <div className="flex flex-col w-full gap-1">
           <div className="flex items-center pr-4 border rounded-lg bg-[#efefef]">
             <Controller

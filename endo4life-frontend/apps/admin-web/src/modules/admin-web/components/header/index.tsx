@@ -12,11 +12,12 @@ import clsx from 'clsx';
 export default function Header() {
   const { t } = useTranslation('app');
   const menuRef = useRef<HTMLDivElement>(null);
-  const [menuOpened, { setLeft: setMenuOff, toggle: toggleMenu }] = useToggle(false);
+  const [menuOpened, { setLeft: setMenuOff, toggle: toggleMenu }] =
+    useToggle(false);
 
   useClickAway((evt) => {
     const element = evt.target as HTMLElement;
-    if (element && element.id !== "profile-menu-button") {
+    if (element && element.id !== 'profile-menu-button') {
       setMenuOff();
     }
   }, menuRef);
@@ -25,7 +26,7 @@ export default function Header() {
     event.preventDefault();
     event.stopPropagation();
     toggleMenu();
-  }
+  };
 
   return (
     <div className="flex items-center justify-between flex-none gap-4 px-8 shadow h-14">
@@ -40,19 +41,24 @@ export default function Header() {
             type="button"
             onClick={onClickMenu}
             className={clsx(
-              "flex items-center justify-center h-10 gap-3 px-3 text-sm text-black rounded hover:bg-slate-100",
-              { 'bg-slate-100': menuOpened }
+              'flex items-center justify-center h-10 gap-3 px-3 text-sm text-black rounded hover:bg-slate-100',
+              { 'bg-slate-100': menuOpened },
             )}
           >
             <Avatar
               alt="avatar"
               sx={{ bgcolor: deepOrange[500], width: '28px', height: '28px' }}
-              src="https://img.freepik.com/free-photo/close-up-young-successful-man-smiling-camera-standing-casual-outfit-against-blue-background_1258-65746.jpg"
-            ></Avatar>
+              src={userProfile?.avatarLink}
+            >
+              {!userProfile?.avatarLink &&
+                (userProfile?.firstName?.charAt(0) ||
+                  userProfile?.lastName?.charAt(0) ||
+                  userProfile?.email?.charAt(0)?.toUpperCase())}
+            </Avatar>
             {menuOpened ? <VscChevronUp /> : <VscChevronDown />}
           </button>
           <div ref={menuRef}>
-            <ProfileMenu opened={menuOpened}/>
+            <ProfileMenu opened={menuOpened} />
           </div>
         </div>
       </div>

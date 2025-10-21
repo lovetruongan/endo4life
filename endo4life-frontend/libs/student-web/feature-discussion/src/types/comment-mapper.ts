@@ -34,6 +34,7 @@ export class CommentMapper implements ICommentMapper {
       replies: dto.replies ? dto.replies.map(reply => this.fromDto(reply)) : undefined,
       createdAt: dto.createdAt,
       createdBy: dto.createdBy,
+      createdByInfo: dto.createdByInfo,
     }
   }
 
