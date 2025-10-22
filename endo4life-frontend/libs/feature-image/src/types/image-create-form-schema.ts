@@ -6,7 +6,7 @@ export const useImageCreateFormSchema = () => {
   const { t } = useTranslation(['common', 'image']);
 
   return yup.object({
-    type: yup.string().default(UploadType.Multiple),
+    type: yup.string().default(UploadType.Image),
     files: yup.mixed(),
     metadata: yup.array().of(
       yup.object({

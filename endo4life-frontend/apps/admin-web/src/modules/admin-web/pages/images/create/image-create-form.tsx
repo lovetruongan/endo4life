@@ -60,7 +60,7 @@ export function ImageCreateForm({ loading, onSubmit }: IImageCreateFormProps) {
       resolver: yupResolver(useImageCreateFormSchema()),
       mode: 'onChange',
       defaultValues: {
-        type: UploadType.Multiple,
+        type: UploadType.Image,
         files: [],
         metadata: [
           {
@@ -215,9 +215,9 @@ export function ImageCreateForm({ loading, onSubmit }: IImageCreateFormProps) {
                     !formValues.files
                       ? '-'
                       : formatFileSize(
-                          getFileSize(formValues.files[0] || ({} as File)),
-                          2,
-                        )
+                        getFileSize(formValues.files[0] || ({} as File)),
+                        2,
+                      )
                   }
                 />
               </div>

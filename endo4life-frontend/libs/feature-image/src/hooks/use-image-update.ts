@@ -10,11 +10,13 @@ export function useImageUpdate() {
 
   const mutation = useMutation({
     mutationFn: async (data: IImageUpdateFormData) => {
+      console.log('[useImageUpdate] mutationFn called', { id: data.id, hasFile: !!(data as any).file });
       if (!data.id) {
         throw new Error(t('errors.invalidImageId'));
       }
       const api = new ImageApiImpl();
       const response = await api.updateImage(data);
+      console.log('[useImageUpdate] api.updateImage returned', response);
       return response;
     },
     onSuccess() {

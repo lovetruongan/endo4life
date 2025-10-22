@@ -20,6 +20,7 @@ export default function ImageDetailPage() {
 
   const updateImage = useCallback(
     (formData: IImageUpdateFormData) => {
+      console.log('[ImageDetailPage] updateImage called', formData);
       const partialFormData = ImageMapper.getInstance().toPartialUpdateFormData(
         formData,
         data?.data || ({} as IImageEntity),
@@ -39,6 +40,7 @@ export default function ImageDetailPage() {
             autoClose: 1000,
             hideProgressBar: true,
           });
+          console.log('[ImageDetailPage] updateImage success');
           refetch();
         },
         onError(_error) {
@@ -47,6 +49,7 @@ export default function ImageDetailPage() {
             autoClose: 1000,
             hideProgressBar: true,
           });
+          console.log('[ImageDetailPage] updateImage failed');
         },
       });
     },
