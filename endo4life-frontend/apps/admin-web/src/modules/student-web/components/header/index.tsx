@@ -17,7 +17,7 @@ import { useNameInitial } from '@endo4life/feature-user';
 
 const MENUS = {
   PROFILE: 'profile',
-  NOTIFICATION: 'notification'
+  NOTIFICATION: 'notification',
 } as const;
 
 export default function Header() {
@@ -32,9 +32,12 @@ export default function Header() {
   const { menuSections } = useHeaderItems();
   const firstCharacterName = useNameInitial(userProfile);
 
-  useClickAway((evt) => {
-    setOpenMenu(null);
-  }, [menuRef, notificationRef]);
+  useClickAway(
+    (evt) => {
+      setOpenMenu(null);
+    },
+    [menuRef, notificationRef],
+  );
 
   const onClickMenu = (event: MouseEvent<HTMLElement>, menuType: string) => {
     event.preventDefault();
@@ -61,13 +64,20 @@ export default function Header() {
             {mobileMenuOpen ? <MdClose size={24} /> : <MdMenu size={24} />}
           </IconButton>
 
-          <Drawer anchor="left" open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)}>
+          <Drawer
+            anchor="left"
+            open={mobileMenuOpen}
+            onClose={() => setMobileMenuOpen(false)}
+          >
             <div className="p-6 w-64">
               {menuSections.map((section) => (
                 <div key={section.id} className="mb-4">
                   <ul className="flex flex-col gap-6">
                     {section.children.map((menuItem) => (
-                      <div key={menuItem.link} onClick={() => setMobileMenuOpen(false)}>
+                      <div
+                        key={menuItem.link}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
                         <HeaderMenuItem
                           menuItem={menuItem}
                           isActive={isActiveMenu(menuItem)}
@@ -135,13 +145,21 @@ export default function Header() {
               onClick={(e) => onClickMenu(e, MENUS.PROFILE)}
               className={clsx(
                 'flex items-center justify-center h-10 gap-2 ms-4 px-2 py-1 text-sm text-black rounded hover:bg-slate-100',
-                { 'bg-slate-200': openMenu === MENUS.PROFILE }
+                { 'bg-slate-200': openMenu === MENUS.PROFILE },
               )}
             >
-              <Avatar alt="avatar" sx={{ width: 28, height: 28 }}>
+              <Avatar
+                alt="avatar"
+                src={userProfile?.avatarLink}
+                sx={{ width: 28, height: 28 }}
+              >
                 {firstCharacterName}
               </Avatar>
-              {openMenu === MENUS.PROFILE ? <VscChevronUp /> : <VscChevronDown />}
+              {openMenu === MENUS.PROFILE ? (
+                <VscChevronUp />
+              ) : (
+                <VscChevronDown />
+              )}
             </button>
             <div ref={menuRef}>
               <ProfileMenu opened={openMenu === MENUS.PROFILE} />

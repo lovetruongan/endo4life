@@ -26,6 +26,8 @@ import com.endo4life.repository.UserInfoRepository;
 import com.endo4life.repository.specifications.UserInfoSpecifications;
 import com.endo4life.security.UserContextHolder;
 import com.endo4life.service.keycloak.KeycloakService;
+import com.endo4life.service.minio.MinioService;
+import com.endo4life.service.minio.MinioProperties;
 import com.endo4life.utils.StringUtil;
 import com.endo4life.web.rest.errors.BadRequestException;
 import com.endo4life.web.rest.errors.UserAlreadyExistsException;
@@ -38,7 +40,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -49,10 +50,11 @@ public class UserInfoServiceImpl implements UserInfoService {
     private final UserInfoRepository userInfoRepository;
     private final UserInfoMapper userInfoMapper;
     private final KeycloakService keycloakService;
+    private final MinioService minioService;
+    private final MinioProperties minioProperties;
 
     @Override
-    public UUID createUser(CreateUserRequestDto createUserRequestDto, MultipartFile avatar,
-            List<MultipartFile> certificate) {
+    public UUID createUser(CreateUserRequestDto createUserRequestDto) {
         validateCreateUserRequest(createUserRequestDto);
 
         // Check if user already exists in our database
@@ -74,9 +76,21 @@ public class UserInfoServiceImpl implements UserInfoService {
         userInfo.setUserId(userId);
         userInfo.setCreatedAt(LocalDateTime.now());
         userInfo.setCreatedBy(UserContextHolder.getEmail().orElse(Constants.SYSTEM));
-        userInfoRepository.save(userInfo);
 
-        // TODO: Handle avatar and certificate uploads when MinIO is ready
+        // Handle avatar (object key from presigned URL upload)
+        if (createUserRequestDto.getAvatar() != null) {
+            userInfo.setAvatarPath(createUserRequestDto.getAvatar().toString());
+        }
+
+        // Handle certificates (object keys from presigned URL uploads)
+        if (CollectionUtils.isNotEmpty(createUserRequestDto.getCertificates())) {
+            Set<String> certificatePaths = createUserRequestDto.getCertificates().stream()
+                    .map(UUID::toString)
+                    .collect(Collectors.toSet());
+            userInfo.setCertificatePath(certificatePaths);
+        }
+
+        userInfoRepository.save(userInfo);
 
         return userInfo.getId();
     }
@@ -204,26 +218,119 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public void updateUser(UUID id, UpdateUserRequestDto updateUserRequestDto,
-            MultipartFile avatar, List<String> deleteCertificatePaths,
-            List<MultipartFile> newCertificates) {
+    public void updateUser(UUID id, UpdateUserRequestDto updateUserRequestDto) {
         validateUpdateUserRequest(updateUserRequestDto);
 
         UserInfo userInfo = userInfoRepository.findById(id)
                 .orElseThrow(UserNotFoundException::new);
 
         try {
-            keycloakService.updateUserInKeycloak(userInfo.getUserId().toString(),
-                    updateUserRequestDto.getFirstName(), updateUserRequestDto.getLastName());
+            // Update Keycloak user info only if name fields are actually changing
+            if (StringUtils.isNotBlank(updateUserRequestDto.getFirstName())
+                    || StringUtils.isNotBlank(updateUserRequestDto.getLastName())) {
+                boolean nameChanged = !Objects.equals(updateUserRequestDto.getFirstName(), userInfo.getFirstName())
+                        || !Objects.equals(updateUserRequestDto.getLastName(), userInfo.getLastName());
 
+                if (nameChanged) {
+                    try {
+                        keycloakService.updateUserInKeycloak(
+                                userInfo.getUserId().toString(),
+                                updateUserRequestDto.getFirstName(),
+                                updateUserRequestDto.getLastName());
+                    } catch (Exception e) {
+                        log.warn("Failed to update user in Keycloak (userId: {}), continuing with DB update: {}",
+                                userInfo.getUserId(), e.getMessage());
+                    }
+                }
+            }
+
+            // Update basic user info
             userInfoMapper.updateUserInfo(userInfo, updateUserRequestDto);
 
-            // TODO: Handle avatar and certificate updates when MinIO is ready
+            // Handle role update
+            if (updateUserRequestDto.getRole() != null) {
+                UserInfo.UserInfoRole newRole = UserInfo.UserInfoRole.valueOf(
+                        updateUserRequestDto.getRole().getValue());
+                userInfo.setRole(newRole);
+                // Assign role in Keycloak
+                try {
+                    keycloakService.assignRoleToUser(userInfo.getUserId(), newRole.getValue());
+                    log.info("Updated user role to: {}", newRole);
+                } catch (Exception e) {
+                    log.warn("Failed to assign role in Keycloak (userId: {}), role updated in DB only: {}",
+                            userInfo.getUserId(), e.getMessage());
+                }
+            }
 
+            // Handle state update
+            if (updateUserRequestDto.getState() != null) {
+                UserInfo.UserInfoState newState = UserInfo.UserInfoState.valueOf(
+                        updateUserRequestDto.getState().getValue());
+                userInfo.setState(newState);
+                // Update enabled status in Keycloak
+                try {
+                    boolean isActive = newState == UserInfo.UserInfoState.ACTIVE;
+                    keycloakService.setUserStatusInKeycloak(List.of(userInfo.getUserId()), isActive);
+                    log.info("Updated user state to: {}", newState);
+                } catch (Exception e) {
+                    log.warn("Failed to update state in Keycloak (userId: {}), state updated in DB only: {}",
+                            userInfo.getUserId(), e.getMessage());
+                }
+            }
+
+            // Handle avatar update - avatar is now object key (UUID)
+            if (updateUserRequestDto.getAvatar() != null) {
+                // Delete old avatar if exists
+                if (StringUtils.isNotBlank(userInfo.getAvatarPath())) {
+                    try {
+                        minioService.removeFile(userInfo.getAvatarPath(),
+                                minioProperties.getBucketAvatar());
+                        log.info("Deleted old avatar: {}", userInfo.getAvatarPath());
+                    } catch (Exception e) {
+                        log.warn("Failed to delete old avatar: {}", userInfo.getAvatarPath(), e);
+                    }
+                }
+                // Set new avatar path (object key from presigned URL upload)
+                userInfo.setAvatarPath(updateUserRequestDto.getAvatar().toString());
+                log.info("Updated avatar to: {}", userInfo.getAvatarPath());
+            }
+
+            // Handle certificate updates
+            Set<String> currentCertificates = new java.util.HashSet<>(userInfo.getCertificatePath());
+
+            // Delete specified certificates
+            if (CollectionUtils.isNotEmpty(updateUserRequestDto.getDeleteCertificatePaths())) {
+                currentCertificates = currentCertificates.stream()
+                        .filter(path -> !updateUserRequestDto.getDeleteCertificatePaths().contains(path))
+                        .collect(Collectors.toSet());
+
+                // Delete from MinIO
+                updateUserRequestDto.getDeleteCertificatePaths().forEach(path -> {
+                    try {
+                        minioService.removeFile(path, minioProperties.getBucketOther());
+                        log.info("Deleted certificate: {}", path);
+                    } catch (Exception e) {
+                        log.warn("Failed to delete certificate: {}", path, e);
+                    }
+                });
+            }
+
+            // Add new certificates (they are object keys from presigned uploads)
+            if (CollectionUtils.isNotEmpty(updateUserRequestDto.getNewCertificates())) {
+                currentCertificates.addAll(
+                        updateUserRequestDto.getNewCertificates().stream()
+                                .map(UUID::toString)
+                                .collect(Collectors.toSet()));
+                log.info("Added {} new certificates", updateUserRequestDto.getNewCertificates().size());
+            }
+
+            userInfo.setCertificatePath(currentCertificates);
             userInfo.setUpdatedBy(UserContextHolder.getEmail().orElse(Constants.SYSTEM));
             userInfoRepository.saveAndFlush(userInfo);
+
+            log.info("Successfully updated user: {}", id);
         } catch (final Exception e) {
-            // TODO: Cleanup uploaded files if any
+            log.error("Failed to update user: {}", id, e);
             throw e;
         }
     }

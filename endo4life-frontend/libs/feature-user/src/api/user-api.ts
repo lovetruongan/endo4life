@@ -1,4 +1,4 @@
-import { BaseApi, UserV1Api } from '@endo4life/data-access';
+import { BaseApi, UserV1Api, StorageApiImpl, ResourceType } from '@endo4life/data-access';
 import {
   IFilter,
   IPaginatedResponse,
@@ -53,16 +53,77 @@ export class UserApiImpl extends BaseApi implements IUserApi {
   async createUser(data: IUserCreateFormData): Promise<IUserEntity> {
     const config = await this.getApiConfiguration();
     const api = new UserV1Api(config);
-    const response = await api.createUser(data);
+    const storageApi = new StorageApiImpl(EnvConfig.Endo4LifeServiceUrl);
+
+    let avatarObjectKey: string | undefined;
+    let certificateObjectKeys: string[] | undefined;
+
+    // Upload avatar to MinIO if provided
+    if (data.avatar) {
+      avatarObjectKey = await storageApi.uploadFile(data.avatar, ResourceType.Avatar);
+    }
+
+    // Upload certificates to MinIO if provided
+    if (data.certificate && data.certificate.length > 0) {
+      certificateObjectKeys = await storageApi.uploadFiles(data.certificate, ResourceType.Other);
+    }
+
+    // Create user with object keys
+    const createRequest = {
+      email: data.user.email,
+      firstName: data.user.firstName,
+      lastName: data.user.lastName,
+      phoneNumber: data.user.phoneNumber,
+      role: data.user.role,
+      state: data.user.state,
+      password: data.user.password,
+      avatar: avatarObjectKey,
+      certificates: certificateObjectKeys,
+    };
+
+    const response = await api.createUser({ createUserRequestDto: createRequest });
     return UserMapper.getInstance().fromDto(response.data);
   }
 
   async updateUser(data: IUserUpdateAccountFormData): Promise<void> {
+    if (!data.id) throw new Error('User ID is required');
+
     const config = await this.getApiConfiguration();
     const api = new UserV1Api(config);
-    const payload = UserMapper.getInstance().toUpdateRequest(data);
-    await api.updateUser(payload);
-    return;
+    const storageApi = new StorageApiImpl(EnvConfig.Endo4LifeServiceUrl);
+
+    let avatarObjectKey: string | undefined;
+    let newCertificateObjectKeys: string[] | undefined;
+
+    // Upload avatar to MinIO if provided
+    if (data.avatar instanceof File) {
+      avatarObjectKey = await storageApi.uploadFile(data.avatar, ResourceType.Avatar);
+    }
+
+    // Upload new certificates to MinIO if provided
+    if (data.newCertificates && data.newCertificates.length > 0) {
+      const filesList = data.newCertificates.filter((cert): cert is File => cert instanceof File);
+      if (filesList.length > 0) {
+        newCertificateObjectKeys = await storageApi.uploadFiles(filesList, ResourceType.Other);
+      }
+    }
+
+    // Update user with object keys
+    const updateRequest = {
+      firstName: data.user?.firstName,
+      lastName: data.user?.lastName,
+      phoneNumber: data.user?.phoneNumber,
+      role: data.user?.role,
+      state: data.user?.state,
+      avatar: avatarObjectKey,
+      deleteCertificatePaths: data.deleteCertificatePaths,
+      newCertificates: newCertificateObjectKeys,
+    };
+
+    await api.updateUser({
+      id: data.id,
+      updateUserRequestDto: updateRequest,
+    });
   }
 
   async inviteUser(data: IUserInviteFormData): Promise<IResponse<IUserEntity>> {

@@ -1,6 +1,5 @@
 package com.endo4life.web.rest;
 
-import java.util.List;
 import java.util.UUID;
 
 import com.endo4life.web.rest.model.CreateUserRequestDto;
@@ -20,7 +19,6 @@ import com.endo4life.web.rest.api.UserV1ApiDelegate;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.multipart.MultipartFile;
 
 @Component
 @RequiredArgsConstructor
@@ -29,9 +27,8 @@ public class UserV1ApiDelegateImpl implements UserV1ApiDelegate {
     private final UserInfoService userInfoService;
 
     @Override
-    public ResponseEntity<IdWrapperDto> createUser(CreateUserRequestDto createUserRequestDto,
-            MultipartFile avatar, List<MultipartFile> certification) {
-        var id = userInfoService.createUser(createUserRequestDto, avatar, certification);
+    public ResponseEntity<IdWrapperDto> createUser(CreateUserRequestDto createUserRequestDto) {
+        var id = userInfoService.createUser(createUserRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(new IdWrapperDto().id(id));
     }
 
@@ -64,16 +61,20 @@ public class UserV1ApiDelegateImpl implements UserV1ApiDelegate {
     }
 
     @Override
+    public ResponseEntity<UserResponseDto> getUserInfo() {
+        UserResponseDto userResponseDto = userInfoService.getCurrentUserInfo();
+        return ResponseEntity.ok(userResponseDto);
+    }
+
+    @Override
     public ResponseEntity<UserResponseDto> getUserById(UUID id) {
         UserResponseDto userResponseDto = userInfoService.getUserById(id);
         return ResponseEntity.ok(userResponseDto);
     }
 
     @Override
-    public ResponseEntity<Void> updateUser(UUID id, UpdateUserRequestDto dto,
-            MultipartFile avatar, List<String> deleteCertificatePaths,
-            List<MultipartFile> newCertificates) {
-        userInfoService.updateUser(id, dto, avatar, deleteCertificatePaths, newCertificates);
+    public ResponseEntity<Void> updateUser(UUID id, UpdateUserRequestDto dto) {
+        userInfoService.updateUser(id, dto);
         return ResponseEntity.noContent().build();
     }
 }

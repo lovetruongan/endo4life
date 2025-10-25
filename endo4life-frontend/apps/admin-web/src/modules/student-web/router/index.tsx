@@ -27,6 +27,7 @@ const ResourceCoursePage = lazy(
 
 const AboutUsPage = lazy(() => import('../pages/about-us/page'));
 const LibraryPage = lazy(() => import('../pages/library/page'));
+const MyProfilePage = lazy(() => import('../pages/my-profile/page'));
 
 export const studentWebRouter = createBrowserRouter([
   {
@@ -131,6 +132,18 @@ export const studentWebRouter = createBrowserRouter([
           <Suspense fallback={<AboutUsLoading />}>
             <AboutUsPage />
           </Suspense>
+        ),
+      },
+
+      // MY_PROFILE
+      {
+        path: STUDENT_WEB_ROUTES.MY_PROFILE,
+        element: (
+          <ProtectedRoute roles={[]}>
+            <Suspense>
+              <MyProfilePage />
+            </Suspense>
+          </ProtectedRoute>
         ),
       },
     ],

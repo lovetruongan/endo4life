@@ -5,9 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import com.endo4life.service.comment.CommentService;
 import com.endo4life.web.rest.api.CommentV1ApiDelegate;
 import com.endo4life.web.rest.model.CommentCriteria;
+import com.endo4life.web.rest.model.CommentResponseDto;
 import com.endo4life.web.rest.model.CommentResponsePaginatedDto;
 import com.endo4life.web.rest.model.CreateCommentRequestDto;
 import com.endo4life.web.rest.model.IdWrapperDto;
+import com.endo4life.web.rest.model.UpdateCommentRequestDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,5 +37,17 @@ public class CommentV1ApiDelegateImpl implements CommentV1ApiDelegate {
                 new CommentResponsePaginatedDto()
                         .data(result.getContent())
                         .total(result.getTotalElements()));
+    }
+
+    @Override
+    public ResponseEntity<CommentResponseDto> updateComment(UUID id, UpdateCommentRequestDto updateCommentRequestDto) {
+        CommentResponseDto result = commentService.updateComment(id, updateCommentRequestDto);
+        return ResponseEntity.ok(result);
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteComment(UUID id) {
+        commentService.deleteComment(id);
+        return ResponseEntity.noContent().build();
     }
 }

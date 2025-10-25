@@ -1,10 +1,12 @@
 import { useAuthContext } from '@endo4life/feature-auth';
+import { STUDENT_WEB_ROUTES } from '@endo4life/feature-config';
 import { Avatar } from '@mui/material';
 import { FaUser } from 'react-icons/fa';
 import { IoMdSettings } from 'react-icons/io';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 import { TbLogout2 } from 'react-icons/tb';
+import { Link } from 'react-router-dom';
 
 interface IProfileMenu {
   opened: boolean;
@@ -18,19 +20,25 @@ export default function ProfileMenu({ opened }: IProfileMenu) {
     <div
       className={clsx(
         'fixed left-40 bottom-10 z-10 mt-2 border border-slate-100 bg-white shadow min-w-320 rounded-xl p-2',
-        { hidden: !opened }
+        { hidden: !opened },
       )}
     >
       <section className="py-2 w-72">
         <div className="flex items-center gap-3 px-4 py-2 cursor-pointer">
           <Avatar
             alt="avatar"
+            src={userProfile?.avatarLink}
             sx={{
-              bgcolor: "#ccc",
+              bgcolor: '#ccc',
               width: '36px',
               height: '36px',
             }}
-          />
+          >
+            {!userProfile?.avatarLink &&
+              (userProfile?.firstName?.charAt(0) ||
+                userProfile?.lastName?.charAt(0) ||
+                userProfile?.email?.charAt(0)?.toUpperCase())}
+          </Avatar>
           <div>
             <h3 className="text-sm">
               {userProfile?.firstName} {userProfile?.lastName}
@@ -38,12 +46,15 @@ export default function ProfileMenu({ opened }: IProfileMenu) {
             <p className="text-xs text-slate-500">{userProfile?.email}</p>
           </div>
         </div>
-        <button className="flex items-center w-full gap-4 px-4 py-2 mt-2 hover:bg-slate-100">
+        <Link
+          to={STUDENT_WEB_ROUTES.MY_PROFILE}
+          className="flex items-center w-full gap-4 px-4 py-2 mt-2 hover:bg-slate-100"
+        >
           <FaUser color="gray" />
           <span className="flex-auto text-sm text-left">
             {t('account.txtProfile')}
           </span>
-        </button>
+        </Link>
         <button className="flex items-center w-full gap-4 px-4 py-2 hover:bg-slate-100">
           <IoMdSettings color="gray" />
           <span className="flex-auto text-sm text-left">

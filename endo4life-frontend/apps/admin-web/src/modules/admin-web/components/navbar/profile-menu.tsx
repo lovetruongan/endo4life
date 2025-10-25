@@ -29,12 +29,18 @@ export default function ProfileMenu({ opened }: IProfileMenu) {
         <div className="flex items-center gap-3 px-4 py-2 cursor-pointer">
           <Avatar
             alt="avatar"
+            src={userProfile?.avatarLink}
             sx={{
               bgcolor: '#ccc',
               width: '36px',
               height: '36px',
             }}
-          />
+          >
+            {!userProfile?.avatarLink &&
+              (userProfile?.firstName?.charAt(0) ||
+                userProfile?.lastName?.charAt(0) ||
+                userProfile?.email?.charAt(0)?.toUpperCase())}
+          </Avatar>
           <div>
             <h3 className="text-sm">
               {userProfile?.firstName} {userProfile?.lastName}
