@@ -284,98 +284,94 @@ export class ImageApiImpl extends BaseApi implements IImageApi {
   // }
   async updateImage(data: IImageUpdateFormData): Promise<void> {
     console.log('[image-api] updateImage called', { id: (data as any)?.id, hasFile: !!(data as any)?.file });
-    const file = (data as any).file as File | undefined;
+
     const config = await this.getApiConfiguration();
     const api = new ResourceV1Api(config);
 
-    // If no new file provided, call update normally
-    if (!file) {
-      const updateReq = ImageMapper.getInstance().toUpdateResourceRequest(data);
-      console.log('[image-api] updateImage -> no file, updateReq=', updateReq);
-      try {
-        // try direct call first
-        // @ts-ignore
-        const respDirect = await api.updateResource(updateReq);
-        console.log('[image-api] updateResource direct resp=', respDirect);
-        return;
-      } catch (errDirect) {
-        console.warn('[image-api] updateResource direct failed, try wrapper', errDirect);
-        try {
-          // @ts-ignore
-          const respWrap = await (api as any).updateResource({ updateResourceRequest: updateReq });
-          console.log('[image-api] updateResource wrapper resp=', respWrap);
-          return;
-        } catch (errWrap) {
-          console.error('[image-api] updateResource failed (both ways)', errWrap);
-          throw errWrap;
-        }
+    let uploadedFileKey: string | undefined;
+
+    // 1) Nếu có file mới -> lấy presigned url từ MinioV1Api (qua helper) và upload
+    if (data.file) {
+      const dto: GeneratePreSignedUrlDto = {
+        resourceType: (data as any).resourceType ?? (ResourceType as any)?.Image ?? 'IMAGE',
+        numberOfUrls: 1,
+      };
+      console.log('[image-api] requesting presigned url dto=', dto);
+
+      const presignedUrls = await this.generatePreSignedUrls(dto);
+      console.log('[image-api] presignedUrls=', presignedUrls);
+
+      if (!Array.isArray(presignedUrls) || presignedUrls.length < 1) {
+        throw new Error('No presigned URL returned from server');
       }
+
+      const uploadUrl = presignedUrls[0];
+      console.log('[image-api] uploading', (data.file as File).name, 'to', uploadUrl);
+
+      const putResp = await fetch(uploadUrl, {
+        method: 'PUT',
+        body: data.file as File, // avoid custom headers unless server signed them
+      });
+
+      let respText = '';
+      try { respText = await putResp.text(); } catch (e) { /* ignore */ }
+      console.log('[image-api] PUT status', putResp.status, respText);
+
+      if (!putResp.ok) {
+        throw new Error(`Upload failed for ${(data.file as File).name}: ${putResp.status} ${respText}`);
+      }
+
+      // derive objectKey from presigned url
+      try {
+        const urlObj = new URL(uploadUrl);
+        const pathSegments = urlObj.pathname.split('/').filter(Boolean);
+        uploadedFileKey = decodeURIComponent(pathSegments.slice(1).join('/')); // drop bucket
+      } catch (e) {
+        console.warn('[image-api] cannot parse objectKey from url', e);
+      }
+
+      console.log('[image-api] uploadedFileKey=', uploadedFileKey);
     }
 
-    // 1) Request one presigned URL
-    const dto: GeneratePreSignedUrlDto = {
-      resourceType: (ResourceType as any)?.Image ?? 'IMAGE',
-      numberOfUrls: 1,
-    };
-    console.log('[image-api] requesting presigned url dto=', dto);
-    const presignedUrls = await this.generatePreSignedUrls(dto);
-    console.log('[image-api] presignedUrls=', presignedUrls);
-
-    if (!Array.isArray(presignedUrls) || presignedUrls.length < 1) {
-      throw new Error('No presigned URL returned from server');
-    }
-
-    // 2) Upload the file to presigned URL
-    const uploadUrl = presignedUrls[0];
-    console.log('[image-api] uploading', file.name, 'to', uploadUrl);
-
-    const putResp = await fetch(uploadUrl, {
-      method: 'PUT',
-      body: file, // avoid custom headers unless signed
+    // 2) Build update payload (mapper should return UpdateResourceRequestDto shape)
+    const updatePayload = ImageMapper.getInstance().toUpdateResourceRequest({
+      ...data,
+      ...(uploadedFileKey ? { fileKey: uploadedFileKey } : {}),
     });
 
-    let respText = '';
-    try { respText = await putResp.text(); } catch (e) { /* ignore */ }
-    console.log('[image-api] PUT status', putResp.status, respText);
+    console.log('[image-api] mapped updatePayload=', updatePayload);
 
-    if (!putResp.ok) {
-      console.error('[image-api] PUT failed', { status: putResp.status, text: respText });
-      throw new Error(`Upload failed for ${file.name}: ${putResp.status} ${respText}`);
+    // 3) Call backend update API - MUST pass resource id as path param
+    const resourceId = (data as any).id;
+    if (!resourceId) {
+      throw new Error('Missing resource id for update');
     }
 
-    // 3) derive objectKey from presigned url and attach to metadata (single metadata object)
-    let objectKey: string | undefined;
     try {
-      const urlObj = new URL(uploadUrl);
-      const pathSegments = urlObj.pathname.split('/').filter(Boolean);
-      objectKey = decodeURIComponent(pathSegments.slice(1).join('/')); // omit bucket
-    } catch (e) {
-      console.warn('[image-api] cannot parse objectKey from url', e);
-    }
-
-    if (!data.metadata) data.metadata = {} as any;
-    (data.metadata as any).objectKey = objectKey;
-    console.log('[image-api] attached objectKey to metadata', objectKey);
-
-    // 4) Call backend update
-    const updateReq = ImageMapper.getInstance().toUpdateResourceRequest(data);
-    console.log('[image-api] updateResource payload=', updateReq);
-
-    try {
-      // try direct
+      // Try wrapper param style first (generated clients often expect { id, updateResourceRequestDto })
       // @ts-ignore
-      const resp = await api.updateResource(updateReq);
-      console.log('[image-api] updateResource direct resp=', resp);
-    } catch (err) {
-      console.warn('[image-api] updateResource direct failed, trying wrapper', err);
+      const resp = await (api as any).updateResource({ id: resourceId, updateResourceRequestDto: updatePayload });
+      console.log('[image-api] updateResource wrapper resp=', resp);
+    } catch (errWrapper) {
+      console.warn('[image-api] wrapper update failed, try direct call', errWrapper);
       try {
+        // direct call style: api.updateResource(id, body)
         // @ts-ignore
-        const resp2 = await (api as any).updateResource({ updateResourceRequest: updateReq });
-        console.log('[image-api] updateResource wrapper resp=', resp2);
-      } catch (err2) {
-        console.error('[image-api] updateResource failed (both ways)', err2);
-        throw err2;
+        const respDirect = await api.updateResource(resourceId, updatePayload);
+        console.log('[image-api] updateResource direct resp=', respDirect);
+      } catch (errDirect) {
+        console.error('[image-api] updateResource failed (both attempts)', errDirect);
+        throw errDirect;
       }
+    }
+
+    // optional: verify by fetching updated resource (helps debug)
+    try {
+      // @ts-ignore
+      const verify = await api.getResourceById({ id: resourceId });
+      console.log('[image-api] verify getResourceById after update =', verify?.data);
+    } catch (e) {
+      console.warn('[image-api] verify fetch failed', e);
     }
     return;
   }
