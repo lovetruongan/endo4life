@@ -5,6 +5,7 @@ import { useCallback } from 'react';
 import { IImageUpdateFormData } from '../../types';
 import { toast } from 'react-toastify';
 import { useImageUpdate } from '../../hooks/use-image-update';
+import { useImageGetById } from '../../hooks/use-image-get-by-id';
 import { ResourceState } from '@endo4life/data-access';
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
 }
 export function ImageStateDialog({ imageId, state, onClose }: Props) {
   const { t } = useTranslation('image');
+  const { data: imageData, loading } = useImageGetById(imageId);
   const { mutation: updateImageMutation } = useImageUpdate();
   const updateStateImage = useCallback(
     (values: IImageUpdateFormData) => {
@@ -25,7 +27,22 @@ export function ImageStateDialog({ imageId, state, onClose }: Props) {
         });
         return;
       }
-      updateImageMutation.mutate(values, {
+
+      // Merge with existing data to preserve tags and other fields
+      const existingData = imageData?.data;
+      const mergedValues: IImageUpdateFormData = {
+        ...values,
+        metadata: {
+          ...values.metadata,
+          title: existingData?.metadata?.title || values.metadata?.title || '',
+          description:
+            existingData?.metadata?.description || values.metadata?.description,
+          tag: existingData?.tag || [],
+          detailTag: existingData?.detailTag || [],
+        },
+      };
+
+      updateImageMutation.mutate(mergedValues, {
         onSuccess() {
           toast.success(t('imageStateDialog.status.success'), {
             position: 'top-right',
@@ -44,8 +61,13 @@ export function ImageStateDialog({ imageId, state, onClose }: Props) {
         },
       });
     },
-    [updateImageMutation, onClose],
+    [updateImageMutation, onClose, imageData, t],
   );
+
+  if (loading) {
+    return null; // or show loading spinner
+  }
+
   return (
     <Modal
       open

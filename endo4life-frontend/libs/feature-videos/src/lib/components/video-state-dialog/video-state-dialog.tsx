@@ -5,6 +5,7 @@ import { useCallback } from 'react';
 import { IVideoUpdateFormData } from '../../types';
 import { toast } from 'react-toastify';
 import { useUpdateVideo } from '../../hooks/use-update-video';
+import { useVideoGetById } from '../../hooks/use-video-get-by-id';
 import { ResourceState } from '@endo4life/data-access';
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
 }
 export function VideoStateDialog({ videoId, state, onClose }: Props) {
   const { t } = useTranslation('video');
+  const { data: videoData, loading } = useVideoGetById(videoId);
   const { mutation: updateVideoMutation } = useUpdateVideo({});
   const updateStateVideo = useCallback(
     (values: IVideoUpdateFormData) => {
@@ -25,7 +27,22 @@ export function VideoStateDialog({ videoId, state, onClose }: Props) {
         });
         return;
       }
-      updateVideoMutation.mutate(values, {
+
+      // Merge with existing data to preserve tags and other fields
+      const existingData = videoData?.data;
+      const mergedValues: IVideoUpdateFormData = {
+        ...values,
+        metadata: {
+          ...values.metadata,
+          title: existingData?.metadata?.title || values.metadata?.title || '',
+          description:
+            existingData?.metadata?.description || values.metadata?.description,
+          tag: existingData?.tag || [],
+          detailTag: existingData?.detailTag || [],
+        },
+      };
+
+      updateVideoMutation.mutate(mergedValues, {
         onSuccess() {
           toast.success(t('videoStateDialog.state.success'), {
             position: 'top-right',
@@ -44,8 +61,12 @@ export function VideoStateDialog({ videoId, state, onClose }: Props) {
         },
       });
     },
-    [updateVideoMutation, onClose],
+    [updateVideoMutation, onClose, videoData, t],
   );
+  if (loading) {
+    return null; // or show loading spinner
+  }
+
   return (
     <Modal
       open

@@ -11,14 +11,15 @@ export interface IImageFilter extends IFilter {
 
 export class ImageFilter extends BaseFilter implements IImageFilter {
   toCriteria(): ResourceCriteria {
+    const search = this.getSearch();
     const data: ResourceCriteria = {
       tag: this.getArrayStringField('tag'),
       detailTag: this.getArrayStringField('detailTag'),
-      resourceType: (this.getStringField('resourceType') as ResourceType) ?? ResourceType.Image,
+      type: (this.getStringField('resourceType') as ResourceType) ?? ResourceType.Image,
       title: this.getStringField('title'),
       state: this.getStringField('state') as ResourceState,
       ids: this.getArrayStringField('ids'),
-      searchWords: this.getSearch(),
+      searchWords: search ? [search] : undefined,
       fromDate: this.getStringField('fromDate'),
       toDate: this.getStringField('toDate'),
     };

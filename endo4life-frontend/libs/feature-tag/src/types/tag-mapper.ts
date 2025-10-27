@@ -22,11 +22,11 @@ export class TagMapper implements ITagMapper {
   toOption(entity: ITagEntity): IOption<ITagEntity> {
     return {
       label: entity.content,
-      value: entity.content,
+      value: entity.id, // Use ID instead of content for API compatibility
       children: entity.children?.map((item) => {
         return {
           label: item.content,
-          value: item.content,
+          value: item.id, // Use ID instead of content
           metadata: item,
         };
       }),

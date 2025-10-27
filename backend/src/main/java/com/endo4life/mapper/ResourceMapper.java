@@ -37,12 +37,16 @@ public abstract class ResourceMapper {
     @Mapping(target = "createdAt", source = "createdAt", qualifiedByName = "toOffsetDateTime")
     @Mapping(target = "thumbnailUrl", source = "resource", qualifiedByName = "thumbnailToUrl")
     @Mapping(target = "resourceUrl", source = "resource", qualifiedByName = "resourcePathToUrl")
-    @Mapping(target = "tags", ignore = true)
+    @Mapping(target = "tags", source = "tag")
+    @Mapping(target = "tag", source = "tag")
+    @Mapping(target = "detailTag", source = "detailTag")
     public abstract ResourceDetailResponseDto toResourceDetailResponseDto(Resource resource);
 
     @Mapping(target = "createdAt", source = "createdAt", qualifiedByName = "toOffsetDateTime")
     @Mapping(target = "thumbnailUrl", source = "resource", qualifiedByName = "thumbnailToUrl")
-    @Mapping(target = "tags", ignore = true)
+    @Mapping(target = "tags", source = "tag")
+    @Mapping(target = "tag", source = "tag")
+    @Mapping(target = "detailTag", source = "detailTag")
     public abstract ResourceResponseDto toResourceResponseDto(Resource resource);
 
     @Mapping(target = "createdAt", source = "createdAt", qualifiedByName = "toOffsetDateTime")

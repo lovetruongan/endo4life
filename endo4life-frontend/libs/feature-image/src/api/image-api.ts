@@ -206,39 +206,24 @@ export class ImageApiImpl extends BaseApi implements IImageApi {
       throw new Error('Not enough presigned URLs returned from server');
     }
 
-    // 2) Upload files to presigned URLs
-    const uploadedMeta: CreateResourceRequestDto[] = [];
+    // 2) Extract objectKeys from presigned URLs and prepare metadata
+    const preparedMeta: CreateResourceRequestDto[] = [];
     for (let i = 0; i < files.length; i++) {
       const file = files[i] as File;
       const uploadUrl = presignedUrls[i];
-      console.log('[createImage] uploading', file.name, 'to', uploadUrl);
 
-      const putResp = await fetch(uploadUrl, {
-        method: 'PUT',
-        body: file, // do not add custom headers unless backend signed them
-      });
-
-      let respText = '';
-      try { respText = await putResp.text(); } catch (e) { /* ignore */ }
-      console.log('[createImage] PUT status', putResp.status, respText);
-
-      if (!putResp.ok) {
-        throw new Error(`Upload failed for ${file.name}: ${putResp.status} ${respText}`);
-      }
-
-      // 3) derive objectKey from presigned url
+      // derive objectKey from presigned url
       let objectKey: string | undefined;
       try {
         const urlObj = new URL(uploadUrl);
         const pathSegments = urlObj.pathname.split('/').filter(Boolean);
-        // assume /{bucket}/{objectKey...}
         objectKey = decodeURIComponent(pathSegments.slice(1).join('/'));
       } catch (e) {
         console.warn('[createImage] cannot parse objectKey from url', e);
       }
 
       const meta = (data.metadata && data.metadata[i]) || (data.metadata && data.metadata[0]) || {};
-      uploadedMeta.push({
+      preparedMeta.push({
         objectKey,
         title: meta.title ?? file.name,
         description: meta.description,
@@ -248,22 +233,41 @@ export class ImageApiImpl extends BaseApi implements IImageApi {
       });
     }
 
-    // 4) create resource records on backend
-    console.log('[createImage] createResource payload metadata=', uploadedMeta);
+    // 3) Create resource records FIRST (before uploading)
+    console.log('[createImage] createResource payload metadata=', preparedMeta);
     const resourceApi = new ResourceV1Api(config);
     const createReq: CreateResourceRequest = {
       type: UploadType.Image,
-      metadata: uploadedMeta,
+      metadata: preparedMeta,
     };
 
     try {
-      // generator usually expects wrapper { createResourceRequest }
       // @ts-ignore
       const resp = await (resourceApi as any).createResource({ createResourceRequest: createReq });
       console.log('[createImage] createResource done', resp);
     } catch (err) {
       console.error('[createImage] createResource failed', err);
       throw err;
+    }
+
+    // 4) NOW upload files (webhook will find existing resources and link thumbnails)
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i] as File;
+      const uploadUrl = presignedUrls[i];
+      console.log('[createImage] uploading', file.name, 'to', uploadUrl);
+
+      const putResp = await fetch(uploadUrl, {
+        method: 'PUT',
+        body: file,
+      });
+
+      let respText = '';
+      try { respText = await putResp.text(); } catch (e) { /* ignore */ }
+      console.log('[createImage] PUT status', putResp.status, respText);
+
+      if (!putResp.ok) {
+        throw new Error(`Upload failed for ${file.name}: ${putResp.status} ${respText}`);
+      }
     }
   }
 
@@ -291,7 +295,9 @@ export class ImageApiImpl extends BaseApi implements IImageApi {
     let uploadedFileKey: string | undefined;
 
     // 1) Nếu có file mới -> lấy presigned url từ MinioV1Api (qua helper) và upload
-    if (data.file) {
+    // Check if file is a valid File object with content (not just empty object)
+    const hasNewFile = data.file && data.file instanceof File && data.file.size > 0;
+    if (hasNewFile) {
       const dto: GeneratePreSignedUrlDto = {
         resourceType: (data as any).resourceType ?? (ResourceType as any)?.Image ?? 'IMAGE',
         numberOfUrls: 1,

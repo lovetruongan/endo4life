@@ -107,7 +107,7 @@ public class WebhookServiceImpl implements WebhookService {
                 return;
             }
         }
-        
+
         MultipartFile frame = FileUtil.toMultipartFile(
                 imageBytes,
                 evtDetail.objectKey(),
@@ -115,6 +115,9 @@ public class WebhookServiceImpl implements WebhookService {
 
         // Generate thumbnails (resource already has thumbnail name set)
         resourceService.createThumbnail(frame);
+
+        // Update resource metadata (size, dimension, extension)
+        resourceService.updateResourceThumbnail(evtDetail.objectKey());
     }
 
     @Description("Handle Delete event")
