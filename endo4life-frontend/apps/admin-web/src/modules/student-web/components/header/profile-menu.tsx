@@ -1,11 +1,15 @@
 import { useAuthContext } from '@endo4life/feature-auth';
-import { WEB_CLIENT_ADMIN } from '@endo4life/feature-config';
+import {
+  WEB_CLIENT_ADMIN,
+  STUDENT_WEB_ROUTES,
+} from '@endo4life/feature-config';
 import { useNameInitial } from '@endo4life/feature-user';
 import { Avatar } from '@mui/material';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 import { IoIosLogOut } from 'react-icons/io';
 import { PiGearSix, PiUserCircle } from 'react-icons/pi';
+import { Link } from 'react-router-dom';
 
 interface IProfileMenu {
   opened: boolean;
@@ -38,6 +42,7 @@ export default function ProfileMenu({ opened }: IProfileMenu) {
         <div className="flex items-center gap-3 px-4 py-2 cursor-pointer">
           <Avatar
             alt="avatar"
+            src={userProfile?.avatarLink}
             sx={{
               width: '36px',
               height: '36px',
@@ -52,12 +57,15 @@ export default function ProfileMenu({ opened }: IProfileMenu) {
             <p className="text-xs text-slate-500">{userProfile?.email}</p>
           </div>
         </div>
-        <button className="flex items-center w-full gap-3 px-4 py-2 mt-2 hover:bg-slate-100">
+        <Link
+          to={STUDENT_WEB_ROUTES.MY_PROFILE}
+          className="flex items-center w-full gap-3 px-4 py-2 mt-2 hover:bg-slate-100"
+        >
           <PiUserCircle size={20} color="gray" />
           <span className="flex-auto text-sm text-left">
             {t('account.txtProfile')}
           </span>
-        </button>
+        </Link>
         <button
           className="flex items-center w-full gap-3 px-4 py-2 hover:bg-slate-100"
           onClick={onClickSwitchToAdmin}

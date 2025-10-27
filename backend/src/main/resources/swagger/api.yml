@@ -484,23 +484,9 @@ paths:
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
-              type: object
-              required:
-                - user
-              properties:
-                user:
-                  $ref: "#/components/schemas/CreateUserRequestDto"
-                avatar:
-                  type: string
-                  format: binary
-                  description: "Profile image"
-                certificate:
-                  type: array
-                  items:
-                    type: string
-                    format: binary
+              $ref: "#/components/schemas/CreateUserRequestDto"
       responses:
         201:
           description: User created successfully
@@ -546,26 +532,9 @@ paths:
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
-              type: object
-              required:
-                - user
-              properties:
-                user:
-                  $ref: "#/components/schemas/UpdateUserRequestDto"
-                avatar:
-                  type: string
-                  format: binary
-                deleteCertificatePaths:
-                  type: array
-                  items:
-                    type: string
-                newCertificates:
-                  type: array
-                  items:
-                    type: string
-                    format: binary
+              $ref: "#/components/schemas/UpdateUserRequestDto"
       responses:
         204:
           description: User updated successfully
@@ -599,6 +568,20 @@ paths:
       responses:
         200:
           description: Current user info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponseDto"
+
+  /api/v1/users/info:
+    get:
+      operationId: getUserInfo
+      description: Get current user info
+      tags:
+        - "user-v1"
+      responses:
+        200:
+          description: Successful operation
           content:
             application/json:
               schema:
@@ -826,6 +809,48 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/IdWrapperDto"
+
+  /api/v1/comments/{id}:
+    put:
+      description: Update a comment by ID
+      operationId: updateComment
+      tags:
+        - "comment-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCommentRequestDto"
+      responses:
+        200:
+          description: Comment updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentResponseDto"
+    delete:
+      description: Delete a comment by ID
+      operationId: deleteComment
+      tags:
+        - "comment-v1"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: Comment deleted successfully
 
   # Tag Management APIs
   /api/v1/tags:
@@ -1899,6 +1924,16 @@ components:
         password:
           type: string
           minLength: 8
+        avatar:
+          type: string
+          format: uuid
+          description: "MinIO object key for avatar (uploaded via presigned URL)"
+        certificates:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: "List of certificate object keys (uploaded via presigned URL)"
 
     UpdateUserRequestDto:
       type: object
@@ -1913,6 +1948,21 @@ components:
           $ref: "#/components/schemas/UserInfoRole"
         state:
           $ref: "#/components/schemas/UserInfoState"
+        avatar:
+          type: string
+          format: uuid
+          description: "MinIO object key for avatar (uploaded via presigned URL)"
+        deleteCertificatePaths:
+          type: array
+          items:
+            type: string
+          description: "List of certificate object keys to delete"
+        newCertificates:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: "List of new certificate object keys (uploaded via presigned URL)"
 
     InviteUserRequestDto:
       type: object
@@ -1971,6 +2021,9 @@ components:
     UserInfoDto:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
         firstName:
           type: string
         lastName:
@@ -2263,6 +2316,18 @@ components:
       required:
         - content
         - userInfoId
+
+    UpdateCommentRequestDto:
+      type: object
+      properties:
+        attachments:
+          type: array
+          items:
+            type: string
+        content:
+          type: string
+      required:
+        - content
     # Doctor and User Conversation schemas
     DoctorUserConversationCriteria:
       type: object

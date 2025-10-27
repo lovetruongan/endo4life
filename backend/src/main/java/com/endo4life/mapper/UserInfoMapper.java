@@ -1,7 +1,10 @@
 package com.endo4life.mapper;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import com.endo4life.service.minio.MinioService;
+import com.endo4life.service.minio.MinioProperties;
 import com.endo4life.web.rest.model.CreateUserRequestDto;
 import com.endo4life.web.rest.model.InviteUserRequestDto;
 import com.endo4life.web.rest.model.UpdateUserRequestDto;
@@ -9,6 +12,7 @@ import com.endo4life.web.rest.model.UserInfoDto;
 import com.endo4life.web.rest.model.UserResponseDto;
 import com.endo4life.domain.document.UserInfo;
 import com.endo4life.utils.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.BeanMapping;
@@ -17,11 +21,19 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
+@Slf4j
 @Mapper(componentModel = SPRING, uses = { DateTimeMapper.class })
 public abstract class UserInfoMapper {
+
+    @Autowired
+    protected MinioService minioService;
+
+    @Autowired
+    protected MinioProperties minioProperties;
 
     @Mapping(target = "username", source = "email", qualifiedByName = "emailToUsername")
     @Mapping(target = "userId", ignore = true)
@@ -65,8 +77,15 @@ public abstract class UserInfoMapper {
         if (StringUtils.isBlank(avatarResourcePath)) {
             return null;
         }
-        // TODO: Implement MinIO presigned URL generation
-        return avatarResourcePath;
+        try {
+            String presignedUrl = minioService.createGetPreSignedLink(
+                    avatarResourcePath,
+                    minioProperties.getBucketAvatar());
+            return StringUtils.isNotBlank(presignedUrl) ? presignedUrl : null;
+        } catch (Exception e) {
+            log.error("Failed to generate avatar presigned URL for: {}", avatarResourcePath, e);
+            return null;
+        }
     }
 
     @Named("certificatePathToList")
@@ -74,8 +93,20 @@ public abstract class UserInfoMapper {
         if (CollectionUtils.isEmpty(certificatePaths)) {
             return List.of();
         }
-        // TODO: Implement MinIO presigned URL generation
-        return certificatePaths.stream().toList();
+        return certificatePaths.stream()
+                .map(path -> {
+                    try {
+                        String presignedUrl = minioService.createGetPreSignedLink(
+                                path,
+                                minioProperties.getBucketOther());
+                        return StringUtils.isNotBlank(presignedUrl) ? presignedUrl : null;
+                    } catch (Exception e) {
+                        log.error("Failed to generate certificate presigned URL for: {}", path, e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     @Named("emailToUsername")

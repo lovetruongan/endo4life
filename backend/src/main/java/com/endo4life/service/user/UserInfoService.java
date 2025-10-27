@@ -10,33 +10,29 @@ import com.endo4life.web.rest.model.*;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.multipart.MultipartFile;
 
 public interface UserInfoService {
 
-    UUID createUser(CreateUserRequestDto createUserRequestDto, MultipartFile avatar,
-            List<MultipartFile> certificate);
+        UUID createUser(CreateUserRequestDto createUserRequestDto);
 
-    UUID inviteUser(InviteUserRequestDto inviteUserRequestDto);
+        UUID inviteUser(InviteUserRequestDto inviteUserRequestDto);
 
-    void deleteUser(UUID id, String password);
+        void deleteUser(UUID id, String password);
 
-    Page<UserResponseDto> getUserByCriteria(UserInfoCriteria criteria, Pageable pageable);
+        Page<UserResponseDto> getUserByCriteria(UserInfoCriteria criteria, Pageable pageable);
 
-    UserResponseDto getUserById(UUID id);
+        UserResponseDto getUserById(UUID id);
 
-    UserResponseDto getCurrentUserInfo();
+        UserResponseDto getCurrentUserInfo();
 
-    void updateUser(UUID id, UpdateUserRequestDto dto,
-            MultipartFile avatar, List<String> deleteCertificatePaths,
-            List<MultipartFile> newCertificates);
+        void updateUser(UUID id, UpdateUserRequestDto dto);
 
-    void syncUserInfoFromKeycloak(UserRepresentation keycloakUser);
+        void syncUserInfoFromKeycloak(UserRepresentation keycloakUser);
 
-    void syncInvitedUserInfoFromKeycloak(String userId, String updatedFirstName,
-            String updatedLastname);
+        void syncInvitedUserInfoFromKeycloak(String userId, String updatedFirstName,
+                        String updatedLastname);
 
-    void deleteUsers(List<UUID> id, String password);
+        void deleteUsers(List<UUID> id, String password);
 
-    Map<String, UserInfo> getUserInfoByCreatedBy(Set<String> setCreatedBy);
+        Map<String, UserInfo> getUserInfoByCreatedBy(Set<String> setCreatedBy);
 }

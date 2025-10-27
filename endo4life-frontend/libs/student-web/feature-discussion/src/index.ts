@@ -5,3 +5,7 @@ export * from "./components/DiscussionWrapper";
 export * from "./components/DiscussionSection";
 export * from "./components/DiscussionBox";
 export * from "./components/DiscussionFormInput";
+export * from "./components/DiscussionEditDialog";
+export * from "./components/DoctorUserConversationSection";
+export * from "./components/DoctorUserConversationBox";
+export * from "./components/DoctorUserConversationFormInput";

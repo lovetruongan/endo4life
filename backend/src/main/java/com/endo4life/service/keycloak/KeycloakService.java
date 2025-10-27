@@ -27,4 +27,6 @@ public interface KeycloakService {
     List<String> getUserRolesById(String userId);
 
     void deleteUserFromKeycloak(UUID userId);
+
+    void assignRoleToUser(UUID userId, String roleName);
 }
