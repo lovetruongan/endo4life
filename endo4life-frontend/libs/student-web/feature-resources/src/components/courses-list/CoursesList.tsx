@@ -14,7 +14,8 @@ interface Props {
 export function CoursesList({ loading, data }: Props) {
   const { t } = useTranslation('common');
 
-  const truncateDescription = (text: string, maxLength: number) => {
+  const truncateDescription = (text: string | undefined, maxLength: number) => {
+    if (!text || typeof text !== 'string') return '';
     if (text.length > maxLength) {
       return text.substring(0, maxLength) + '...';
     }
@@ -30,11 +31,29 @@ export function CoursesList({ loading, data }: Props) {
               key={course.id}
               className="flex flex-col gap-2.5 py-3 bg-white rounded-lg"
             >
-              <Link to={STUDENT_WEB_ROUTES.RESOURCE_COURSE.replace(':id', course.id)} className="flex items-center justify-center">
+              <Link
+                to={STUDENT_WEB_ROUTES.RESOURCE_COURSE.replace(
+                  ':id',
+                  course.id,
+                )}
+                className="flex items-center justify-center"
+              >
                 <img
-                  src={course.thumbnailUrl}
+                  src={
+                    (course as any).thumbnail?.src ||
+                    course.thumbnailUrl ||
+                    'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect width="400" height="300" fill="%23f0f0f0"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23999"%3ENo Image%3C/text%3E%3C/svg%3E'
+                  }
                   alt={course.title}
-                  className="w-full h-60 mb-2 object-cover rounded-lg"
+                  className="w-full h-60 mb-2 object-cover rounded-lg bg-gray-100"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    // Prevent infinite loop - only set placeholder once
+                    if (!target.src.startsWith('data:image/svg')) {
+                      target.src =
+                        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect width="400" height="300" fill="%23f0f0f0"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23999"%3ENo Image%3C/text%3E%3C/svg%3E';
+                    }
+                  }}
                 />
               </Link>
               <div className="flex items-center justify-between">
@@ -42,7 +61,7 @@ export function CoursesList({ loading, data }: Props) {
               </div>
               <div className="flex items-center">
                 <span className="text-sm text-gray-700 break-all">
-                  {truncateDescription(course.description || '', 120)}
+                  {truncateDescription(course.description, 120)}
                 </span>
               </div>
             </div>

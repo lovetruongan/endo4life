@@ -13,10 +13,7 @@ import {
   FormInputText,
   FormSelectMulti,
 } from '@endo4life/ui-common';
-import {
-  useSubTagOptions,
-  useTagOptions,
-} from '@endo4life/feature-tag';
+import { useSubTagOptions, useTagOptions } from '@endo4life/feature-tag';
 import { localUuid } from '@endo4life/util-common';
 import { useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -58,6 +55,7 @@ export function CourseForm({
 
   return (
     <form
+      id="course-detail-form"
       onSubmit={handleSubmit(onSubmit)}
       className={clsx({
         'pointer-events-none cursor-default opacity-60': loading,
@@ -215,11 +213,9 @@ export function CourseForm({
 }
 
 function getParentTags(allTags: IOption[], selectedTabs: string[] = []) {
-  const selectedItems = selectedTabs.join(', ');
-  return allTags
-    .filter((item) => selectedItems.includes(item.label))
-    .map((item) => item.metadata?.id || '')
-    .join(',');
+  if (!selectedTabs || selectedTabs.length === 0) return '';
+  // selectedTabs already contains tag IDs (values), just join them
+  return selectedTabs.join(',');
 }
 
 export default CourseForm;

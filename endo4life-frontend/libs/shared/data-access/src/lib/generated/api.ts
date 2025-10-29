@@ -535,6 +535,12 @@ export interface CreateCourseRequestDto {
      */
     'state': CourseState;
     /**
+     * MinIO object key for thumbnail (uploaded via presigned URL)
+     * @type {string}
+     * @memberof CreateCourseRequestDto
+     */
+    'thumbnail'?: string;
+    /**
      * 
      * @type {Array<string>}
      * @memberof CreateCourseRequestDto
@@ -879,6 +885,12 @@ export interface CreateTestRequestDto {
      * @type {string}
      * @memberof CreateTestRequestDto
      */
+    'courseSectionId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateTestRequestDto
+     */
     'type'?: string;
     /**
      * 
@@ -886,6 +898,12 @@ export interface CreateTestRequestDto {
      * @memberof CreateTestRequestDto
      */
     'state'?: string;
+    /**
+     * 
+     * @type {Array<CreateQuestionRequestDto>}
+     * @memberof CreateTestRequestDto
+     */
+    'questions'?: Array<CreateQuestionRequestDto>;
 }
 /**
  * 
@@ -2268,6 +2286,12 @@ export interface UpdateCourseRequestDto {
      */
     'state'?: CourseState;
     /**
+     * MinIO object key for thumbnail (uploaded via presigned URL)
+     * @type {string}
+     * @memberof UpdateCourseRequestDto
+     */
+    'thumbnail'?: string;
+    /**
      * 
      * @type {Array<string>}
      * @memberof UpdateCourseRequestDto
@@ -2409,6 +2433,12 @@ export interface UpdateQuestionRequestDto {
      */
     'orderIndex'?: number;
     /**
+     * Flag to mark question for deletion
+     * @type {boolean}
+     * @memberof UpdateQuestionRequestDto
+     */
+    'isDelete'?: boolean;
+    /**
      * 
      * @type {Array<QuestionAttachmentCreateDto>}
      * @memberof UpdateQuestionRequestDto
@@ -2515,6 +2545,12 @@ export interface UpdateTestRequestDto {
      * @type {string}
      * @memberof UpdateTestRequestDto
      */
+    'courseId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateTestRequestDto
+     */
     'type'?: string;
     /**
      * 
@@ -2522,6 +2558,12 @@ export interface UpdateTestRequestDto {
      * @memberof UpdateTestRequestDto
      */
     'state'?: string;
+    /**
+     * 
+     * @type {Array<UpdateQuestionRequestDto>}
+     * @memberof UpdateTestRequestDto
+     */
+    'questions'?: Array<UpdateQuestionRequestDto>;
 }
 /**
  * 
@@ -7159,6 +7201,54 @@ export const TestV1ApiAxiosParamCreator = function (configuration?: Configuratio
         },
         /**
          * 
+         * @summary Get a test by course ID and type
+         * @param {string} courseId 
+         * @param {string} type 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTestByCourseIdAndType: async (courseId: string, type: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'courseId' is not null or undefined
+            assertParamExists('getTestByCourseIdAndType', 'courseId', courseId)
+            // verify required parameter 'type' is not null or undefined
+            assertParamExists('getTestByCourseIdAndType', 'type', type)
+            const localVarPath = `/api/v1/tests/by-course`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (courseId !== undefined) {
+                localVarQueryParameter['courseId'] = courseId;
+            }
+
+            if (type !== undefined) {
+                localVarQueryParameter['type'] = type;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get a test by ID
          * @param {string} id 
          * @param {*} [options] Override http request option.
@@ -7316,6 +7406,20 @@ export const TestV1ApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Get a test by course ID and type
+         * @param {string} courseId 
+         * @param {string} type 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getTestByCourseIdAndType(courseId: string, type: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TestDetailResponseDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getTestByCourseIdAndType(courseId, type, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['TestV1Api.getTestByCourseIdAndType']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary Get a test by ID
          * @param {string} id 
          * @param {*} [options] Override http request option.
@@ -7386,6 +7490,16 @@ export const TestV1ApiFactory = function (configuration?: Configuration, basePat
         },
         /**
          * 
+         * @summary Get a test by course ID and type
+         * @param {TestV1ApiGetTestByCourseIdAndTypeRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTestByCourseIdAndType(requestParameters: TestV1ApiGetTestByCourseIdAndTypeRequest, options?: RawAxiosRequestConfig): AxiosPromise<TestDetailResponseDto> {
+            return localVarFp.getTestByCourseIdAndType(requestParameters.courseId, requestParameters.type, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get a test by ID
          * @param {TestV1ApiGetTestByIdRequest} requestParameters Request parameters.
          * @param {*} [options] Override http request option.
@@ -7443,6 +7557,27 @@ export interface TestV1ApiDeleteTestRequest {
      * @memberof TestV1ApiDeleteTest
      */
     readonly id: string
+}
+
+/**
+ * Request parameters for getTestByCourseIdAndType operation in TestV1Api.
+ * @export
+ * @interface TestV1ApiGetTestByCourseIdAndTypeRequest
+ */
+export interface TestV1ApiGetTestByCourseIdAndTypeRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof TestV1ApiGetTestByCourseIdAndType
+     */
+    readonly courseId: string
+
+    /**
+     * 
+     * @type {string}
+     * @memberof TestV1ApiGetTestByCourseIdAndType
+     */
+    readonly type: string
 }
 
 /**
@@ -7523,6 +7658,18 @@ export class TestV1Api extends BaseAPI {
      */
     public deleteTest(requestParameters: TestV1ApiDeleteTestRequest, options?: RawAxiosRequestConfig) {
         return TestV1ApiFp(this.configuration).deleteTest(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get a test by course ID and type
+     * @param {TestV1ApiGetTestByCourseIdAndTypeRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof TestV1Api
+     */
+    public getTestByCourseIdAndType(requestParameters: TestV1ApiGetTestByCourseIdAndTypeRequest, options?: RawAxiosRequestConfig) {
+        return TestV1ApiFp(this.configuration).getTestByCourseIdAndType(requestParameters.courseId, requestParameters.type, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

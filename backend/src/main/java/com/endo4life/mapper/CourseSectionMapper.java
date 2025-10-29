@@ -48,6 +48,7 @@ public abstract class CourseSectionMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "lastUpdated", source = "courseSection.updatedAt")
+    @Mapping(target = "state", source = "courseSection.state")
     public abstract CourseSectionResponseDto toCourseSectionResponseDto(CourseSection courseSection);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

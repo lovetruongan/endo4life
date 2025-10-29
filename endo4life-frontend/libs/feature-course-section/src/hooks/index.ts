@@ -6,3 +6,4 @@ export * from './use-nav-course-items';
 export * from './use-course-section-delete-multiple';
 export * from './use-course-section-delete';
 export * from './use-course-section-create';
+export * from './use-course-section-update';

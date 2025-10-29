@@ -11,10 +11,7 @@ import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import {
-  useSubTagOptions,
-  useTagOptions,
-} from '@endo4life/feature-tag';
+import { useSubTagOptions, useTagOptions } from '@endo4life/feature-tag';
 import { useRef } from 'react';
 import { IOption } from '@endo4life/types';
 import { courseLectureScheme, ICourseSectionFormData } from '../../types';
@@ -260,11 +257,9 @@ export function CourseSectionForm({
 }
 
 function getParentTags(allTags: IOption[], selectedTabs: string[] = []) {
-  const selectedItems = selectedTabs.join(', ');
-  return allTags
-    .filter((item) => selectedItems.includes(item.label))
-    .map((item) => item.metadata?.id || '')
-    .join(',');
+  if (!selectedTabs || selectedTabs.length === 0) return '';
+  // selectedTabs already contains tag IDs (values), just join them
+  return selectedTabs.join(',');
 }
 
 export default CourseSectionForm;

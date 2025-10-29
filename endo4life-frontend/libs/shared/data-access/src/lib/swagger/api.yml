@@ -296,6 +296,31 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdWrapperDto'
 
+  /api/v1/tests/by-course:
+    get:
+      summary: Get a test by course ID and type
+      tags: ['test-v1']
+      operationId: getTestByCourseIdAndType
+      parameters:
+        - name: courseId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The test details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestDetailResponseDto'
+
   /api/v1/tests/{id}:
     get:
       summary: Get a test by ID
@@ -1466,6 +1491,10 @@ components:
           type: string
         state:
           $ref: '#/components/schemas/CourseState'
+        thumbnail:
+          type: string
+          format: uuid
+          description: 'MinIO object key for thumbnail (uploaded via presigned URL)'
         tags:
           type: array
           items:
@@ -1486,6 +1515,10 @@ components:
           type: string
         state:
           $ref: '#/components/schemas/CourseState'
+        thumbnail:
+          type: string
+          format: uuid
+          description: 'MinIO object key for thumbnail (uploaded via presigned URL)'
         tags:
           type: array
           items:
@@ -2091,10 +2124,17 @@ components:
         courseId:
           type: string
           format: uuid
+        courseSectionId:
+          type: string
+          format: uuid
         type:
           type: string
         state:
           type: string
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateQuestionRequestDto'
 
     UpdateTestRequestDto:
       type: object
@@ -2103,10 +2143,17 @@ components:
           type: string
         description:
           type: string
+        courseId:
+          type: string
+          format: uuid
         type:
           type: string
         state:
           type: string
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/UpdateQuestionRequestDto'
 
     # Question schemas
     QuestionResponseDto:
@@ -2165,6 +2212,9 @@ components:
           type: object
         orderIndex:
           type: integer
+        isDelete:
+          type: boolean
+          description: Flag to mark question for deletion
         attachments:
           type: array
           items:

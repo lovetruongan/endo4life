@@ -12,17 +12,13 @@ import {
   CourseDeleteMultipleConfirmDialog,
 } from '@endo4life/feature-course';
 import { IFilterSort } from '@endo4life/types';
-import {
-  Button,
-  PageHeader,
-  Pagination,
-} from '@endo4life/ui-common';
+import { Button, PageHeader, Pagination } from '@endo4life/ui-common';
 import { formatNumber, localUuid } from '@endo4life/util-common';
 import { IconButton, Tooltip } from '@mui/material';
 import { SortChangedEvent } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { useToggle } from 'ahooks';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CiImport } from 'react-icons/ci';
 import { VscAdd, VscRefresh } from 'react-icons/vsc';
@@ -86,10 +82,6 @@ export default function CoursesPage() {
     },
     [filter, updateFilter],
   );
-
-  useEffect(() => {
-    client.invalidateQueries([REACT_QUERY_KEYS.COURSES]);
-  }, [data, client]);
 
   return (
     <div className="flex flex-col h-full">

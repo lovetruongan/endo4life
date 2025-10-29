@@ -13,10 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import {
-  useSubTagOptions,
-  useTagOptions,
-} from '@endo4life/feature-tag';
+import { useSubTagOptions, useTagOptions } from '@endo4life/feature-tag';
 import { ICourseSectionCreateFormData } from '../../types';
 import { useCourseStateOptions } from '../../hooks';
 import { CourseState } from '@endo4life/data-access';
@@ -42,7 +39,7 @@ export function CourseSectionCreateForm({ loading, onClose, onSubmit }: Props) {
       ),
       state: yup
         .string()
-        .default(CourseState.Unlisted)
+        .default(CourseState.Private)
         .required(
           t('common:txtRequiredField', {
             field_name: t('course:basicInfo.state'),
@@ -72,18 +69,17 @@ export function CourseSectionCreateForm({ loading, onClose, onSubmit }: Props) {
     useForm<ICourseSectionCreateFormData>({
       resolver: yupResolver(schema),
       mode: 'onChange',
+      defaultValues: {
+        courseSection: {
+          state: CourseState.Private,
+        },
+      },
     });
 
   const selectedTag = watch('courseSection.tags');
 
   const { options: allTagOptions } = useTagOptions(selectedTag);
-  const { options: subTagOptions } = useSubTagOptions(
-    allTagOptions
-      ?.filter((item) => selectedTag?.includes(item.label))
-      .map((item) => item.metadata.id || '')
-      .join(',') || '',
-    '',
-  );
+  const { options: subTagOptions } = useSubTagOptions(selectedTag || '', '');
 
   return (
     <>

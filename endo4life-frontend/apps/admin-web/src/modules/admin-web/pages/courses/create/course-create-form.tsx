@@ -14,10 +14,7 @@ import {
   FormSelectMulti,
 } from '@endo4life/ui-common';
 import { CourseState } from '@endo4life/data-access';
-import {
-  useSubTagOptions,
-  useTagOptions,
-} from '@endo4life/feature-tag';
+import { useSubTagOptions, useTagOptions } from '@endo4life/feature-tag';
 import { useRef } from 'react';
 
 interface Props {
@@ -49,7 +46,7 @@ export function CourseCreateForm({ loading, onSubmit }: Props) {
       ),
       state: yup
         .string()
-        .default(CourseState.Unlisted)
+        .default(CourseState.Private)
         .required(
           t('common:txtRequiredField', {
             field_name: t('course:basicInfo.state'),
@@ -70,13 +67,7 @@ export function CourseCreateForm({ loading, onSubmit }: Props) {
   const selectedTag = watch('course.tags');
 
   const { options: allTagOptions } = useTagOptions(selectedTag);
-  const { options: subTagOptions } = useSubTagOptions(
-    allTagOptions
-      ?.filter((item) => selectedTag?.includes(item.label))
-      .map((item) => item.metadata.id || '')
-      .join(',') || '',
-    '',
-  );
+  const { options: subTagOptions } = useSubTagOptions(selectedTag || '', '');
 
   return (
     <form

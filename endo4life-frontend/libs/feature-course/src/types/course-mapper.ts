@@ -46,7 +46,7 @@ export class CourseMapper implements ICourseMapper {
       tags: dto.tags,
       detailTags: dto.tagsDetail,
       thumbnail: urlToUploadableImageEntity(dto.thumbnailUrl),
-      updatedAt: dto.lastUpdated,
+      updatedAt: dto.updatedAt,
     };
   }
   toUpdateCourseRequest(
@@ -55,7 +55,7 @@ export class CourseMapper implements ICourseMapper {
     if (!data.id) throw new Error('Invalid Course');
     return {
       id: data.id,
-      metadata: {
+      updateCourseRequestDto: {
         state: data.course.state,
         title: data.course.title,
         description: data.course.description,
@@ -79,7 +79,7 @@ export class CourseMapper implements ICourseMapper {
 
     return {
       id: data.id,
-      metadata: {
+      updateCourseRequestDto: {
         thumbnail,
         state: data.state as CourseState,
         title: data.title,
@@ -95,7 +95,7 @@ export class CourseMapper implements ICourseMapper {
     data: ICourseInfoFormData,
   ): CourseV1ApiCreateCourseRequest {
     return {
-      course: {
+      createCourseRequestDto: {
         state: data.course.state,
         title: data.course.title,
         description: data.course.description,
@@ -113,7 +113,7 @@ export class CourseMapper implements ICourseMapper {
     data: ICourseFormData,
   ): CourseV1ApiCreateCourseRequest {
     return {
-      course: {
+      createCourseRequestDto: {
         state: data.state as CourseState,
         title: data.title,
         description: data.description?.content || '',
@@ -125,7 +125,7 @@ export class CourseMapper implements ICourseMapper {
   }
   toCreateRequest(data: ICourseFormData): CourseV1ApiCreateCourseRequest {
     return {
-      course: {
+      createCourseRequestDto: {
         state: data.state as CourseState,
         title: data.title,
         description: data.description?.content || '',

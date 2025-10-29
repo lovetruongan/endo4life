@@ -2,6 +2,7 @@ import {
   CourseSectionCriteria,
   CourseSectionResponseDto,
   CourseSectionV1ApiCreateCourseSectionRequest,
+  CourseSectionV1ApiUpdateCourseSectionRequest,
   CourseSectionV1ApiGetCourseSectionsRequest,
   CourseState,
   CreateCourseSectionRequestDtoAttribute,
@@ -31,6 +32,9 @@ export interface ICourseSectionMapper {
   toCreateRequest(
     data: ICourseSectionFormData,
   ): CourseSectionV1ApiCreateCourseSectionRequest;
+  toUpdateRequest(
+    data: ICourseSectionFormData,
+  ): CourseSectionV1ApiUpdateCourseSectionRequest;
   toGetManyRequest(data: IFilter): CourseSectionV1ApiGetCourseSectionsRequest;
 }
 
@@ -49,7 +53,7 @@ export class CourseSectionMapper implements ICourseSectionMapper {
     return {
       id: dto.id || '',
       title: dto.title,
-      status: dto.state,
+      state: dto.state,
       updatedAt: dto.lastUpdated,
       thumbnail: urlToUploadableImageEntity(dto.thumbnailUrl),
     };
@@ -74,12 +78,17 @@ export class CourseSectionMapper implements ICourseSectionMapper {
     let attribute: CreateCourseSectionRequestDtoAttribute | undefined =
       undefined;
     try {
-      attribute = JSON.parse(dto.attribute || '');
+      if (dto.attribute) {
+        attribute = typeof dto.attribute === 'string' 
+          ? JSON.parse(dto.attribute) 
+          : dto.attribute;
+      }
     } catch (err) {}
 
     return {
       id: dto.id,
       title: dto.title,
+      state: dto.state,
       content: stringToRichText(attribute?.metadata?.mainContent),
       target: stringToRichText(attribute?.metadata?.target),
       requirement: stringToRichText(attribute?.metadata?.lessonObjectives),
@@ -96,7 +105,7 @@ export class CourseSectionMapper implements ICourseSectionMapper {
     data: ICourseSectionCreateFormData,
   ): CourseSectionV1ApiCreateCourseSectionRequest {
     return {
-      courseSection: {
+      createCourseSectionRequestDto: {
         courseId: data.courseSection.courseId,
         state: data.courseSection.state,
         title: data.courseSection.title,
@@ -125,7 +134,7 @@ export class CourseSectionMapper implements ICourseSectionMapper {
   ): CourseSectionV1ApiCreateCourseSectionRequest {
     if (!data.courseId) throw new Error('Invalid course id');
     return {
-      courseSection: {
+      createCourseSectionRequestDto: {
         courseId: data.courseId,
         state: data.state as CourseState,
         title: data.title,
@@ -133,6 +142,32 @@ export class CourseSectionMapper implements ICourseSectionMapper {
         tagsDetail: data.detailTags,
         totalCredits: data.numCredits,
 
+        attribute: {
+          metadata: {
+            description: data.description?.content,
+            mainContent: data.content?.content,
+            lessonObjectives: data.requirement?.content,
+            target: data.target?.content,
+          },
+        },
+        thumbnail: toResourceObjectKey(data.thumbnail?.id),
+        attachments: toResourceObjectKey(data.video?.id),
+      },
+    };
+  }
+
+  toUpdateRequest(
+    data: ICourseSectionFormData,
+  ): CourseSectionV1ApiUpdateCourseSectionRequest {
+    if (!data.id) throw new Error('Invalid course section id');
+    return {
+      id: data.id,
+      metadata: {
+        state: data.state as CourseState,
+        title: data.title,
+        tags: data.tags,
+        tagsDetail: data.detailTags,
+        totalCredits: data.numCredits,
         attribute: {
           metadata: {
             description: data.description?.content,

@@ -44,6 +44,11 @@ public class TestV1ApiDelegateImpl implements TestV1ApiDelegate {
     }
 
     @Override
+    public ResponseEntity<TestDetailResponseDto> getTestByCourseIdAndType(UUID courseId, String type) {
+        return ResponseEntity.ok(testService.getTestByCourseIdAndType(courseId, type));
+    }
+
+    @Override
     public ResponseEntity<Void> updateTest(UUID id, UpdateTestRequestDto updateTestRequestDto) {
         testService.updateTest(id, updateTestRequestDto);
         return ResponseEntity.noContent().build();

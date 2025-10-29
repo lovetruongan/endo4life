@@ -16,8 +16,8 @@ export function useCourseStateOptions(defaultValue = CourseState.Public) {
         value: CourseState.Draft.toString(),
       },
       {
-        label: t(`state.${CourseState.Unlisted.toString()}`),
-        value: CourseState.Unlisted.toString(),
+        label: t(`state.${CourseState.Private.toString()}`),
+        value: CourseState.Private.toString(),
       },
     ];
   }, [t]);

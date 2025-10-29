@@ -11,4 +11,6 @@ import java.util.UUID;
 @Repository
 public interface TestRepository extends JpaRepository<Test, UUID>, JpaSpecificationExecutor<Test> {
     List<Test> findByCourseId(UUID courseId);
+
+    List<Test> findByCourseIdAndType(UUID courseId, String type);
 }

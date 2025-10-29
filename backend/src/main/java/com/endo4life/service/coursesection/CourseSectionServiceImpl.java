@@ -63,6 +63,9 @@ public class CourseSectionServiceImpl implements CourseSectionService {
                         "Course not found with id: " + courseSectionRequestDto.getCourseId()));
 
         courseSectionEntity.setCourse(courseEntity);
+        courseSectionEntity.setState(courseSectionRequestDto.getState() != null
+                ? courseSectionRequestDto.getState().toString()
+                : "DRAFT");
         courseSectionEntity.setTags(StringUtil.convertListToString(courseSectionRequestDto.getTags()));
         courseSectionEntity.setTagsDetail(StringUtil.convertListToString(courseSectionRequestDto.getTagsDetail()));
 
@@ -116,6 +119,10 @@ public class CourseSectionServiceImpl implements CourseSectionService {
                 .orElseThrow(() -> new BadRequestException("Course section not found with id: " + id));
 
         courseSectionMapper.toCourseSection(courseSectionEntity, updateCourseSectionDto);
+
+        if (Objects.nonNull(updateCourseSectionDto.getState())) {
+            courseSectionEntity.setState(updateCourseSectionDto.getState().toString());
+        }
 
         if (Objects.nonNull(updateCourseSectionDto.getAttribute())) {
             courseSectionEntity.setAttribute(convertToJsonString(updateCourseSectionDto.getAttribute()));

@@ -19,10 +19,10 @@ export function CourseStatusCell({ course }: CourseStateCellProps) {
           <IoChevronDown />
         </>
       )}
-      {course?.status === CourseState.Unlisted.toString() && (
+      {course?.status === CourseState.Private.toString() && (
         <>
           <FaLock />
-          <span>{t(`state.${CourseState.Unlisted.toString()}`)}</span>
+          <span>{t(`state.${CourseState.Private.toString()}`)}</span>
           <IoChevronDown />
         </>
       )}

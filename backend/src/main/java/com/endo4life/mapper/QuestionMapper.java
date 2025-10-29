@@ -25,6 +25,11 @@ public abstract class QuestionMapper {
     @Mapping(target = "attachments", ignore = true)
     public abstract Question toQuestion(CreateQuestionRequestDto createQuestionRequestDto);
 
+    @Mapping(target = "test", ignore = true) // Sẽ được set trong service
+    @Mapping(target = "answers", ignore = true) // Chuyển đổi JSON thủ công nếu cần
+    @Mapping(target = "attachments", ignore = true)
+    public abstract Question toQuestionFromUpdate(UpdateQuestionRequestDto updateQuestionRequestDto);
+
     @Mapping(target = "answers", ignore = true) // Chuyển đổi JSON thủ công nếu cần
     @Mapping(target = "attachments", ignore = true)
     public abstract QuestionResponseDto toQuestionResponseDto(Question question);

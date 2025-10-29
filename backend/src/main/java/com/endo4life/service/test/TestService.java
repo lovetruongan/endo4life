@@ -9,8 +9,14 @@ import java.util.UUID;
 
 public interface TestService {
     List<TestResponseDto> getTestsByCourseId(UUID courseId);
+
+    TestDetailResponseDto getTestByCourseIdAndType(UUID courseId, String type);
+
     UUID createTest(CreateTestRequestDto createTestRequestDto);
+
     TestDetailResponseDto getTestById(UUID id);
+
     void updateTest(UUID id, UpdateTestRequestDto updateTestRequestDto);
+
     void deleteTest(UUID id);
 }

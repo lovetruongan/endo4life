@@ -35,18 +35,16 @@ function useCourseSectionManagementColumns({
         colId: 'thumbnailUrl',
         field: 'thumbnailUrl',
         headerName: t('courseSectionTable.course'),
-        hide: true,
+        hide: false,
         initialFlex: 0.25,
         cellRenderer: (params: ICellRendererParams<ICourseSectionEntity>) => (
-          <Link to={ADMIN_WEB_ROUTES.COURSE_DETAIL}>
-            <div className="flex items-center justify-center h-full">
-              <img
-                src={params?.data?.thumbnail?.src}
-                alt={params?.data?.title || 'Course'}
-                className="object-cover w-12 h-12 my-2 rounded-md"
-              />
-            </div>
-          </Link>
+          <div className="flex items-center justify-center h-full">
+            <img
+              src={params?.data?.thumbnail?.src}
+              alt={params?.data?.title || 'Course'}
+              className="object-cover w-12 h-12 my-2 rounded-md"
+            />
+          </div>
         ),
       },
 

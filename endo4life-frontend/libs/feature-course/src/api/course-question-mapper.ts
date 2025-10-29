@@ -1,6 +1,6 @@
 import {
-  AnswerMetadata,
-  QuestionDto,
+  QuestionResponseDto,
+  QuestionType,
 } from '@endo4life/data-access';
 
 import {
@@ -13,26 +13,58 @@ import {
 } from '@endo4life/types';
 import { localUuid } from '@endo4life/util-common';
 
+// Map backend enum to frontend enum
+function mapQuestionTypeFromBackend(backendType?: QuestionType): QuestionTypeEnum | undefined {
+  if (!backendType) return undefined;
+  
+  const mapping: Record<QuestionType, QuestionTypeEnum> = {
+    [QuestionType.SingleChoice]: QuestionTypeEnum.SINGLE_CHOICE,
+    [QuestionType.MultipleChoice]: QuestionTypeEnum.MULTIPLE_CHOICE,
+    [QuestionType.FillInTheBlank]: QuestionTypeEnum.FREE_TEXT,
+    [QuestionType.Essay]: QuestionTypeEnum.FREE_TEXT,
+  };
+  
+  return mapping[backendType];
+}
+
+interface AnswerMetadata {
+  id?: string;
+  content?: string;
+  isCorrect?: boolean;
+  essay_answer?: string;
+}
+
 export interface ICourseQuestionMapper {
-  fromDto(dto: QuestionDto): IQuestionEntity;
+  fromDto(dto: QuestionResponseDto): IQuestionEntity;
 }
 
 export class CourseQuestionMapper implements ICourseQuestionMapper {
-  getAnswersMetadata(dto: QuestionDto): AnswerMetadata[] {
+  getAnswersMetadata(dto: QuestionResponseDto): AnswerMetadata[] {
     try {
-      let metadataStr: string = (dto as any)?.answers;
-      const answerMetadatas: AnswerMetadata[] =
-        JSON.parse(metadataStr)?.metadata || [];
-      return answerMetadatas;
-    } catch (error) {}
+      if (!dto.answers) return [];
+      
+      // If answers is already an object with metadata, use it directly
+      if (typeof dto.answers === 'object' && 'metadata' in dto.answers) {
+        return (dto.answers as { metadata: AnswerMetadata[] }).metadata || [];
+      }
+      
+      // Otherwise, try to parse it as a string
+      if (typeof dto.answers === 'string') {
+        const answerMetadatas: AnswerMetadata[] =
+          JSON.parse(dto.answers)?.metadata || [];
+        return answerMetadatas;
+      }
+    } catch (error) {
+      // Silently handle JSON parse errors
+    }
 
     return [];
   }
-  fromDto(dto: QuestionDto): IQuestionEntity {
-    const type = dto.type as QuestionTypeEnum;
+  fromDto(dto: QuestionResponseDto): IQuestionEntity {
+    const type = mapQuestionTypeFromBackend(dto.type);
     const answerMetadatas = this.getAnswersMetadata(dto);
     const isFreeText = type === QuestionTypeEnum.FREE_TEXT;
-    let answers = isFreeText
+    const answers = isFreeText
       ? []
       : answerMetadatas?.map((item) => {
           return {
@@ -48,17 +80,17 @@ export class CourseQuestionMapper implements ICourseQuestionMapper {
       answer = essayAnswer ? { content: essayAnswer } : undefined;
     }
     let image: IImageUploadableEntity | undefined = undefined;
-    if (dto.questionAttachments && dto.questionAttachments.length > 0) {
-      const attchment = dto.questionAttachments[0];
-      if (attchment) {
+    if (dto.attachments && dto.attachments.length > 0) {
+      const attachment = dto.attachments[0];
+      if (attachment) {
         image = {
-          id: attchment.id || localUuid(),
-          src: attchment.objectKeyUrl,
-          width: attchment.width,
-          height: attchment.height,
-          fileName: attchment.fileName,
-          fileSize: attchment.fileSize,
-          extension: attchment.fileType,
+          id: attachment.id || localUuid(),
+          src: attachment.fileUrl,
+          width: attachment.width,
+          height: attachment.height,
+          fileName: attachment.fileName,
+          fileSize: attachment.fileSize,
+          extension: attachment.fileType,
         };
       }
     }

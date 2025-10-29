@@ -1,20 +1,47 @@
 import {
   CourseState,
-  DetailTestOfTheCourseDto,
-  QuestionAttachmentDto,
-  QuestionDto,
+  CreateQuestionRequestDto,
+  QuestionAttachmentCreateDto,
   QuestionType,
-  TestType,
+  TestDetailResponseDto,
   TestV1ApiCreateTestRequest,
   TestV1ApiUpdateTestRequest,
+  UpdateQuestionRequestDto,
 } from '@endo4life/data-access';
 import { CourseTestTypeEnum, ICourseTestEntity } from '../types';
 import { v4 } from 'uuid';
-import { IQuestionEntity } from '@endo4life/feature-test';
+import { IQuestionEntity, QuestionTypeEnum } from '@endo4life/feature-test';
 import { isLocalUuid } from '@endo4life/util-common';
 
+// Map frontend enum to backend enum
+function mapQuestionType(frontendType?: QuestionTypeEnum): QuestionType | undefined {
+  if (!frontendType) return undefined;
+  
+  const mapping: Record<QuestionTypeEnum, QuestionType> = {
+    [QuestionTypeEnum.SINGLE_CHOICE]: QuestionType.SingleChoice,
+    [QuestionTypeEnum.MULTIPLE_CHOICE]: QuestionType.MultipleChoice,
+    [QuestionTypeEnum.FREE_TEXT]: QuestionType.Essay,
+  };
+  
+  return mapping[frontendType];
+}
+
+// Map backend enum to frontend enum
+function mapQuestionTypeFromBackend(backendType?: QuestionType): QuestionTypeEnum | undefined {
+  if (!backendType) return undefined;
+  
+  const mapping: Record<QuestionType, QuestionTypeEnum> = {
+    [QuestionType.SingleChoice]: QuestionTypeEnum.SINGLE_CHOICE,
+    [QuestionType.MultipleChoice]: QuestionTypeEnum.MULTIPLE_CHOICE,
+    [QuestionType.FillInTheBlank]: QuestionTypeEnum.FREE_TEXT,
+    [QuestionType.Essay]: QuestionTypeEnum.FREE_TEXT,
+  };
+  
+  return mapping[backendType];
+}
+
 export interface ICourseTestMapper {
-  fromDto(dto: DetailTestOfTheCourseDto): ICourseTestEntity;
+  fromDto(dto: TestDetailResponseDto): ICourseTestEntity;
   toCreateRequest(
     test: ICourseTestEntity,
     questions: Record<string, IQuestionEntity>,
@@ -31,20 +58,18 @@ export class CourseTestMapper implements ICourseTestMapper {
     questions: Record<string, IQuestionEntity>,
   ): TestV1ApiCreateTestRequest {
     return {
-      test: {
-        title: test.title,
+      createTestRequestDto: {
+        title: test.title || '',
         description: test.description,
-        courseId: test.courseId,
-        courseSectionId: test.courseSectionId,
-        state: test.status as CourseState,
-        type: test.type as TestType,
+        courseId: test.courseId || '',
+        state: test.status,
+        type: test.type,
+        // @ts-ignore - questions field added to OpenAPI spec but API client not regenerated yet
         questions: test.questionIds.map((questionId) => {
           const question = questions[questionId];
-          let questionAttachments: QuestionAttachmentDto[] | undefined =
-            undefined;
-          const questionDto: QuestionDto = {
-            title: question.instruction?.content,
-            type: question.type as QuestionType,
+          const questionDto: CreateQuestionRequestDto = {
+            title: question.instruction?.content || '',
+            type: mapQuestionType(question.type) || QuestionType.SingleChoice,
             description: question.content?.content,
             answers: {
               metadata: question.answers?.map((answer) => {
@@ -54,8 +79,7 @@ export class CourseTestMapper implements ICourseTestMapper {
                 };
               }),
             },
-            questionAttachments,
-            isDelete: question.isDeleted,
+            attachments: undefined,
           };
           return questionDto;
         }),
@@ -68,19 +92,17 @@ export class CourseTestMapper implements ICourseTestMapper {
   ): TestV1ApiUpdateTestRequest {
     return {
       id: test.id,
-      test: {
-        id: test.id,
+      updateTestRequestDto: {
         title: test.title,
         description: test.description,
-        courseId: test.courseId,
-        state: test.status as CourseState,
-        type: test.type as TestType,
+        state: test.status,
+        type: test.type,
+        // @ts-ignore - questions field added to OpenAPI spec but API client not regenerated yet
         questions: test.questionIds.map((questionId) => {
           const question = questions[questionId];
-          const questionDto: QuestionDto = {
-            id: isLocalUuid(question.id) ? undefined : question.id,
+          const questionDto: UpdateQuestionRequestDto = {
             title: question.instruction?.content,
-            type: question.type as QuestionType,
+            type: mapQuestionType(question.type) || QuestionType.SingleChoice,
             description: question.content?.content,
             answers: {
               metadata: question.answers?.map((answer) => {
@@ -90,23 +112,22 @@ export class CourseTestMapper implements ICourseTestMapper {
                 };
               }),
             },
-            questionAttachments: question.image?.uploadResponse
+            attachments: question.image?.uploadResponse
               ? [question.image?.uploadResponse]
-              : [],
-            isDelete: question.isDeleted,
+              : undefined,
           };
           return questionDto;
         }),
       },
     };
   }
-  fromDto(dto: DetailTestOfTheCourseDto): ICourseTestEntity {
+  fromDto(dto: TestDetailResponseDto): ICourseTestEntity {
     return {
       id: dto.id || v4(),
-      courseId: dto.courseId,
+      courseId: dto.courseId || '',
       type: dto.type as CourseTestTypeEnum,
       questionIds:
-        dto.questions?.map((item) => item.id || '').filter((item) => !!item) ||
+        dto.questions?.map((item: any) => item.id || '').filter((item: any) => !!item) ||
         [],
       title: dto.title,
       description: dto.description,

@@ -12,6 +12,23 @@ export const store = configureStore({
     tests: courseTestsReducer,
     questions: courseQuestionsReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // Ignore File objects in these action paths
+        ignoredActions: [
+          'course-questions/updateEditingQuestion',
+          'course-questions/addCourseQuestion',
+          'course-questions/updateCourseQuestion',
+          'course-questions/addCourseQuestions',
+        ],
+        // Ignore File objects in these state paths (File objects from image uploads)
+        ignoredPaths: [
+          'questions.editingQuestion.image.file',
+          'questions.questions',
+        ],
+      },
+    }),
   devTools: process.env.NODE_ENV !== 'production',
 });
 export type AppDispatch = typeof store.dispatch;

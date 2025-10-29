@@ -28,7 +28,7 @@ export class CourseMapper implements ICourseMapper {
       id: dto.id,
       title: dto.title,
       state: dto.state,
-      description: dto.description,
+      description: typeof dto.description === 'string' ? dto.description : '',
       thumbnailUrl: dto.thumbnailUrl,
       lastUpdated: dto.lastUpdated,
       metadata: dto,

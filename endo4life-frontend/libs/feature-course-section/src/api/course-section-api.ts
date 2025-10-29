@@ -24,6 +24,7 @@ export interface ICourseSectionApi {
   deleteCourseSection(id: string): Promise<void>;
   deleteCourseSections(ids: string[]): Promise<void>;
   createCourseSection(data: ICourseSectionFormData): Promise<void>;
+  updateCourseSection(data: ICourseSectionFormData): Promise<void>;
 }
 
 export class CourseSectionApiImpl extends BaseApi implements ICourseSectionApi {
@@ -75,6 +76,26 @@ export class CourseSectionApiImpl extends BaseApi implements ICourseSectionApi {
     const courseSectionMapper = new CourseSectionMapper();
     const payload = courseSectionMapper.toCreateRequest(data);
     await api.createCourseSection(payload);
+    return;
+  }
+
+  async updateCourseSection(data: ICourseSectionFormData): Promise<void> {
+    if (!data.id) throw new Error('Invalid course section id');
+    const storageApi = new StorageApiImpl(this.getBasePath());
+    if (data.thumbnail?.file) {
+      data.thumbnail.id = await storageApi.uploadFile(
+        data.thumbnail.file,
+        'THUMBNAIL',
+      );
+    }
+    if (data.video?.file) {
+      data.video.id = await storageApi.uploadFile(data.video.file, 'VIDEO');
+    }
+    const config = await this.getApiConfiguration();
+    const api = new CourseSectionV1Api(config);
+    const courseSectionMapper = new CourseSectionMapper();
+    const payload = courseSectionMapper.toUpdateRequest(data);
+    await api.updateCourseSection(payload);
     return;
   }
 
