@@ -8,7 +8,10 @@
       "@nx/react/typings/image.d.ts",
       "vite/client"
     ],
-    "composite": true
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "incremental": true
   },
   "exclude": [
     "src/**/*.spec.ts",

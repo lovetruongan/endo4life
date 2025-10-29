@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import com.endo4life.domain.document.Resource.ResourceType;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -105,7 +106,15 @@ public class ResourceServiceImpl implements ResourceService {
                         resource.setType(getUploadTypeCreateResource(createResourceRequest.getType()));
                     }
                     if (Objects.nonNull(request.getObjectKey())) {
-                        resource.setPath(request.getObjectKey().toString());
+                        String objectKey = request.getObjectKey().toString();
+                        resource.setPath(objectKey);
+
+                        // Set thumbnail name based on objectKey (webhook will generate the file)
+                        String baseName = objectKey;
+                        if (objectKey.contains(".")) {
+                            baseName = objectKey.substring(0, objectKey.lastIndexOf("."));
+                        }
+                        resource.setThumbnail(Constants.TEMPLATE_THUMBNAIL_NAME + baseName);
                     }
                     return resource;
                 }).toList();
@@ -133,12 +142,33 @@ public class ResourceServiceImpl implements ResourceService {
         // update path attachment - only if explicitly provided
         UUID attachmentDto = updateResourceDto.getAttachment();
         if (Objects.nonNull(attachmentDto)) {
-            if (!StringUtils.equalsIgnoreCase(resource.getPath(), attachmentDto.toString()) &&
+            String newObjectKey = attachmentDto.toString();
+
+            // Remove old file from MinIO if different
+            if (!StringUtils.equalsIgnoreCase(resource.getPath(), newObjectKey) &&
                     StringUtils.isNotBlank(resource.getPath())) {
                 minioService.removeFile(resource.getPath(),
                         minioService.getBucketFromResourceType(resource.getType().getValue()));
+
+                // Also remove old thumbnails
+                if (StringUtils.isNotBlank(resource.getThumbnail())) {
+                    minioService.removeFile(resource.getThumbnail(), minioConfig.bucketThumbnail());
+                    minioService.removeFile(Constants.TEMPLATE_SMALL_THUMBNAIL_NAME +
+                            resource.getThumbnail().replace(Constants.TEMPLATE_THUMBNAIL_NAME, ""),
+                            minioConfig.bucketThumbnail());
+                }
             }
-            resource.setPath(attachmentDto.toString());
+
+            // Update path
+            resource.setPath(newObjectKey);
+
+            // Update thumbnail name to match new file
+            // Webhook will generate the actual thumbnail files
+            String baseName = newObjectKey;
+            if (newObjectKey.contains(".")) {
+                baseName = newObjectKey.substring(0, newObjectKey.lastIndexOf("."));
+            }
+            resource.setThumbnail(Constants.TEMPLATE_THUMBNAIL_NAME + baseName);
         }
         resourceMapper.toResource(resource, updateResourceDto);
         resourceRepository.save(resource);
@@ -228,6 +258,37 @@ public class ResourceServiceImpl implements ResourceService {
         }
 
         Resource resource = resourceOpt.get();
+        String bucketName = minioService.getBucketFromResourceType(resource.getType().getValue());
+
+        // Get file from MinIO to calculate metadata
+        try (InputStream fileStream = minioService.getFile(bucketName, objectKey)) {
+            if (fileStream == null) {
+                log.error("Failed to get file from MinIO for metadata update: {}", objectKey);
+                return;
+            }
+
+            // Convert to MultipartFile to use utility methods
+            String contentType = FileUtil.getFileExtension(objectKey);
+            MultipartFile file = FileUtil.toMultipartFile(fileStream, objectKey, contentType);
+
+            // Update file metadata
+            var webResourceType = convertToWebResourceType(resource.getType());
+            resource.setDimension(ResourceUtil.getDimensions(file, webResourceType));
+            resource.setSize(ResourceUtil.getSize(file));
+
+            // Set extension from filename
+            if (objectKey.contains(".")) {
+                resource.setExtension(objectKey.substring(objectKey.lastIndexOf(".") + 1));
+            }
+
+            // Update video duration if it's a video
+            if (resource.getType() == ResourceType.VIDEO) {
+                resource.setTime(FileUtil.getVideoDuration(file));
+            }
+
+        } catch (Exception e) {
+            log.error("Failed to update resource metadata for {}: {}", objectKey, e.getMessage(), e);
+        }
 
         // Extract base name without extension: uuid_filename.ext -> uuid_filename
         String baseName = objectKey;
@@ -243,7 +304,7 @@ public class ResourceServiceImpl implements ResourceService {
         resource.setUpdatedBy(UserContextHolder.getEmail().orElse(Constants.SYSTEM));
         resourceRepository.save(resource);
 
-        log.info("Updated resource {} with thumbnail: {}", resource.getId(), thumbnailName);
+        log.info("Updated resource {} with thumbnail and metadata: {}", resource.getId(), thumbnailName);
     }
 
     @Override

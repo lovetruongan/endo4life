@@ -1549,6 +1549,14 @@ components:
           type: array
           items:
             type: string
+        tag:
+          type: array
+          items:
+            type: string
+        detailTag:
+          type: array
+          items:
+            type: string
         createdAt:
           type: string
           format: date-time
@@ -1570,6 +1578,14 @@ components:
               type: string
             time:
               type: integer
+            tag:
+              type: array
+              items:
+                type: string
+            detailTag:
+              type: array
+              items:
+                type: string
 
     UserResourceResponsePaginatedDto:
       type: object

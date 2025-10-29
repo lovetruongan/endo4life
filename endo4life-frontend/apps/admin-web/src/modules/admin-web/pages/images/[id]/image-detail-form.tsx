@@ -33,6 +33,8 @@ import {
   getFileFormat,
   objectUtils,
   stringUtils,
+  formatDate,
+  DATE_FORMAT,
 } from '@endo4life/util-common';
 import { FiCamera, FiCrop, FiDownload } from 'react-icons/fi';
 import { RiDeleteBinLine } from 'react-icons/ri';
@@ -208,11 +210,14 @@ export function ImageDetailForm({ loading, formData, onSubmit }: Props) {
               <div className="flex flex-col items-start gap-4 overflow-x-hidden md:w-1/2">
                 <InfoCard
                   label={t('image:basicInfo.createdAt')}
-                  content={getFileFormat(
-                    EnvConfig.Endo4LifeServiceUrl,
-                    selectedFile,
-                    formData,
-                  )}
+                  content={
+                    formData?.entity?.createdAt
+                      ? formatDate(
+                          new Date(formData.entity.createdAt),
+                          DATE_FORMAT,
+                        )
+                      : '-'
+                  }
                 />
                 <InfoCard
                   label={t('image:basicInfo.size')}

@@ -4,6 +4,7 @@ import {
   ResourceState,
   ResourceV1ApiCreateResourceRequest,
   ResourceV1ApiUpdateResourceRequest,
+  UpdateResourceRequestDto,
   UploadType,
 } from '@endo4life/data-access';
 import { IImageEntity } from './image-entity';
@@ -33,7 +34,7 @@ export interface IImageMapper {
   ): ResourceV1ApiCreateResourceRequest;
   toUpdateResourceRequest(
     data: IImageUpdateFormData
-  ): ResourceV1ApiUpdateResourceRequest;
+  ): UpdateResourceRequestDto;
 }
 
 export class ImageMapper implements IImageMapper {
@@ -54,11 +55,9 @@ export class ImageMapper implements IImageMapper {
       thumbnailUrl: dto.thumbnailUrl,
       commentCount: dto.commentCount,
       viewNumber: dto.viewNumber,
-      time: dto.time,
       createdAt: dto.createdAt,
-      updatedAt: dto.updatedAt,
-      tag: dto.tag,
-      detailTag: dto.detailTag,
+      tag: dto.tag || [],
+      detailTag: dto.detailTag || [],
       metadata: dto,
     };
   }
@@ -237,17 +236,20 @@ export class ImageMapper implements IImageMapper {
 
   toUpdateResourceRequest(
     data: IImageUpdateFormData
-  ): ResourceV1ApiUpdateResourceRequest {
-    return {
-      id: data.id,
-      file: data.file,
-      metadata: {
-        title: data.metadata.title,
-        description: data.metadata.description,
-        state: data.metadata.state,
-        tag: data.metadata.tag,
-        detailTag: data.metadata.detailTag,
-      },
+  ): UpdateResourceRequestDto {
+    const payload: UpdateResourceRequestDto = {
+      title: data.metadata.title,
+      description: data.metadata.description,
+      state: data.metadata.state,
+      tag: data.metadata.tag,
+      detailTag: data.metadata.detailTag,
     };
+
+    // If a new file was uploaded, include the attachment field (objectKey)
+    if ((data as any).fileKey) {
+      payload.attachment = (data as any).fileKey;
+    }
+
+    return payload;
   }
 }

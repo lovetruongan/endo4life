@@ -1745,6 +1745,18 @@ export interface ResourceDetailResponseDto {
     'tags'?: Array<string>;
     /**
      * 
+     * @type {Array<string>}
+     * @memberof ResourceDetailResponseDto
+     */
+    'tag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ResourceDetailResponseDto
+     */
+    'detailTag'?: Array<string>;
+    /**
+     * 
      * @type {string}
      * @memberof ResourceDetailResponseDto
      */
@@ -1854,6 +1866,18 @@ export interface ResourceResponseDto {
      * @memberof ResourceResponseDto
      */
     'tags'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ResourceResponseDto
+     */
+    'tag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ResourceResponseDto
+     */
+    'detailTag'?: Array<string>;
     /**
      * 
      * @type {string}
