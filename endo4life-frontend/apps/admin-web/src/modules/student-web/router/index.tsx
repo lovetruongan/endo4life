@@ -28,8 +28,19 @@ const ResourceCoursePage = lazy(
 const AboutUsPage = lazy(() => import('../pages/about-us/page'));
 const LibraryPage = lazy(() => import('../pages/library/page'));
 const MyProfilePage = lazy(() => import('../pages/my-profile/page'));
+const LoginPage = lazy(() => import('../pages/login/page'));
 
 export const studentWebRouter = createBrowserRouter([
+  // LOGIN PAGE - No Layout (no header/footer)
+  {
+    path: '/login',
+    element: (
+      <Suspense fallback={<div>Loading...</div>}>
+        <LoginPage />
+      </Suspense>
+    ),
+  },
+  // MAIN APP - With Layout (has header/footer)
   {
     path: STUDENT_WEB_ROUTES.ROOT,
     errorElement: <div> Loading</div>,

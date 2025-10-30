@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { EnvConfig } from '@endo4life/feature-config';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   MdEmail, 
   MdLock, 
@@ -11,11 +12,17 @@ import {
 } from 'react-icons/md';
 import { FaSpinner } from 'react-icons/fa';
 
-interface LoginFormProps {
-  onLoginSuccess: (token: string, refreshToken: string, expiresIn?: number) => void;
-}
+// Authentication storage keys
+const AUTH_STORAGE_KEYS = {
+  ACCESS_TOKEN: 'endo4life_access_token',
+  REFRESH_TOKEN: 'endo4life_refresh_token',
+  TOKEN_EXPIRY: 'endo4life_token_expiry',
+  USER_PROFILE: 'endo4life_user_profile',
+};
 
-export function LoginForm({ onLoginSuccess }: LoginFormProps) {
+export function LoginPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -23,6 +30,19 @@ export function LoginForm({ onLoginSuccess }: LoginFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+
+  // Get the redirect path from state or default to home
+  const from = (location.state as any)?.from?.pathname || '/';
+
+  const saveTokensToStorage = (token: string, refreshToken: string, expiresIn?: number) => {
+    localStorage.setItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN, token);
+    localStorage.setItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+    
+    if (expiresIn) {
+      const expiryTime = Date.now() + expiresIn * 1000;
+      localStorage.setItem(AUTH_STORAGE_KEYS.TOKEN_EXPIRY, expiryTime.toString());
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,15 +69,43 @@ export function LoginForm({ onLoginSuccess }: LoginFormProps) {
       );
 
       if (response.data.access_token && response.data.refresh_token) {
+        // Decode token to get user info
+        const tokenParts = response.data.access_token.split('.');
+        const tokenPayload = JSON.parse(atob(tokenParts[1]));
+        
+        // Create user profile from token
+        const userProfile = {
+          id: tokenPayload.sub,
+          username: tokenPayload.preferred_username || tokenPayload.name || username,
+          firstName: tokenPayload.given_name || '',
+          lastName: tokenPayload.family_name || '',
+          email: tokenPayload.email || '',
+          roles: tokenPayload.realm_access?.roles || ['user'],
+          userId: tokenPayload.sub,
+          isActive: true,
+        };
+
+        console.log('Login successful! User profile:', userProfile);
+        console.log('Redirect to:', from);
+
+        // Save tokens to localStorage
+        saveTokensToStorage(
+          response.data.access_token,
+          response.data.refresh_token,
+          response.data.expires_in
+        );
+        
+        // Save user profile to localStorage
+        localStorage.setItem(AUTH_STORAGE_KEYS.USER_PROFILE, JSON.stringify(userProfile));
+
         setSuccess(true);
         
-        // Show success animation before redirecting
+        // Show success animation then navigate
         setTimeout(() => {
-          onLoginSuccess(
-            response.data.access_token, 
-            response.data.refresh_token,
-            response.data.expires_in
-          );
+          // Use navigate instead of window.location to avoid full reload
+          navigate(from, { replace: true });
+          // Force a state update by triggering a storage event
+          window.dispatchEvent(new Event('storage'));
         }, 800);
       } else {
         setError('Phản hồi đăng nhập thiếu token bắt buộc');
@@ -74,23 +122,23 @@ export function LoginForm({ onLoginSuccess }: LoginFormProps) {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 relative overflow-hidden">
-      {/* Grid Pattern Overlay */}
-      <div 
-        className="absolute inset-0 opacity-10"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: '50px 50px'
-        }}
-      />
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
         <div className="absolute top-40 right-10 w-72 h-72 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-2000"></div>
         <div className="absolute -bottom-32 left-40 w-72 h-72 bg-pink-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-4000"></div>
       </div>
+
+      {/* Back to Home Link */}
+      <button
+        onClick={() => navigate('/')}
+        className="absolute top-6 left-6 text-white hover:text-primary-200 transition-colors flex items-center gap-2 font-medium"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+        Về trang chủ
+      </button>
 
       {/* Login Card */}
       <div className="relative w-full max-w-md">
@@ -285,7 +333,7 @@ export function LoginForm({ onLoginSuccess }: LoginFormProps) {
         {/* Footer */}
         <div className="text-center mt-8">
           <p className="text-primary-100 text-sm">
-            Endo4Life
+            © 2025 Endo4Life. Bảo lưu mọi quyền.
           </p>
         </div>
       </div>
@@ -328,3 +376,5 @@ export function LoginForm({ onLoginSuccess }: LoginFormProps) {
     </div>
   );
 }
+
+export default LoginPage;
