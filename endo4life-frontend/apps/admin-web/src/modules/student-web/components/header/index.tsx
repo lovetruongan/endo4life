@@ -168,10 +168,11 @@ export default function Header() {
         </div>
       )}
 
-      {!isAuthenticated && (
+{!isAuthenticated && (
         <div className="flex items-center">
           <Link
-            to={STUDENT_WEB_ROUTES.RESOURCES}
+            to="/login"
+            state={{ from: { pathname: '/' } }}
             className="flex items-center gap-2 text-md text-slate-700 font-medium hover:text-slate-500"
           >
             {t('accountMenu.textLogin')}

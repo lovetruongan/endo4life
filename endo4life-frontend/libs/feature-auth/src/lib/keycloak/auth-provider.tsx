@@ -24,6 +24,14 @@ import {
 } from '@endo4life/feature-config';
 import { stringUtils } from '@endo4life/util-common';
 
+// Authentication storage keys
+const AUTH_STORAGE_KEYS = {
+  ACCESS_TOKEN: 'endo4life_access_token',
+  REFRESH_TOKEN: 'endo4life_refresh_token',
+  TOKEN_EXPIRY: 'endo4life_token_expiry',
+  USER_PROFILE: 'endo4life_user_profile',
+};
+
 export interface KeycloakUserProfile extends KeycloakProfile {
   [key: string]: unknown;
   username?: string;
@@ -62,6 +70,51 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [userProfile, setUserProfile] = useState<KeycloakUserProfile>();
   const [useDirectLogin] = useState(true); // Set to true for direct login, false for redirect
+
+    // Helper functions for token management
+    const saveTokensToStorage = (token: string, refreshToken: string, expiresIn?: number) => {
+      localStorage.setItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN, token);
+      localStorage.setItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+      
+      if (expiresIn) {
+        const expiryTime = Date.now() + expiresIn * 1000; // Convert to milliseconds
+        localStorage.setItem(AUTH_STORAGE_KEYS.TOKEN_EXPIRY, expiryTime.toString());
+      }
+    };
+  
+    const getTokensFromStorage = () => {
+      const token = localStorage.getItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN);
+      const refreshToken = localStorage.getItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN);
+      const expiry = localStorage.getItem(AUTH_STORAGE_KEYS.TOKEN_EXPIRY);
+      
+      return { token, refreshToken, expiry };
+    };
+  
+    const clearTokensFromStorage = () => {
+      localStorage.removeItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN);
+      localStorage.removeItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN);
+      localStorage.removeItem(AUTH_STORAGE_KEYS.TOKEN_EXPIRY);
+      localStorage.removeItem(AUTH_STORAGE_KEYS.USER_PROFILE);
+    };
+  
+    const isTokenExpired = (expiry: string | null) => {
+      if (!expiry) return true;
+      return Date.now() > parseInt(expiry);
+    };
+  
+    const saveUserProfileToStorage = (profile: KeycloakUserProfile) => {
+      localStorage.setItem(AUTH_STORAGE_KEYS.USER_PROFILE, JSON.stringify(profile));
+    };
+  
+    const getUserProfileFromStorage = (): KeycloakUserProfile | null => {
+      const profileStr = localStorage.getItem(AUTH_STORAGE_KEYS.USER_PROFILE);
+      if (!profileStr) return null;
+      try {
+        return JSON.parse(profileStr);
+      } catch {
+        return null;
+      }
+    };
 
   const loadUserProfile = async (keycloakInstance: Keycloak) => {
     const keycloakProfile = await keycloakInstance.loadUserProfile();
@@ -105,7 +158,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setUserProfile(newUserProfile);
   };
 
-  const handleDirectLogin = async (token: string, refreshToken: string) => {
+  const handleDirectLogin = async (token: string, refreshToken: string, expiresIn?: number) => {
     try {
       console.log('Starting direct login with token...');
       setIsAuthenticating(true);
@@ -142,10 +195,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         },
       } as any;
 
+      // Save tokens to localStorage for session persistence
+      saveTokensToStorage(token, refreshToken, expiresIn);
+      saveUserProfileToStorage(newUserProfile);
+
       setIsAuthenticated(true);
       setKeycloak(keycloakInstance);
       keycloakUtils.setKeycloak(keycloakInstance);
-      console.log('Authentication successful!');
+      console.log('Authentication successful! Tokens saved to storage.');
 
       // Try to load additional user info from backend (optional)
       // This is non-blocking - app will work even if this fails
@@ -182,7 +239,47 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsAuthenticating(true);
 
       if (useDirectLogin) {
-        // For direct login, we just set authenticating to false and show login form
+        // Try to restore session from localStorage
+        console.log('Checking for existing session...');
+        const { token, refreshToken, expiry } = getTokensFromStorage();
+        
+        if (token && refreshToken) {
+          // Check if token is still valid
+          if (!isTokenExpired(expiry)) {
+            console.log('Found valid session, restoring...');
+            
+            // Restore user profile from storage
+            const savedProfile = getUserProfileFromStorage();
+            if (savedProfile) {
+              setUserProfile(savedProfile);
+            }
+
+            // Create Keycloak instance
+            const tokenParts = token.split('.');
+            const tokenPayload = JSON.parse(atob(tokenParts[1]));
+            
+            const keycloakInstance = {
+              token,
+              refreshToken,
+              authenticated: true,
+              tokenParsed: tokenPayload,
+              logout: () => {
+                window.location.href = `${EnvConfig.Endo4LifeUrl}/realms/${EnvConfig.Endo4LifeRealm}/protocol/openid-connect/logout?redirect_uri=${window.location.origin}`;
+              },
+            } as any;
+
+            setIsAuthenticated(true);
+            setKeycloak(keycloakInstance);
+            keycloakUtils.setKeycloak(keycloakInstance);
+            console.log('Session restored successfully!');
+          } else {
+            console.log('Token expired, clearing storage...');
+            clearTokensFromStorage();
+          }
+        } else {
+          console.log('No existing session found.');
+        }
+        
         setIsAuthenticating(false);
         return;
       }
@@ -196,6 +293,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       const result = await keycloakInstance.init({
         onLoad: 'login-required',
+        checkLoginIframe: false, // Disable iframe checking for better reliability
       });
 
       if (result) {
@@ -211,6 +309,43 @@ export function AuthProvider({ children }: AuthProviderProps) {
     initKeycloak();
   }, [useDirectLogin]);
 
+  // Listen for storage changes (after login from another tab or after login success)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      console.log('Storage changed, checking for new session...');
+      const { token, refreshToken, expiry } = getTokensFromStorage();
+      
+      if (token && refreshToken && !isTokenExpired(expiry)) {
+        const savedProfile = getUserProfileFromStorage();
+        if (savedProfile && !isAuthenticated) {
+          console.log('New session detected, restoring...');
+          
+          const tokenParts = token.split('.');
+          const tokenPayload = JSON.parse(atob(tokenParts[1]));
+          
+          const keycloakInstance = {
+            token,
+            refreshToken,
+            authenticated: true,
+            tokenParsed: tokenPayload,
+            logout: () => {
+              window.location.href = `${EnvConfig.Endo4LifeUrl}/realms/${EnvConfig.Endo4LifeRealm}/protocol/openid-connect/logout?redirect_uri=${window.location.origin}`;
+            },
+          } as any;
+
+          setUserProfile(savedProfile);
+          setIsAuthenticated(true);
+          setKeycloak(keycloakInstance);
+          keycloakUtils.setKeycloak(keycloakInstance);
+          console.log('Session restored from storage event!');
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [isAuthenticated]);
+  
   const updateUserInfo = (profile: UserResponseDto) => {
     setUserProfile({
       ...userProfile,
@@ -224,7 +359,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const logout = useCallback(() => {
+    // Clear tokens from storage
+    clearTokensFromStorage();
+    
+    // Clear keycloak instance
     keycloakUtils.dispose();
+    
     if (useDirectLogin && keycloak?.logout) {
       // For direct login, use the simple logout function
       keycloak.logout();
@@ -232,6 +372,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // For redirect login, use Keycloak's logout
       keycloak.logout({ redirectUri: window.location.origin });
     }
+    
+    // Force reload to clear all state
+    window.location.href = '/';
   }, [keycloak, useDirectLogin]);
 
   const changeWebClientId = useCallback((webClientId: string) => {
@@ -254,13 +397,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   return (
     <AuthContext.Provider value={value}>
       {isAuthenticating && <KeycloakLoading />}
-      {!isAuthenticating && isAuthenticated && children}
-      {!isAuthenticating && !isAuthenticated && useDirectLogin && (
-        <LoginForm onLoginSuccess={handleDirectLogin} />
-      )}
-      {!isAuthenticating && !isAuthenticated && !useDirectLogin && (
-        <LoginRequired />
-      )}
+      {!isAuthenticating && children}
     </AuthContext.Provider>
   );
 }
