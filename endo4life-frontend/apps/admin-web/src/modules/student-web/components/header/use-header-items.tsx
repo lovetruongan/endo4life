@@ -21,23 +21,30 @@ export function useHeaderItems() {
             label: t('navigation.txtResources'),
             name: 'RESOURCES',
             link: STUDENT_WEB_ROUTES.RESOURCES,
-            isAuthRequired: true
+            isAuthRequired: true,
           },
           {
             id: 'common3',
-            label: t('navigation.txtMyLibrary'),
-            name: 'MY_LIBRARY',
-            link: STUDENT_WEB_ROUTES.MY_LIBRARY,
-            isAuthRequired: true
+            label: t('navigation.txtMyLearning'),
+            name: 'MY_LEARNING',
+            link: STUDENT_WEB_ROUTES.MY_LEARNING,
+            isAuthRequired: true,
           },
           {
             id: 'common4',
+            label: t('navigation.txtMyLibrary'),
+            name: 'MY_LIBRARY',
+            link: STUDENT_WEB_ROUTES.MY_LIBRARY,
+            isAuthRequired: true,
+          },
+          {
+            id: 'common5',
             label: t('navigation.txtAboutUs'),
             name: 'ABOUT_US',
-            link: STUDENT_WEB_ROUTES.ABOUT_US
-          }
-        ]
-      }
+            link: STUDENT_WEB_ROUTES.ABOUT_US,
+          },
+        ],
+      },
     ];
     return sections;
   }, [t]);
