@@ -98,8 +98,8 @@ export function CourseTest({ courseId, type, testId }: Props) {
   };
 
   return (
-    <div className="relative flex-auto h-1">
-      <div className="h-full pb-24 overflow-y-auto">
+    <div className="relative flex flex-col h-full">
+      <div className="flex-1 pb-24 overflow-y-auto">
         {questions.length === 0 && (
           <div className="p-4 text-center">
             <div className="flex items-center justify-center">

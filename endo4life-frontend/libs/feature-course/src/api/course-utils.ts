@@ -47,10 +47,24 @@ export async function getAllQuestions(tests: ICourseTestEntity[]) {
   const allQuestions: IQuestionEntity[] = [];
   const questionMapper = new CourseQuestionMapper();
   for (const test of tests) {
+    console.log('getAllQuestions - processing test:', {
+      testId: test.id,
+      hasMetadata: !!test.metadata,
+      metadataQuestions: test.metadata?.questions,
+      questionsCount: test.metadata?.questions?.length || 0,
+    });
+    
     for (const questionDto of test.metadata?.questions || []) {
+      console.log('getAllQuestions - processing questionDto:', questionDto);
       const question = questionMapper.fromDto(questionDto);
+      console.log('getAllQuestions - mapped question:', {
+        id: question.id,
+        type: question.type,
+        answersCount: question.answers?.length || 0,
+      });
       allQuestions.push(question);
     }
   }
+  console.log('getAllQuestions - final result:', allQuestions.length, 'questions');
   return allQuestions;
 }

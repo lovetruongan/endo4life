@@ -44,6 +44,20 @@ public class UserProgressCourseSectionServiceImpl implements UserProgressCourseS
         Integer totalTimeUserWatchedVideoInSecond = recordDataUserCourseSectionDto.getTotalTimeUserWatchedVideo();
         processUserProgressCourseSection(userProgressCourseSection, totalTimeUserWatchedVideoInSecond);
         userProgressCourseSectionRepository.save(userProgressCourseSection);
+
+        // Recompute per-course aggregates
+        UserRegistrationCourse registration = userProgressCourseSection.getUserRegistrationCourse();
+        if (registration != null && registration.getUserProgressCourseSections() != null) {
+            List<UserProgressCourseSection> sections = registration.getUserProgressCourseSections();
+            int total = sections.size();
+            int completed = (int) sections.stream()
+                    .filter(s -> Boolean.TRUE.equals(s.getIsCompletedCourseSection()))
+                    .count();
+            registration.setTotalLectures(total);
+            registration.setNumberLecturesCompleted(completed);
+            registration.setIsCompletedTotalCourseSection(total > 0 && completed == total);
+            userRegistrationCourseRepository.save(registration);
+        }
         return userProgressCourseSection.getId();
     }
 
@@ -105,16 +119,58 @@ public class UserProgressCourseSectionServiceImpl implements UserProgressCourseS
 
     private void calculateAndSetProgress(UserProgressCourseSection userProgressCourseSection) {
         Integer totalVideoDuration = userProgressCourseSection.getTotalSecondLectureVideo();
+        Integer watched = userProgressCourseSection.getTotalSecondWatchedLectureVideo();
+
+        // If duration is unknown, try to hydrate from course section or use a safe
+        // fallback
         if (Objects.isNull(totalVideoDuration)) {
-            return;
+            Integer sectionDuration = Optional.ofNullable(userProgressCourseSection.getCourseSection())
+                    .map(CourseSection::getVideoDuration)
+                    .orElse(null);
+            if (Objects.nonNull(sectionDuration)) {
+                userProgressCourseSection.setTotalSecondLectureVideo(sectionDuration);
+                totalVideoDuration = sectionDuration;
+            } else {
+                // Fallback: if user watched at least N seconds, mark as completed to avoid
+                // blocking progress
+                if (Objects.nonNull(watched) && watched >= Constants.MIN_WATCH_SECONDS_TO_COMPLETE_FALLBACK) {
+                    userProgressCourseSection.setIsCompletedVideoCourseSection(true);
+                    userProgressCourseSection.setPercentageVideoWatched(Constants.ONE_HUNDRED);
+                    // With video considered done, also mark section completed when review is not
+                    // required
+                    boolean reviewDone = Boolean.TRUE
+                            .equals(userProgressCourseSection.getIsCompletedLectureReviewQuestion());
+                    boolean hasReview = Optional.ofNullable(userProgressCourseSection.getCourseSection())
+                            .map(CourseSection::getTest)
+                            .map(t -> t.getQuestions() != null && !t.getQuestions().isEmpty())
+                            .orElse(false);
+                    if (!hasReview || reviewDone) {
+                        userProgressCourseSection.setIsCompletedCourseSection(true);
+                    }
+                }
+                return;
+            }
         }
-        if (totalVideoDuration > 0) {
-            float percentageWatched = (userProgressCourseSection.getTotalSecondWatchedLectureVideo()
-                    * Constants.ONE_HUNDRED) / totalVideoDuration;
+
+        if (Objects.nonNull(totalVideoDuration) && totalVideoDuration > 0 && Objects.nonNull(watched)) {
+            float percentageWatched = (watched * Constants.ONE_HUNDRED) / totalVideoDuration;
             userProgressCourseSection.setPercentageVideoWatched(percentageWatched);
             if (percentageWatched > Constants.COMPLETION_THRESHOLD) {
                 userProgressCourseSection.setIsCompletedVideoCourseSection(true);
             }
+        }
+
+        // If video is completed, mark course section completed when review questions
+        // are not required
+        boolean videoDone = Boolean.TRUE.equals(userProgressCourseSection.getIsCompletedVideoCourseSection());
+        boolean reviewDone = Boolean.TRUE
+                .equals(userProgressCourseSection.getIsCompletedLectureReviewQuestion());
+        boolean hasReview = Optional.ofNullable(userProgressCourseSection.getCourseSection())
+                .map(CourseSection::getTest)
+                .map(t -> t.getQuestions() != null && !t.getQuestions().isEmpty())
+                .orElse(false);
+        if (videoDone && (!hasReview || reviewDone)) {
+            userProgressCourseSection.setIsCompletedCourseSection(true);
         }
     }
 }

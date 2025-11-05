@@ -12,6 +12,12 @@ import LibraryPageLayout from '../pages/library/layout';
 import { ResourcesPageLayout } from '../pages/resources/layout';
 import AboutUsPageError from '../pages/about-us/error';
 import AboutUsLoading from '../pages/about-us/loading';
+import MyLearningPageError from '../pages/my-learning/error';
+import MyLearningPageLoading from '../pages/my-learning/loading';
+import MyLearningPageLayout from '../pages/my-learning/layout';
+import WatchHistoryPageError from '../pages/watch-history/error';
+import WatchHistoryPageLoading from '../pages/watch-history/loading';
+import WatchHistoryPageLayout from '../pages/watch-history/layout';
 
 const HomePage = lazy(() => import('../pages/home/page'));
 const ResourcesPage = lazy(() => import('../pages/resources/page'));
@@ -24,9 +30,23 @@ const ResourceVideoPage = lazy(
 const ResourceCoursePage = lazy(
   () => import('../pages/resources/courses/[id]/page'),
 );
+const EntranceTestPage = lazy(
+  () => import('../pages/resources/courses/[courseId]/entrance-test/page'),
+);
+const LecturePlayerPage = lazy(
+  () => import('../pages/resources/courses/[courseId]/lectures/[lectureId]/page'),
+);
+const LectureReviewPage = lazy(
+  () => import('../pages/resources/courses/[courseId]/lectures/[lectureId]/review/page'),
+);
+const FinalExamPage = lazy(
+  () => import('../pages/resources/courses/[courseId]/final-exam/page'),
+);
 
 const AboutUsPage = lazy(() => import('../pages/about-us/page'));
 const LibraryPage = lazy(() => import('../pages/library/page'));
+const MyLearningPage = lazy(() => import('../pages/my-learning/page'));
+const WatchHistoryPage = lazy(() => import('../pages/watch-history/page'));
 const MyProfilePage = lazy(() => import('../pages/my-profile/page'));
 const LoginPage = lazy(() => import('../pages/login/page'));
 
@@ -105,6 +125,94 @@ export const studentWebRouter = createBrowserRouter([
             element: (
               <Suspense>
                 <ResourceCoursePage />
+              </Suspense>
+            ),
+          },
+
+          {
+            path: STUDENT_WEB_ROUTES.COURSE_ENTRANCE_TEST,
+            element: (
+              <ProtectedRoute roles={[]}>
+                <Suspense>
+                  <EntranceTestPage />
+                </Suspense>
+              </ProtectedRoute>
+            ),
+          },
+
+          {
+            path: STUDENT_WEB_ROUTES.COURSE_LECTURE,
+            element: (
+              <ProtectedRoute roles={[]}>
+                <Suspense>
+                  <LecturePlayerPage />
+                </Suspense>
+              </ProtectedRoute>
+            ),
+          },
+
+          {
+            path: STUDENT_WEB_ROUTES.COURSE_LECTURE_REVIEW,
+            element: (
+              <ProtectedRoute roles={[]}>
+                <Suspense>
+                  <LectureReviewPage />
+                </Suspense>
+              </ProtectedRoute>
+            ),
+          },
+
+          {
+            path: STUDENT_WEB_ROUTES.COURSE_FINAL_EXAM,
+            element: (
+              <ProtectedRoute roles={[]}>
+                <Suspense>
+                  <FinalExamPage />
+                </Suspense>
+              </ProtectedRoute>
+            ),
+          },
+        ],
+      },
+
+      // MY_LEARNING
+      {
+        path: STUDENT_WEB_ROUTES.MY_LEARNING,
+        element: (
+          <ProtectedRoute roles={[]}>
+            <MyLearningPageLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            path: STUDENT_WEB_ROUTES.MY_LEARNING,
+            index: true,
+            errorElement: <MyLearningPageError />,
+            element: (
+              <Suspense fallback={<MyLearningPageLoading />}>
+                <MyLearningPage />
+              </Suspense>
+            ),
+          },
+        ],
+      },
+
+      // WATCH_HISTORY
+      {
+        path: STUDENT_WEB_ROUTES.WATCH_HISTORY,
+        element: (
+          <ProtectedRoute roles={[]}>
+            <WatchHistoryPageLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            path: STUDENT_WEB_ROUTES.WATCH_HISTORY,
+            index: true,
+            errorElement: <WatchHistoryPageError />,
+            element: (
+              <Suspense fallback={<WatchHistoryPageLoading />}>
+                <WatchHistoryPage />
               </Suspense>
             ),
           },

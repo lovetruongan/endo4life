@@ -21,6 +21,8 @@ function mapQuestionType(frontendType?: QuestionTypeEnum): QuestionType | undefi
     [QuestionTypeEnum.SINGLE_CHOICE]: QuestionType.SingleChoice,
     [QuestionTypeEnum.MULTIPLE_CHOICE]: QuestionType.MultipleChoice,
     [QuestionTypeEnum.FREE_TEXT]: QuestionType.Essay,
+    [QuestionTypeEnum.ESSAY]: QuestionType.Essay,
+    [QuestionTypeEnum.FILL_IN_THE_BLANK]: QuestionType.Essay,
   };
   
   return mapping[frontendType];
@@ -62,6 +64,8 @@ export class CourseTestMapper implements ICourseTestMapper {
         title: test.title || '',
         description: test.description,
         courseId: test.courseId || '',
+        // Ensure lecture review tests are linked to a specific course section
+        courseSectionId: test.courseSectionId,
         state: test.status,
         type: test.type,
         // @ts-ignore - questions field added to OpenAPI spec but API client not regenerated yet
@@ -79,7 +83,9 @@ export class CourseTestMapper implements ICourseTestMapper {
                 };
               }),
             },
-            attachments: undefined,
+            attachments: question.image?.uploadResponse
+              ? [question.image?.uploadResponse]
+              : undefined,
           };
           return questionDto;
         }),
@@ -100,7 +106,10 @@ export class CourseTestMapper implements ICourseTestMapper {
         // @ts-ignore - questions field added to OpenAPI spec but API client not regenerated yet
         questions: test.questionIds.map((questionId) => {
           const question = questions[questionId];
+          // Only include ID if it's a backend UUID (not a local _uuid)
+          const isBackendQuestion = question.id && !question.id.startsWith('_');
           const questionDto: UpdateQuestionRequestDto = {
+            id: isBackendQuestion ? question.id : undefined,
             title: question.instruction?.content,
             type: mapQuestionType(question.type) || QuestionType.SingleChoice,
             description: question.content?.content,
@@ -115,6 +124,7 @@ export class CourseTestMapper implements ICourseTestMapper {
             attachments: question.image?.uploadResponse
               ? [question.image?.uploadResponse]
               : undefined,
+            isDelete: question.isDeleted,  // CRITICAL: Map the delete flag!
           };
           return questionDto;
         }),

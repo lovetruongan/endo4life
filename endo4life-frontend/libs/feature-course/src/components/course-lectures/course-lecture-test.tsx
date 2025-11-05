@@ -9,6 +9,8 @@ import { Button } from '@endo4life/ui-common';
 import { loadCourseLectureDetailAsync } from '../../store/course-lectures/thunks/load-course-lecture-detail.thunk';
 import { selectCourseTestByLectureId } from '../../store/course-tests/course-tests.selectors';
 import { VscClose } from 'react-icons/vsc';
+import { ADMIN_WEB_ROUTES } from '@endo4life/feature-config';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface Props {
   open?: boolean;
@@ -26,6 +28,7 @@ export function CourseLectureTestModal({
   const [loading, setLoading] = useState(true);
   const lecture = useAppSelector(selectCourseLectureById(lectureId));
   const test = useAppSelector(selectCourseTestByLectureId(lectureId));
+  const navigate = useNavigate();
 
   useMount(async () => {
     try {
@@ -46,6 +49,14 @@ export function CourseLectureTestModal({
       <div className="bg-white rounded shadow w-full max-w-4xl h-4/5 relative flex flex-col">
         <div className="flex items-center gap-2 p-4">
           <h3 className="text-lg font-semibold flex-auto">{lecture?.title}</h3>
+          <Link
+            className="flex-none px-3 py-1 text-sm bg-white border rounded-lg border-slate-300"
+            to={ADMIN_WEB_ROUTES.COURSE_DETAIL_LECTURES_RECAP_QUESTION
+              .replace(':id', courseId)
+              .replace(':lectureId', lectureId)}
+          >
+            Mở toàn trang
+          </Link>
           <IconButton onClick={onClose} className="flex-none">
             <VscClose size={18} />
           </IconButton>

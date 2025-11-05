@@ -42,9 +42,11 @@ export function EditableAnswerCard({
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div ref={setNodeRef} style={style} {...attributes}>
       <div className={clsx('flex items-center gap-2')}>
-        <GrDrag size={16} className="flex-none" />
+        <div {...listeners} className="cursor-grab active:cursor-grabbing">
+          <GrDrag size={16} className="flex-none" />
+        </div>
         <div
           className="flex items-center justify-center cursor-pointer"
           onClick={(evt) => {
@@ -66,7 +68,7 @@ export function EditableAnswerCard({
             id={data.id.toString()}
             title={data.id.toString()}
             checked={!!data.isCorrect}
-            className="flex-none point-events-none"
+            className="flex-none pointer-events-none"
           />
         </div>
         <EditableRichText

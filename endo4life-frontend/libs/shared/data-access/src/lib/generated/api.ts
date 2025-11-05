@@ -1552,6 +1552,43 @@ export interface QuestionResponseDto {
 /**
  * 
  * @export
+ * @interface QuestionResultDto
+ */
+export interface QuestionResultDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof QuestionResultDto
+     */
+    'questionId'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof QuestionResultDto
+     */
+    'correct'?: boolean;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof QuestionResultDto
+     */
+    'selectedAnswers'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof QuestionResultDto
+     */
+    'correctAnswers'?: Array<string>;
+    /**
+     * 
+     * @type {StudentQuestionDto}
+     * @memberof QuestionResultDto
+     */
+    'question'?: StudentQuestionDto;
+}
+/**
+ * 
+ * @export
  * @enum {string}
  */
 
@@ -2042,6 +2079,12 @@ export interface ResponseDetailCourseSectionDto {
      * @memberof ResponseDetailCourseSectionDto
      */
     'videoDuration'?: number;
+    /**
+     * 
+     * @type {TestDetailResponseDto}
+     * @memberof ResponseDetailCourseSectionDto
+     */
+    'lectureReviewQuestionsDto'?: TestDetailResponseDto;
 }
 
 
@@ -2099,6 +2142,150 @@ export interface StatusUserProgressCourseDto {
      * @memberof StatusUserProgressCourseDto
      */
     'isCompletedCourse'?: boolean;
+}
+/**
+ * 
+ * @export
+ * @interface StudentAnswerDto
+ */
+export interface StudentAnswerDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof StudentAnswerDto
+     */
+    'id'?: string;
+    /**
+     * Rich text content (isCorrect field is hidden from students)
+     * @type {object}
+     * @memberof StudentAnswerDto
+     */
+    'content'?: object;
+}
+/**
+ * 
+ * @export
+ * @interface StudentQuestionDto
+ */
+export interface StudentQuestionDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof StudentQuestionDto
+     */
+    'id'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof StudentQuestionDto
+     */
+    'title'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof StudentQuestionDto
+     */
+    'description'?: string;
+    /**
+     * 
+     * @type {QuestionType}
+     * @memberof StudentQuestionDto
+     */
+    'type'?: QuestionType;
+    /**
+     * 
+     * @type {Array<StudentAnswerDto>}
+     * @memberof StudentQuestionDto
+     */
+    'answers'?: Array<StudentAnswerDto>;
+    /**
+     * 
+     * @type {number}
+     * @memberof StudentQuestionDto
+     */
+    'orderIndex'?: number;
+    /**
+     * 
+     * @type {Array<QuestionAttachmentResponseDto>}
+     * @memberof StudentQuestionDto
+     */
+    'attachments'?: Array<QuestionAttachmentResponseDto>;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface StudentTestDto
+ */
+export interface StudentTestDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof StudentTestDto
+     */
+    'id'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof StudentTestDto
+     */
+    'title'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof StudentTestDto
+     */
+    'description'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof StudentTestDto
+     */
+    'courseId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof StudentTestDto
+     */
+    'courseSectionId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof StudentTestDto
+     */
+    'type'?: string;
+    /**
+     * Passing score percentage (0-100)
+     * @type {number}
+     * @memberof StudentTestDto
+     */
+    'passingScore'?: number;
+    /**
+     * 
+     * @type {Array<StudentQuestionDto>}
+     * @memberof StudentTestDto
+     */
+    'questions'?: Array<StudentQuestionDto>;
+}
+/**
+ * 
+ * @export
+ * @interface SubmittedAnswerDto
+ */
+export interface SubmittedAnswerDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof SubmittedAnswerDto
+     */
+    'questionId': string;
+    /**
+     * Array of selected answer IDs
+     * @type {Array<string>}
+     * @memberof SubmittedAnswerDto
+     */
+    'selectedAnswers': Array<string>;
 }
 /**
  * 
@@ -2235,6 +2422,80 @@ export interface TestResponseDto {
      * @memberof TestResponseDto
      */
     'state'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface TestResultDto
+ */
+export interface TestResultDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof TestResultDto
+     */
+    'testId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TestResultDto
+     */
+    'userId'?: string;
+    /**
+     * Score percentage (0-100)
+     * @type {number}
+     * @memberof TestResultDto
+     */
+    'score'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof TestResultDto
+     */
+    'correctCount'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof TestResultDto
+     */
+    'totalQuestions'?: number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof TestResultDto
+     */
+    'passed'?: boolean;
+    /**
+     * 
+     * @type {Array<QuestionResultDto>}
+     * @memberof TestResultDto
+     */
+    'questions'?: Array<QuestionResultDto>;
+    /**
+     * 
+     * @type {string}
+     * @memberof TestResultDto
+     */
+    'submittedAt'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface TestSubmissionDto
+ */
+export interface TestSubmissionDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof TestSubmissionDto
+     */
+    'userInfoId': string;
+    /**
+     * 
+     * @type {Array<SubmittedAnswerDto>}
+     * @memberof TestSubmissionDto
+     */
+    'answers': Array<SubmittedAnswerDto>;
 }
 /**
  * 
@@ -2402,6 +2663,12 @@ export interface UpdateDoctorUserConversationDto {
  * @interface UpdateQuestionRequestDto
  */
 export interface UpdateQuestionRequestDto {
+    /**
+     * Question ID (for existing questions)
+     * @type {string}
+     * @memberof UpdateQuestionRequestDto
+     */
+    'id'?: string;
     /**
      * 
      * @type {string}
@@ -8836,6 +9103,656 @@ export class UserResourceV1Api extends BaseAPI {
      */
     public getUserResources(requestParameters: UserResourceV1ApiGetUserResourcesRequest = {}, options?: RawAxiosRequestConfig) {
         return UserResourceV1ApiFp(this.configuration).getUserResources(requestParameters.criteria, requestParameters.pageable, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * UserTestV1Api - axios parameter creator
+ * @export
+ */
+export const UserTestV1ApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Get entrance test for a course
+         * @param {string} courseId 
+         * @param {string} userInfoId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCourseEntranceTest: async (courseId: string, userInfoId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'courseId' is not null or undefined
+            assertParamExists('getCourseEntranceTest', 'courseId', courseId)
+            // verify required parameter 'userInfoId' is not null or undefined
+            assertParamExists('getCourseEntranceTest', 'userInfoId', userInfoId)
+            const localVarPath = `/api/v1/user/courses/{courseId}/entrance-test`
+                .replace(`{${"courseId"}}`, encodeURIComponent(String(courseId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (userInfoId !== undefined) {
+                localVarQueryParameter['userInfoId'] = userInfoId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get final exam for a course
+         * @param {string} courseId 
+         * @param {string} userInfoId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCourseFinalExam: async (courseId: string, userInfoId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'courseId' is not null or undefined
+            assertParamExists('getCourseFinalExam', 'courseId', courseId)
+            // verify required parameter 'userInfoId' is not null or undefined
+            assertParamExists('getCourseFinalExam', 'userInfoId', userInfoId)
+            const localVarPath = `/api/v1/user/courses/{courseId}/final-exam`
+                .replace(`{${"courseId"}}`, encodeURIComponent(String(courseId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (userInfoId !== undefined) {
+                localVarQueryParameter['userInfoId'] = userInfoId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get lecture review questions
+         * @param {string} lectureId 
+         * @param {string} userInfoId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLectureReviewTest: async (lectureId: string, userInfoId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'lectureId' is not null or undefined
+            assertParamExists('getLectureReviewTest', 'lectureId', lectureId)
+            // verify required parameter 'userInfoId' is not null or undefined
+            assertParamExists('getLectureReviewTest', 'userInfoId', userInfoId)
+            const localVarPath = `/api/v1/user/courses/lectures/{lectureId}/review-test`
+                .replace(`{${"lectureId"}}`, encodeURIComponent(String(lectureId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (userInfoId !== undefined) {
+                localVarQueryParameter['userInfoId'] = userInfoId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get test questions for student (without correct answers)
+         * @param {string} testId 
+         * @param {string} userInfoId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getStudentTestQuestions: async (testId: string, userInfoId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'testId' is not null or undefined
+            assertParamExists('getStudentTestQuestions', 'testId', testId)
+            // verify required parameter 'userInfoId' is not null or undefined
+            assertParamExists('getStudentTestQuestions', 'userInfoId', userInfoId)
+            const localVarPath = `/api/v1/user/tests/{testId}/questions`
+                .replace(`{${"testId"}}`, encodeURIComponent(String(testId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (userInfoId !== undefined) {
+                localVarQueryParameter['userInfoId'] = userInfoId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get test result with correct answers shown
+         * @param {string} testId 
+         * @param {string} userInfoId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getStudentTestResult: async (testId: string, userInfoId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'testId' is not null or undefined
+            assertParamExists('getStudentTestResult', 'testId', testId)
+            // verify required parameter 'userInfoId' is not null or undefined
+            assertParamExists('getStudentTestResult', 'userInfoId', userInfoId)
+            const localVarPath = `/api/v1/user/tests/{testId}/result`
+                .replace(`{${"testId"}}`, encodeURIComponent(String(testId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (userInfoId !== undefined) {
+                localVarQueryParameter['userInfoId'] = userInfoId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Submit student test answers and auto-grade
+         * @param {string} testId 
+         * @param {TestSubmissionDto} testSubmissionDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        submitStudentTest: async (testId: string, testSubmissionDto: TestSubmissionDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'testId' is not null or undefined
+            assertParamExists('submitStudentTest', 'testId', testId)
+            // verify required parameter 'testSubmissionDto' is not null or undefined
+            assertParamExists('submitStudentTest', 'testSubmissionDto', testSubmissionDto)
+            const localVarPath = `/api/v1/user/tests/{testId}/submit`
+                .replace(`{${"testId"}}`, encodeURIComponent(String(testId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(testSubmissionDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * UserTestV1Api - functional programming interface
+ * @export
+ */
+export const UserTestV1ApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = UserTestV1ApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Get entrance test for a course
+         * @param {string} courseId 
+         * @param {string} userInfoId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCourseEntranceTest(courseId: string, userInfoId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StudentTestDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCourseEntranceTest(courseId, userInfoId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserTestV1Api.getCourseEntranceTest']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get final exam for a course
+         * @param {string} courseId 
+         * @param {string} userInfoId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCourseFinalExam(courseId: string, userInfoId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StudentTestDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCourseFinalExam(courseId, userInfoId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserTestV1Api.getCourseFinalExam']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get lecture review questions
+         * @param {string} lectureId 
+         * @param {string} userInfoId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getLectureReviewTest(lectureId: string, userInfoId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StudentTestDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getLectureReviewTest(lectureId, userInfoId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserTestV1Api.getLectureReviewTest']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get test questions for student (without correct answers)
+         * @param {string} testId 
+         * @param {string} userInfoId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getStudentTestQuestions(testId: string, userInfoId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StudentTestDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getStudentTestQuestions(testId, userInfoId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserTestV1Api.getStudentTestQuestions']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get test result with correct answers shown
+         * @param {string} testId 
+         * @param {string} userInfoId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getStudentTestResult(testId: string, userInfoId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TestResultDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getStudentTestResult(testId, userInfoId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserTestV1Api.getStudentTestResult']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Submit student test answers and auto-grade
+         * @param {string} testId 
+         * @param {TestSubmissionDto} testSubmissionDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async submitStudentTest(testId: string, testSubmissionDto: TestSubmissionDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TestResultDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.submitStudentTest(testId, testSubmissionDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserTestV1Api.submitStudentTest']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * UserTestV1Api - factory interface
+ * @export
+ */
+export const UserTestV1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = UserTestV1ApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Get entrance test for a course
+         * @param {UserTestV1ApiGetCourseEntranceTestRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCourseEntranceTest(requestParameters: UserTestV1ApiGetCourseEntranceTestRequest, options?: RawAxiosRequestConfig): AxiosPromise<StudentTestDto> {
+            return localVarFp.getCourseEntranceTest(requestParameters.courseId, requestParameters.userInfoId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get final exam for a course
+         * @param {UserTestV1ApiGetCourseFinalExamRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCourseFinalExam(requestParameters: UserTestV1ApiGetCourseFinalExamRequest, options?: RawAxiosRequestConfig): AxiosPromise<StudentTestDto> {
+            return localVarFp.getCourseFinalExam(requestParameters.courseId, requestParameters.userInfoId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get lecture review questions
+         * @param {UserTestV1ApiGetLectureReviewTestRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLectureReviewTest(requestParameters: UserTestV1ApiGetLectureReviewTestRequest, options?: RawAxiosRequestConfig): AxiosPromise<StudentTestDto> {
+            return localVarFp.getLectureReviewTest(requestParameters.lectureId, requestParameters.userInfoId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get test questions for student (without correct answers)
+         * @param {UserTestV1ApiGetStudentTestQuestionsRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getStudentTestQuestions(requestParameters: UserTestV1ApiGetStudentTestQuestionsRequest, options?: RawAxiosRequestConfig): AxiosPromise<StudentTestDto> {
+            return localVarFp.getStudentTestQuestions(requestParameters.testId, requestParameters.userInfoId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get test result with correct answers shown
+         * @param {UserTestV1ApiGetStudentTestResultRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getStudentTestResult(requestParameters: UserTestV1ApiGetStudentTestResultRequest, options?: RawAxiosRequestConfig): AxiosPromise<TestResultDto> {
+            return localVarFp.getStudentTestResult(requestParameters.testId, requestParameters.userInfoId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Submit student test answers and auto-grade
+         * @param {UserTestV1ApiSubmitStudentTestRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        submitStudentTest(requestParameters: UserTestV1ApiSubmitStudentTestRequest, options?: RawAxiosRequestConfig): AxiosPromise<TestResultDto> {
+            return localVarFp.submitStudentTest(requestParameters.testId, requestParameters.testSubmissionDto, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * Request parameters for getCourseEntranceTest operation in UserTestV1Api.
+ * @export
+ * @interface UserTestV1ApiGetCourseEntranceTestRequest
+ */
+export interface UserTestV1ApiGetCourseEntranceTestRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserTestV1ApiGetCourseEntranceTest
+     */
+    readonly courseId: string
+
+    /**
+     * 
+     * @type {string}
+     * @memberof UserTestV1ApiGetCourseEntranceTest
+     */
+    readonly userInfoId: string
+}
+
+/**
+ * Request parameters for getCourseFinalExam operation in UserTestV1Api.
+ * @export
+ * @interface UserTestV1ApiGetCourseFinalExamRequest
+ */
+export interface UserTestV1ApiGetCourseFinalExamRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserTestV1ApiGetCourseFinalExam
+     */
+    readonly courseId: string
+
+    /**
+     * 
+     * @type {string}
+     * @memberof UserTestV1ApiGetCourseFinalExam
+     */
+    readonly userInfoId: string
+}
+
+/**
+ * Request parameters for getLectureReviewTest operation in UserTestV1Api.
+ * @export
+ * @interface UserTestV1ApiGetLectureReviewTestRequest
+ */
+export interface UserTestV1ApiGetLectureReviewTestRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserTestV1ApiGetLectureReviewTest
+     */
+    readonly lectureId: string
+
+    /**
+     * 
+     * @type {string}
+     * @memberof UserTestV1ApiGetLectureReviewTest
+     */
+    readonly userInfoId: string
+}
+
+/**
+ * Request parameters for getStudentTestQuestions operation in UserTestV1Api.
+ * @export
+ * @interface UserTestV1ApiGetStudentTestQuestionsRequest
+ */
+export interface UserTestV1ApiGetStudentTestQuestionsRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserTestV1ApiGetStudentTestQuestions
+     */
+    readonly testId: string
+
+    /**
+     * 
+     * @type {string}
+     * @memberof UserTestV1ApiGetStudentTestQuestions
+     */
+    readonly userInfoId: string
+}
+
+/**
+ * Request parameters for getStudentTestResult operation in UserTestV1Api.
+ * @export
+ * @interface UserTestV1ApiGetStudentTestResultRequest
+ */
+export interface UserTestV1ApiGetStudentTestResultRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserTestV1ApiGetStudentTestResult
+     */
+    readonly testId: string
+
+    /**
+     * 
+     * @type {string}
+     * @memberof UserTestV1ApiGetStudentTestResult
+     */
+    readonly userInfoId: string
+}
+
+/**
+ * Request parameters for submitStudentTest operation in UserTestV1Api.
+ * @export
+ * @interface UserTestV1ApiSubmitStudentTestRequest
+ */
+export interface UserTestV1ApiSubmitStudentTestRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserTestV1ApiSubmitStudentTest
+     */
+    readonly testId: string
+
+    /**
+     * 
+     * @type {TestSubmissionDto}
+     * @memberof UserTestV1ApiSubmitStudentTest
+     */
+    readonly testSubmissionDto: TestSubmissionDto
+}
+
+/**
+ * UserTestV1Api - object-oriented interface
+ * @export
+ * @class UserTestV1Api
+ * @extends {BaseAPI}
+ */
+export class UserTestV1Api extends BaseAPI {
+    /**
+     * 
+     * @summary Get entrance test for a course
+     * @param {UserTestV1ApiGetCourseEntranceTestRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserTestV1Api
+     */
+    public getCourseEntranceTest(requestParameters: UserTestV1ApiGetCourseEntranceTestRequest, options?: RawAxiosRequestConfig) {
+        return UserTestV1ApiFp(this.configuration).getCourseEntranceTest(requestParameters.courseId, requestParameters.userInfoId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get final exam for a course
+     * @param {UserTestV1ApiGetCourseFinalExamRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserTestV1Api
+     */
+    public getCourseFinalExam(requestParameters: UserTestV1ApiGetCourseFinalExamRequest, options?: RawAxiosRequestConfig) {
+        return UserTestV1ApiFp(this.configuration).getCourseFinalExam(requestParameters.courseId, requestParameters.userInfoId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get lecture review questions
+     * @param {UserTestV1ApiGetLectureReviewTestRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserTestV1Api
+     */
+    public getLectureReviewTest(requestParameters: UserTestV1ApiGetLectureReviewTestRequest, options?: RawAxiosRequestConfig) {
+        return UserTestV1ApiFp(this.configuration).getLectureReviewTest(requestParameters.lectureId, requestParameters.userInfoId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get test questions for student (without correct answers)
+     * @param {UserTestV1ApiGetStudentTestQuestionsRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserTestV1Api
+     */
+    public getStudentTestQuestions(requestParameters: UserTestV1ApiGetStudentTestQuestionsRequest, options?: RawAxiosRequestConfig) {
+        return UserTestV1ApiFp(this.configuration).getStudentTestQuestions(requestParameters.testId, requestParameters.userInfoId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get test result with correct answers shown
+     * @param {UserTestV1ApiGetStudentTestResultRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserTestV1Api
+     */
+    public getStudentTestResult(requestParameters: UserTestV1ApiGetStudentTestResultRequest, options?: RawAxiosRequestConfig) {
+        return UserTestV1ApiFp(this.configuration).getStudentTestResult(requestParameters.testId, requestParameters.userInfoId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Submit student test answers and auto-grade
+     * @param {UserTestV1ApiSubmitStudentTestRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserTestV1Api
+     */
+    public submitStudentTest(requestParameters: UserTestV1ApiSubmitStudentTestRequest, options?: RawAxiosRequestConfig) {
+        return UserTestV1ApiFp(this.configuration).submitStudentTest(requestParameters.testId, requestParameters.testSubmissionDto, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

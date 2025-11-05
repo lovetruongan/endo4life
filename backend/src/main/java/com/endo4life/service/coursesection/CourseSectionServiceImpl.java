@@ -6,7 +6,9 @@ import com.endo4life.config.ApplicationProperties;
 import com.endo4life.constant.Constants;
 import com.endo4life.domain.document.Course;
 import com.endo4life.domain.document.CourseSection;
+import com.endo4life.domain.document.Test;
 import com.endo4life.mapper.CourseSectionMapper;
+import com.endo4life.mapper.TestMapper;
 import com.endo4life.repository.CourseRepository;
 import com.endo4life.repository.CourseSectionRepository;
 import com.endo4life.repository.specifications.CourseSectionSpecification;
@@ -19,6 +21,7 @@ import com.endo4life.web.rest.model.CourseSectionResponseDto;
 import com.endo4life.web.rest.model.CreateCourseSectionRequestDto;
 import com.endo4life.web.rest.model.CreateCourseSectionRequestDtoAttribute;
 import com.endo4life.web.rest.model.ResponseDetailCourseSectionDto;
+import com.endo4life.web.rest.model.TestDetailResponseDto;
 import com.endo4life.web.rest.model.UpdateCourseSectionRequestDto;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +45,7 @@ import java.util.UUID;
 @Slf4j
 public class CourseSectionServiceImpl implements CourseSectionService {
     private final CourseSectionMapper courseSectionMapper;
+    private final TestMapper testMapper;
     private final ObjectMapper objectMapper;
     private final MinioService minioService;
     private final CourseSectionRepository courseSectionRepository;
@@ -97,6 +101,15 @@ public class CourseSectionServiceImpl implements CourseSectionService {
                 .toResponseDetailCourseSectionDto(courseSectionEntity);
         detailCourseSectionDto.setTags(StringUtil.convertStringToList(courseSectionEntity.getTags()));
         detailCourseSectionDto.setTagsDetail(StringUtil.convertStringToList(courseSectionEntity.getTagsDetail()));
+
+        // Include lecture review test if exists
+        if (courseSectionEntity.getTest() != null) {
+            Test test = courseSectionEntity.getTest();
+            if (Constants.LECTURE_REVIEW_QUESTIONS_COURSE.equalsIgnoreCase(test.getType())) {
+                TestDetailResponseDto testDetailDto = testMapper.toTestDetailResponseDto(test);
+                detailCourseSectionDto.setLectureReviewQuestionsDto(testDetailDto);
+            }
+        }
 
         return detailCourseSectionDto;
     }

@@ -23,9 +23,11 @@ export interface IQuestionEntity extends BaseEntity {
 }
 
 export enum QuestionTypeEnum {
-  SINGLE_CHOICE = 'SINGLE_SELECT',
-  MULTIPLE_CHOICE = 'MULTIPLE_SELECT',
+  SINGLE_CHOICE = 'SINGLE_CHOICE',
+  MULTIPLE_CHOICE = 'MULTIPLE_CHOICE',
   FREE_TEXT = 'FREE_TEXT',
+  ESSAY = 'ESSAY',
+  FILL_IN_THE_BLANK = 'FILL_IN_THE_BLANK',
 }
 
 export interface IQuestionFormData {
@@ -234,23 +236,31 @@ export class QuestionBuilder implements IQuestionEntity {
   }
 
   selectAnswer(answerId: string) {
-    console.log('selectAnswer', this.build(), answerId);
+    console.log('selectAnswer - type:', this.type, 'answerId:', answerId);
+    console.log('selectAnswer - before answers:', JSON.parse(JSON.stringify(this.answers)));
+    
     if (QuestionTypeEnum.MULTIPLE_CHOICE === this.type) {
+      console.log('Using MULTIPLE_CHOICE logic');
       this.answers = this.answers?.map((item) => {
         if (item.id === answerId) {
-          return { ...item, isCorrect: !item.isCorrect };
+          // Handle undefined isCorrect by treating it as false
+          return { ...item, isCorrect: !(item.isCorrect ?? false) };
         }
-        return item;
+        return { ...item, isCorrect: item.isCorrect ?? false };
       });
     } else if (QuestionTypeEnum.SINGLE_CHOICE === this.type) {
+      console.log('Using SINGLE_CHOICE logic');
       this.answers = this.answers?.map((item) => {
-        return {
+        const newAnswer = {
           ...item,
           isCorrect: item.id === answerId,
         };
+        console.log(`Answer ${item.id} === ${answerId}?`, item.id === answerId, 'isCorrect:', newAnswer.isCorrect);
+        return newAnswer;
       });
     }
-    console.log('selectAnswerAfter', this.build(), answerId);
+    
+    console.log('selectAnswer - after answers:', JSON.parse(JSON.stringify(this.answers)));
     return this;
   }
 
@@ -302,6 +312,11 @@ export class QuestionBuilder implements IQuestionEntity {
     return this;
   }
 
+  updateInstruction(instruction?: IRichText) {
+    this.instruction = instruction;
+    return this;
+  }
+
   updateContent(content?: IRichText) {
     this.content = content;
     return this;
@@ -315,6 +330,7 @@ export class QuestionBuilder implements IQuestionEntity {
         content: {
           content: '',
         },
+        isCorrect: false,
       },
     ];
     return this;

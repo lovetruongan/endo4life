@@ -33,9 +33,22 @@ export const loadCourseLectureDetailAsync = createAsyncThunk(
 
     const dto = lecture?.metadata as ResponseDetailCourseSectionDto;
     const testDetailDto = dto?.lectureReviewQuestionsDto;
+    
+    console.log('loadCourseLectureDetailAsync - raw data:', {
+      hasDto: !!dto,
+      hasTestDetailDto: !!testDetailDto,
+      testDetailDto,
+      questionsCount: testDetailDto?.questions?.length || 0,
+    });
+    
     if (testDetailDto) {
       test = new CourseTestMapper().fromDto(testDetailDto);
       test.courseSectionId = lectureId;
+      console.log('loadCourseLectureDetailAsync - mapped test:', {
+        testId: test.id,
+        questionIds: test.questionIds,
+        metadata: test.metadata,
+      });
     } else {
       const builder = new CourseTestBuilder(
         courseId,
@@ -44,9 +57,15 @@ export const loadCourseLectureDetailAsync = createAsyncThunk(
         .setCourseSectionId(lectureId)
         .setTitle(lecture?.title);
       test = builder.build();
+      console.log('loadCourseLectureDetailAsync - created draft test');
     }
 
     const questions = await getAllQuestions([test]);
+    console.log('loadCourseLectureDetailAsync - getAllQuestions result:', {
+      questionsCount: questions.length,
+      questions: questions.map(q => ({ id: q.id, type: q.type, answersCount: q.answers?.length })),
+    });
+    
     dispatch(addCourseTests([test]));
     dispatch(addCourseQuestions(questions));
     return { lecture, test };

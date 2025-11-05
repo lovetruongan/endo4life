@@ -123,7 +123,10 @@ public class TestServiceImpl implements TestService {
             // Convert answers to JSON string and ensure IDs
             try {
                 if (questionDto.getAnswers() != null) {
-                    String answersJson = objectMapper.writeValueAsString(ensureAnswerIds(questionDto.getAnswers()));
+                    Object answersWithIds = ensureAnswerIds(questionDto.getAnswers());
+                    // Extract metadata array if it's wrapped in an object
+                    Object answersToStore = unwrapMetadata(answersWithIds);
+                    String answersJson = objectMapper.writeValueAsString(answersToStore);
                     question.setAnswers(answersJson);
                 }
             } catch (JsonProcessingException e) {
@@ -193,6 +196,22 @@ public class TestServiceImpl implements TestService {
         return answersObject;
     }
 
+    private Object unwrapMetadata(Object answersObject) {
+        // If answers are wrapped in {"metadata": [...]}, extract just the array
+        try {
+            if (answersObject instanceof java.util.Map) {
+                @SuppressWarnings("unchecked")
+                java.util.Map<String, Object> answersMap = (java.util.Map<String, Object>) answersObject;
+                if (answersMap.containsKey("metadata")) {
+                    return answersMap.get("metadata");
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Could not unwrap metadata", e);
+        }
+        return answersObject;
+    }
+
     private void updateCourseSectionEntity(Test test, CreateTestRequestDto createTestRequestDto) {
         UUID courseSectionId = createTestRequestDto.getCourseSectionId();
         if (courseSectionId == null) {
@@ -206,7 +225,11 @@ public class TestServiceImpl implements TestService {
             throw new BadRequestException("This course section already has a review test");
         }
 
+        // Link both sides: owning sides are course_section_id on Test and test_id on
+        // CourseSection
+        test.setCourseSection(courseSection);
         courseSection.setTest(test);
+        testRepository.save(test);
         courseSectionRepository.save(courseSection);
     }
 
@@ -238,28 +261,49 @@ public class TestServiceImpl implements TestService {
     }
 
     private void processUpdateQuestions(Test test, List<UpdateQuestionRequestDto> questionDtos, String emailUserLogin) {
+        log.debug("Processing {} total questions for update", questionDtos.size());
+
+        // Get existing question IDs from database
+        List<String> existingQuestionIds = test.getQuestions().stream()
+                .map(Question::getId)
+                .filter(Objects::nonNull)
+                .map(UUID::toString)
+                .toList();
+        log.debug("Existing question IDs in database: {}", existingQuestionIds);
+
         // Separate questions into: existing (to update), new (to create), and deleted
-        List<UpdateQuestionRequestDto> questionsWithId = questionDtos.stream()
-                .filter(q -> q.getTitle() != null) // Existing questions have content
-                .toList();
+        // EXISTING: Has an ID AND that ID exists in database
+        List<UpdateQuestionRequestDto> existingQuestions = new ArrayList<>();
+        List<UpdateQuestionRequestDto> newQuestions = new ArrayList<>();
+        List<UpdateQuestionRequestDto> questionsToDelete = new ArrayList<>();
 
-        List<UpdateQuestionRequestDto> questionsWithoutId = questionDtos.stream()
-                .filter(q -> q.getTitle() == null) // New questions might not have all fields
-                .toList();
+        for (UpdateQuestionRequestDto dto : questionDtos) {
+            if (Boolean.TRUE.equals(dto.getIsDelete())) {
+                questionsToDelete.add(dto);
+            } else {
+                // Check if this question has a database ID
+                String questionIdStr = dto.getId() != null ? dto.getId().toString() : null;
+                if (questionIdStr != null && existingQuestionIds.contains(questionIdStr)) {
+                    existingQuestions.add(dto);
+                } else {
+                    newQuestions.add(dto);
+                }
+            }
+        }
 
-        List<UpdateQuestionRequestDto> questionsToDelete = questionDtos.stream()
-                .filter(q -> Boolean.TRUE.equals(q.getIsDelete()))
-                .toList();
+        log.debug("Found {} existing questions (with DB ID)", existingQuestions.size());
+        log.debug("Found {} new questions (no DB ID or ID not in DB)", newQuestions.size());
+        log.debug("Found {} questions to delete", questionsToDelete.size());
 
         // 1. Update existing questions
-        if (CollectionUtils.isNotEmpty(questionsWithId)) {
-            updateExistingQuestions(test, questionsWithId, emailUserLogin);
+        if (CollectionUtils.isNotEmpty(existingQuestions)) {
+            updateExistingQuestions(test, existingQuestions, emailUserLogin);
         }
 
         // 2. Create new questions
-        if (CollectionUtils.isNotEmpty(questionsWithoutId)) {
-            List<Question> newQuestions = createNewQuestions(test, questionsWithoutId, emailUserLogin);
-            test.getQuestions().addAll(newQuestions);
+        if (CollectionUtils.isNotEmpty(newQuestions)) {
+            List<Question> newQuestionEntities = createNewQuestions(test, newQuestions, emailUserLogin);
+            test.getQuestions().addAll(newQuestionEntities);
         }
 
         // 3. Delete marked questions
@@ -272,40 +316,56 @@ public class TestServiceImpl implements TestService {
             String emailUserLogin) {
         List<Question> existingQuestions = test.getQuestions();
 
-        for (Question questionEntity : existingQuestions) {
-            for (UpdateQuestionRequestDto questionDto : questionDtos) {
-                // Match questions by some identifier - here we'll match by index or content
-                // In a real system, you'd want an ID match
+        // Match questions by ID
+        for (UpdateQuestionRequestDto questionDto : questionDtos) {
+            if (questionDto.getId() == null) {
+                log.warn("Skipping question update - no ID provided");
+                continue;
+            }
 
-                if (Objects.nonNull(questionDto.getTitle())) {
-                    questionEntity.setTitle(questionDto.getTitle());
+            // Find the matching question entity
+            Question questionEntity = existingQuestions.stream()
+                    .filter(q -> q.getId().equals(questionDto.getId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (questionEntity == null) {
+                log.warn("Question with ID {} not found in test", questionDto.getId());
+                continue;
+            }
+
+            if (Objects.nonNull(questionDto.getTitle())) {
+                questionEntity.setTitle(questionDto.getTitle());
+            }
+
+            if (Objects.nonNull(questionDto.getType())) {
+                questionEntity.setType(questionDto.getType().toString());
+            }
+
+            if (Objects.nonNull(questionDto.getDescription())) {
+                questionEntity.setDescription(questionDto.getDescription());
+            }
+
+            questionEntity.setUpdatedBy(emailUserLogin);
+            questionEntity.setUpdatedAt(LocalDateTime.now());
+
+            // Update answers with ID generation
+            if (Objects.nonNull(questionDto.getAnswers())) {
+                try {
+                    Object answersWithIds = ensureAnswerIds(questionDto.getAnswers());
+                    // Extract metadata array if it's wrapped in an object
+                    Object answersToStore = unwrapMetadata(answersWithIds);
+                    String answersJson = objectMapper.writeValueAsString(answersToStore);
+                    questionEntity.setAnswers(answersJson);
+                    log.debug("Updated question {} with {} answers", questionEntity.getId(), answersJson);
+                } catch (JsonProcessingException e) {
+                    log.error("Error converting answers to JSON string", e);
                 }
+            }
 
-                if (Objects.nonNull(questionDto.getType())) {
-                    questionEntity.setType(questionDto.getType().toString());
-                }
-
-                if (Objects.nonNull(questionDto.getDescription())) {
-                    questionEntity.setDescription(questionDto.getDescription());
-                }
-
-                questionEntity.setUpdatedBy(emailUserLogin);
-                questionEntity.setUpdatedAt(LocalDateTime.now());
-
-                // Update answers with ID generation
-                if (Objects.nonNull(questionDto.getAnswers())) {
-                    try {
-                        String answersJson = objectMapper.writeValueAsString(ensureAnswerIds(questionDto.getAnswers()));
-                        questionEntity.setAnswers(answersJson);
-                    } catch (JsonProcessingException e) {
-                        log.error("Error converting answers to JSON string", e);
-                    }
-                }
-
-                // Smart attachment update
-                if (Objects.nonNull(questionDto.getAttachments())) {
-                    processUpdateQuestionAttachments(questionEntity, questionDto.getAttachments(), emailUserLogin);
-                }
+            // Smart attachment update
+            if (Objects.nonNull(questionDto.getAttachments())) {
+                processUpdateQuestionAttachments(questionEntity, questionDto.getAttachments(), emailUserLogin);
             }
         }
     }
@@ -353,9 +413,11 @@ public class TestServiceImpl implements TestService {
 
     private List<Question> createNewQuestions(Test test, List<UpdateQuestionRequestDto> questionDtos,
             String emailUserLogin) {
+        log.debug("Creating {} new questions", questionDtos.size());
         List<Question> newQuestions = new ArrayList<>();
 
         for (UpdateQuestionRequestDto questionDto : questionDtos) {
+            log.debug("Creating new question with description: {}", questionDto.getDescription());
             Question newQuestion = questionMapper.toQuestionFromUpdate(questionDto);
             newQuestion.setTest(test);
             newQuestion.setId(UUID.randomUUID());
@@ -367,7 +429,10 @@ public class TestServiceImpl implements TestService {
             // Handle answers
             if (Objects.nonNull(questionDto.getAnswers())) {
                 try {
-                    String answersJson = objectMapper.writeValueAsString(ensureAnswerIds(questionDto.getAnswers()));
+                    Object answersWithIds = ensureAnswerIds(questionDto.getAnswers());
+                    // Extract metadata array if it's wrapped in an object
+                    Object answersToStore = unwrapMetadata(answersWithIds);
+                    String answersJson = objectMapper.writeValueAsString(answersToStore);
                     newQuestion.setAnswers(answersJson);
                 } catch (JsonProcessingException e) {
                     log.error("Error converting answers to JSON string", e);

@@ -113,11 +113,12 @@ export class CourseTestApiImpl extends BaseApi implements ICourseTestApi {
     test: ICourseTestEntity,
     questions: Record<string, IQuestionEntity>,
   ): Promise<string | undefined> {
+    const testQuestions = await this.uploadImages(test, questions);
     const config = await this.getApiConfiguration();
     const api = new TestV1Api(config);
     const mapper = new CourseTestMapper();
 
-    const payload = mapper.toCreateRequest(test, questions);
+    const payload = mapper.toCreateRequest(test, testQuestions);
     return api.createTest(payload).then((res) => res.data.id);
   }
   async updateTest(

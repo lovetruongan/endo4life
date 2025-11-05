@@ -2,13 +2,13 @@ import { useState } from 'react';
 import axios from 'axios';
 import { EnvConfig } from '@endo4life/feature-config';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { 
-  MdEmail, 
-  MdLock, 
-  MdVisibility, 
+import {
+  MdEmail,
+  MdLock,
+  MdVisibility,
   MdVisibilityOff,
   MdCheckCircle,
-  MdError 
+  MdError,
 } from 'react-icons/md';
 import { FaSpinner } from 'react-icons/fa';
 
@@ -34,13 +34,20 @@ export function LoginPage() {
   // Get the redirect path from state or default to home
   const from = (location.state as any)?.from?.pathname || '/';
 
-  const saveTokensToStorage = (token: string, refreshToken: string, expiresIn?: number) => {
+  const saveTokensToStorage = (
+    token: string,
+    refreshToken: string,
+    expiresIn?: number,
+  ) => {
     localStorage.setItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN, token);
     localStorage.setItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
-    
+
     if (expiresIn) {
       const expiryTime = Date.now() + expiresIn * 1000;
-      localStorage.setItem(AUTH_STORAGE_KEYS.TOKEN_EXPIRY, expiryTime.toString());
+      localStorage.setItem(
+        AUTH_STORAGE_KEYS.TOKEN_EXPIRY,
+        expiryTime.toString(),
+      );
     }
   };
 
@@ -69,44 +76,74 @@ export function LoginPage() {
       );
 
       if (response.data.access_token && response.data.refresh_token) {
-        // Decode token to get user info
-        const tokenParts = response.data.access_token.split('.');
-        const tokenPayload = JSON.parse(atob(tokenParts[1]));
-        
-        // Create user profile from token
-        const userProfile = {
-          id: tokenPayload.sub,
-          username: tokenPayload.preferred_username || tokenPayload.name || username,
-          firstName: tokenPayload.given_name || '',
-          lastName: tokenPayload.family_name || '',
-          email: tokenPayload.email || '',
-          roles: tokenPayload.realm_access?.roles || ['user'],
-          userId: tokenPayload.sub,
-          isActive: true,
-        };
-
-        console.log('Login successful! User profile:', userProfile);
-        console.log('Redirect to:', from);
-
-        // Save tokens to localStorage
+        // Save tokens to localStorage first
         saveTokensToStorage(
           response.data.access_token,
           response.data.refresh_token,
-          response.data.expires_in
+          response.data.expires_in,
         );
-        
-        // Save user profile to localStorage
-        localStorage.setItem(AUTH_STORAGE_KEYS.USER_PROFILE, JSON.stringify(userProfile));
 
-        setSuccess(true);
-        
-        // Show success animation then navigate
-        setTimeout(() => {
-          // Use navigate instead of window.location to avoid full reload
-          navigate(from, { replace: true });
-          // Force a state update by triggering a storage event
-          window.dispatchEvent(new Event('storage'));
-        }, 800);
+        // Fetch user info from backend to get the database user_info.id
+        try {
+          const userInfoResponse = await fetch(
+            `${import.meta.env.VITE_APP_USER_SERVICE_URL || 'http://localhost:8080/api/v1/users'}/info`,
+            {
+              headers: {
+                Authorization: `Bearer ${response.data.access_token}`,
+              },
+            },
+          );
+
+          if (!userInfoResponse.ok) {
+            throw new Error('Failed to fetch user info');
+          }
+
+          const userInfoData = await userInfoResponse.json();
+
+          // Decode token to get Keycloak user info
+          const tokenParts = response.data.access_token.split('.');
+          const tokenPayload = JSON.parse(atob(tokenParts[1]));
+
+          // Create user profile with database ID
+          const userProfile = {
+            id: userInfoData.id, // Database user_info.id (NOT Keycloak ID!)
+            userId: tokenPayload.sub, // Keycloak userId
+            username:
+              userInfoData.username ||
+              tokenPayload.preferred_username ||
+              username,
+            firstName: userInfoData.firstName || tokenPayload.given_name || '',
+            lastName: userInfoData.lastName || tokenPayload.family_name || '',
+            email: userInfoData.email || tokenPayload.email || '',
+            phoneNumber: userInfoData.phoneNumber,
+            roles: [userInfoData.role] ||
+              tokenPayload.realm_access?.roles || ['user'],
+            avatarLink: userInfoData.avatarLink,
+            isActive: userInfoData.state !== 'INACTIVE',
+          };
+
+          console.log('Login successful! User profile:', userProfile);
+          console.log('Redirect to:', from);
+
+          // Save user profile to localStorage
+          localStorage.setItem(
+            AUTH_STORAGE_KEYS.USER_PROFILE,
+            JSON.stringify(userProfile),
+          );
+
+          setSuccess(true);
+
+          // Show success animation then navigate
+          setTimeout(() => {
+            // Use navigate instead of window.location to avoid full reload
+            navigate(from, { replace: true });
+            // Force a state update by triggering a storage event
+            window.dispatchEvent(new Event('storage'));
+          }, 800);
+        } catch (fetchError) {
+          console.error('Failed to fetch user info:', fetchError);
+          setError('Không thể tải thông tin người dùng. Vui lòng thử lại.');
+        }
       } else {
         setError('Phản hồi đăng nhập thiếu token bắt buộc');
       }
@@ -114,7 +151,10 @@ export function LoginPage() {
       const error = err as {
         response?: { data?: { error_description?: string } };
       };
-      setError(error.response?.data?.error_description || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
+      setError(
+        error.response?.data?.error_description ||
+          'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.',
+      );
     } finally {
       setLoading(false);
     }
@@ -134,8 +174,18 @@ export function LoginPage() {
         onClick={() => navigate('/')}
         className="absolute top-6 left-6 text-white hover:text-primary-200 transition-colors flex items-center gap-2 font-medium"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
         </svg>
         Về trang chủ
       </button>
@@ -144,7 +194,6 @@ export function LoginPage() {
       <div className="relative w-full max-w-md">
         {/* Glassmorphism Card */}
         <div className="bg-white bg-opacity-10 backdrop-blur-xl rounded-3xl shadow-2xl border border-white border-opacity-20 p-8 md:p-10">
-          
           {/* Logo & Title */}
           <div className="text-center mb-8">
             <div className="flex justify-center mb-6">
@@ -156,18 +205,17 @@ export function LoginPage() {
                 />
               </div>
             </div>
-            <h1 className="text-4xl font-bold text-white mb-2">
-              Endo4Life
-            </h1>
-            <p className="text-primary-100 text-lg">
-              Đăng nhập vào hệ thống
-            </p>
+            <h1 className="text-4xl font-bold text-white mb-2">Endo4Life</h1>
+            <p className="text-primary-100 text-lg">Đăng nhập vào hệ thống</p>
           </div>
 
           {/* Success Message */}
           {success && (
             <div className="mb-6 p-4 bg-green-500 bg-opacity-20 backdrop-blur-sm border border-green-400 rounded-xl flex items-center gap-3 animate-fade-in">
-              <MdCheckCircle className="text-green-300 flex-shrink-0" size={24} />
+              <MdCheckCircle
+                className="text-green-300 flex-shrink-0"
+                size={24}
+              />
               <span className="text-green-100 font-medium">
                 Đăng nhập thành công! Đang chuyển hướng...
               </span>
@@ -178,9 +226,7 @@ export function LoginPage() {
           {error && (
             <div className="mb-6 p-4 bg-red-500 bg-opacity-20 backdrop-blur-sm border border-red-400 rounded-xl flex items-center gap-3 animate-shake">
               <MdError className="text-red-300 flex-shrink-0" size={24} />
-              <span className="text-red-100 text-sm">
-                {error}
-              </span>
+              <span className="text-red-100 text-sm">{error}</span>
             </div>
           )}
 
@@ -188,8 +234,8 @@ export function LoginPage() {
           <form onSubmit={handleLogin} className="space-y-6">
             {/* Username Field */}
             <div>
-              <label 
-                htmlFor="username" 
+              <label
+                htmlFor="username"
                 className="block text-white text-sm font-semibold mb-2"
               >
                 Tên đăng nhập
@@ -213,8 +259,8 @@ export function LoginPage() {
 
             {/* Password Field */}
             <div>
-              <label 
-                htmlFor="password" 
+              <label
+                htmlFor="password"
                 className="block text-white text-sm font-semibold mb-2"
               >
                 Mật khẩu
@@ -290,13 +336,18 @@ export function LoginPage() {
               ) : (
                 <>
                   <span>Đăng Nhập</span>
-                  <svg 
-                    className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" 
-                    fill="none" 
-                    stroke="currentColor" 
+                  <svg
+                    className="w-5 h-5 transform group-hover:translate-x-1 transition-transform"
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 7l5 5m0 0l-5 5m5-5H6"
+                    />
                   </svg>
                 </>
               )}
@@ -309,9 +360,7 @@ export function LoginPage() {
               <div className="w-full border-t border-white border-opacity-20"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-transparent text-primary-100">
-                hoặc
-              </span>
+              <span className="px-4 bg-transparent text-primary-100">hoặc</span>
             </div>
           </div>
 
@@ -319,7 +368,7 @@ export function LoginPage() {
           <div className="text-center">
             <p className="text-primary-100 text-sm">
               Chưa có tài khoản?{' '}
-              <button 
+              <button
                 type="button"
                 className="text-white font-semibold hover:underline transition-all"
                 disabled={loading || success}

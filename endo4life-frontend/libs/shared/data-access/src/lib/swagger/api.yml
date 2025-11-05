@@ -375,6 +375,163 @@ paths:
         '204':
           description: Test deleted successfully
 
+  # Student Test APIs (Student-facing)
+  /api/v1/user/tests/{testId}/questions:
+    get:
+      summary: Get test questions for student (without correct answers)
+      tags: ['user-test-v1']
+      operationId: getStudentTestQuestions
+      parameters:
+        - name: testId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userInfoId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Test questions retrieved (answers hidden)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentTestDto'
+
+  /api/v1/user/tests/{testId}/submit:
+    post:
+      summary: Submit student test answers and auto-grade
+      tags: ['user-test-v1']
+      operationId: submitStudentTest
+      parameters:
+        - name: testId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestSubmissionDto'
+      responses:
+        '200':
+          description: Test graded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestResultDto'
+
+  /api/v1/user/tests/{testId}/result:
+    get:
+      summary: Get test result with correct answers shown
+      tags: ['user-test-v1']
+      operationId: getStudentTestResult
+      parameters:
+        - name: testId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userInfoId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Test result retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestResultDto'
+
+  /api/v1/user/courses/{courseId}/entrance-test:
+    get:
+      summary: Get entrance test for a course
+      tags: ['user-test-v1']
+      operationId: getCourseEntranceTest
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userInfoId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Entrance test retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentTestDto'
+
+  /api/v1/user/courses/lectures/{lectureId}/review-test:
+    get:
+      summary: Get lecture review questions
+      tags: ['user-test-v1']
+      operationId: getLectureReviewTest
+      parameters:
+        - name: lectureId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userInfoId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Lecture review test retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentTestDto'
+
+  /api/v1/user/courses/{courseId}/final-exam:
+    get:
+      summary: Get final exam for a course
+      tags: ['user-test-v1']
+      operationId: getCourseFinalExam
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userInfoId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Final exam retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentTestDto'
+
   # Question Management APIs
   /api/v1/tests/{testId}/questions:
     get:
@@ -2202,6 +2359,10 @@ components:
     UpdateQuestionRequestDto:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
+          description: Question ID (for existing questions)
         title:
           type: string
         description:
@@ -2277,6 +2438,143 @@ components:
         - MULTIPLE_CHOICE
         - FILL_IN_THE_BLANK
         - ESSAY
+
+    # Student Test schemas (Student-facing, answers hidden)
+    StudentTestDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        courseId:
+          type: string
+          format: uuid
+        courseSectionId:
+          type: string
+          format: uuid
+        type:
+          type: string
+        passingScore:
+          type: integer
+          description: 'Passing score percentage (0-100)'
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/StudentQuestionDto'
+
+    StudentQuestionDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          $ref: '#/components/schemas/QuestionType'
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/StudentAnswerDto'
+        orderIndex:
+          type: integer
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestionAttachmentResponseDto'
+
+    StudentAnswerDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        content:
+          type: object
+          description: 'Rich text content (isCorrect field is hidden from students)'
+
+    TestSubmissionDto:
+      type: object
+      required:
+        - userInfoId
+        - answers
+      properties:
+        userInfoId:
+          type: string
+          format: uuid
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubmittedAnswerDto'
+
+    SubmittedAnswerDto:
+      type: object
+      required:
+        - questionId
+        - selectedAnswers
+      properties:
+        questionId:
+          type: string
+          format: uuid
+        selectedAnswers:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: 'Array of selected answer IDs'
+
+    TestResultDto:
+      type: object
+      properties:
+        testId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        score:
+          type: integer
+          description: 'Score percentage (0-100)'
+        correctCount:
+          type: integer
+        totalQuestions:
+          type: integer
+        passed:
+          type: boolean
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestionResultDto'
+        submittedAt:
+          type: string
+          format: date-time
+
+    QuestionResultDto:
+      type: object
+      properties:
+        questionId:
+          type: string
+          format: uuid
+        correct:
+          type: boolean
+        selectedAnswers:
+          type: array
+          items:
+            type: string
+            format: uuid
+        correctAnswers:
+          type: array
+          items:
+            type: string
+            format: uuid
+        question:
+          $ref: '#/components/schemas/StudentQuestionDto'
 
     WebhookMinIOEventDto:
       type: object
@@ -2707,6 +3005,8 @@ components:
           type: integer
         videoDuration:
           type: integer
+        lectureReviewQuestionsDto:
+          $ref: '#/components/schemas/TestDetailResponseDto'
 
     MetaDataCourseSectionDto:
       type: object
