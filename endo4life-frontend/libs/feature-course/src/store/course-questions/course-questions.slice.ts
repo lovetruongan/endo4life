@@ -16,7 +16,14 @@ const slice = createSlice({
     },
     completeEditingQuestion: (state: CourseQuestionsState) => {
       const question = state.editingQuestion;
+      console.log('completeEditingQuestion called:', {
+        hasEditingQuestion: !!question,
+        questionId: question?.id,
+        answersCount: question?.answers?.length || 0,
+        questionIds: Object.keys(state.questions),
+      });
       if (question) {
+        console.log('Saving editingQuestion to questions:', question.id, 'answers:', question.answers);
         state.questions[question.id] = { ...question };
       }
     },
@@ -37,6 +44,12 @@ const slice = createSlice({
       action: PayloadAction<IQuestionEntity[]>,
     ) => {
       for (const question of action.payload) {
+        console.log('Adding question to Redux:', {
+          id: question.id,
+          type: question.type,
+          answersCount: question.answers?.length || 0,
+          answers: question.answers,
+        });
         state.questions[question.id.toString()] = question;
       }
       state.loading = false;
@@ -60,6 +73,7 @@ const slice = createSlice({
     ) => {
       const question = action.payload;
       if (question.id === state.editingQuestion?.id) {
+        console.log('Redux updating editingQuestion with answers:', question.answers);
         state.editingQuestion = { ...state.editingQuestion, ...question };
       }
     },

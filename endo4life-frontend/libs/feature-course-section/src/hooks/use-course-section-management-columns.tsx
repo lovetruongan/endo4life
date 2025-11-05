@@ -5,7 +5,7 @@ import { ICellRendererParams } from 'ag-grid-community';
 import { CourseStatusCell } from '../components/course-section-table/course-section-status-cell';
 import { Actions } from 'ahooks/lib/useToggle';
 import { CourseState } from '@endo4life/data-access';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ADMIN_WEB_ROUTES } from '@endo4life/feature-config';
 import { formatDate } from '@endo4life/util-common';
 import { ICourseSectionEntity } from '../types';
@@ -27,6 +27,8 @@ function useCourseSectionManagementColumns({
   onSetStateCourse,
 }: ICourseSectionManagementColumnsProps) {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { id: courseId = '' } = useParams<{ id: string }>();
   const { t } = useTranslation('course');
   const userColumns: GridColDef<ICourseSectionEntity>[] = useMemo(() => {
     const cols = [
@@ -55,20 +57,21 @@ function useCourseSectionManagementColumns({
         headerName: t('courseSectionTable.title'),
         hide: false,
         initialFlex: 0.5,
-        cellRenderer: (params: ICellRendererParams<ICourseSectionEntity>) => (
-          <div
-            onClick={() => {
-              const lectureId = params.data?.id;
-              if (lectureId) {
+        cellRenderer: (params: ICellRendererParams<ICourseSectionEntity>) => {
+          const lectureId = params.data?.id;
+          return (
+            <div
+              onClick={() => {
+                if (!lectureId) return;
                 const newParams = new URLSearchParams(searchParams);
                 newParams.set('lectureId', lectureId);
                 setSearchParams(newParams);
-              }
-            }}
-          >
-            {params?.data?.title}
-          </div>
-        ),
+              }}
+            >
+              {params?.data?.title}
+            </div>
+          );
+        },
       },
       {
         id: 2,

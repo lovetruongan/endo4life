@@ -26,6 +26,10 @@ public class Test extends AbstractEntity {
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
+    @ManyToOne
+    @JoinColumn(name = "course_section_id")
+    private CourseSection courseSection;
+
     @Column(name = "type")
     private String type;
 

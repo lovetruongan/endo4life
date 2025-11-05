@@ -12,6 +12,11 @@ interface Props {
 export function QuestionCard({ isEditing, data, onSelect }: Props) {
   return (
     <div className="p-4 space-y-3 bg-white border rounded-lg border-slate-100">
+      {data.instruction && !isEmptyRichTextContent(data.instruction?.content) && (
+        <div className="font-semibold text-gray-900">
+          <RichTextContent value={data.instruction} />
+        </div>
+      )}
       <div>
         <RichTextContent value={data.content} />
       </div>

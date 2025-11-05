@@ -1,5 +1,7 @@
 package com.endo4life.repository;
 
+import com.endo4life.domain.document.Course;
+import com.endo4life.domain.document.UserInfo;
 import com.endo4life.domain.document.UserRegistrationCourse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -15,4 +17,6 @@ public interface UserRegistrationCourseRepository
     Optional<UserRegistrationCourse> findByCourseIdAndUserId(UUID courseId, UUID userInfoId);
 
     List<UserRegistrationCourse> findByUserId(UUID userInfoId);
+
+    Optional<UserRegistrationCourse> findByCourseAndUser(Course course, UserInfo userInfo);
 }

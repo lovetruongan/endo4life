@@ -30,6 +30,18 @@ const ResourceVideoPage = lazy(
 const ResourceCoursePage = lazy(
   () => import('../pages/resources/courses/[id]/page'),
 );
+const EntranceTestPage = lazy(
+  () => import('../pages/resources/courses/[courseId]/entrance-test/page'),
+);
+const LecturePlayerPage = lazy(
+  () => import('../pages/resources/courses/[courseId]/lectures/[lectureId]/page'),
+);
+const LectureReviewPage = lazy(
+  () => import('../pages/resources/courses/[courseId]/lectures/[lectureId]/review/page'),
+);
+const FinalExamPage = lazy(
+  () => import('../pages/resources/courses/[courseId]/final-exam/page'),
+);
 
 const AboutUsPage = lazy(() => import('../pages/about-us/page'));
 const LibraryPage = lazy(() => import('../pages/library/page'));
@@ -114,6 +126,50 @@ export const studentWebRouter = createBrowserRouter([
               <Suspense>
                 <ResourceCoursePage />
               </Suspense>
+            ),
+          },
+
+          {
+            path: STUDENT_WEB_ROUTES.COURSE_ENTRANCE_TEST,
+            element: (
+              <ProtectedRoute roles={[]}>
+                <Suspense>
+                  <EntranceTestPage />
+                </Suspense>
+              </ProtectedRoute>
+            ),
+          },
+
+          {
+            path: STUDENT_WEB_ROUTES.COURSE_LECTURE,
+            element: (
+              <ProtectedRoute roles={[]}>
+                <Suspense>
+                  <LecturePlayerPage />
+                </Suspense>
+              </ProtectedRoute>
+            ),
+          },
+
+          {
+            path: STUDENT_WEB_ROUTES.COURSE_LECTURE_REVIEW,
+            element: (
+              <ProtectedRoute roles={[]}>
+                <Suspense>
+                  <LectureReviewPage />
+                </Suspense>
+              </ProtectedRoute>
+            ),
+          },
+
+          {
+            path: STUDENT_WEB_ROUTES.COURSE_FINAL_EXAM,
+            element: (
+              <ProtectedRoute roles={[]}>
+                <Suspense>
+                  <FinalExamPage />
+                </Suspense>
+              </ProtectedRoute>
             ),
           },
         ],

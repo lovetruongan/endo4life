@@ -9,7 +9,9 @@ export function isEmptyRichTextContent(value?: string) {
       return children.length === 0;
     }
   } catch (error) {
-    console.log('error', error);
+    // If not valid JSON, treat as plain text
+    // Non-empty plain text = not empty
+    return value.trim().length === 0;
   }
   return false;
 }
@@ -18,7 +20,7 @@ export function stringToRichText(str?: string): IRichText | undefined {
   if (!str) return undefined;
   try {
     const jsonData = JSON.parse(str);
-    if (jsonData && jsonData.hasOwnProperty('root')) {
+    if (jsonData && Object.prototype.hasOwnProperty.call(jsonData, 'root')) {
       return { content: str };
     }
   } catch (error) {}

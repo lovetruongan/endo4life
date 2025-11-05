@@ -1,11 +1,14 @@
 package com.endo4life.repository;
 
+import com.endo4life.domain.document.Course;
+import com.endo4life.domain.document.CourseSection;
 import com.endo4life.domain.document.Test;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -13,4 +16,8 @@ public interface TestRepository extends JpaRepository<Test, UUID>, JpaSpecificat
     List<Test> findByCourseId(UUID courseId);
 
     List<Test> findByCourseIdAndType(UUID courseId, String type);
+
+    Optional<Test> findByCourseAndType(Course course, String type);
+
+    Optional<Test> findByCourseSectionAndType(CourseSection courseSection, String type);
 }

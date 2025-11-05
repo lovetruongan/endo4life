@@ -2,6 +2,7 @@ import { useAuthContext } from '@endo4life/feature-auth';
 import { useCourseProgress } from '@endo4life/feature-resources';
 import { useNavigate } from 'react-router-dom';
 import { STUDENT_WEB_ROUTES } from '@endo4life/feature-config';
+import { SmartCourseCard } from './components/SmartCourseCard';
 
 export function MyLearningPage() {
   const { userProfile } = useAuthContext();
@@ -78,67 +79,13 @@ export function MyLearningPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {courses.map((course) => {
-          const progressPercentage =
-            course.totalLectures > 0
-              ? Math.round((course.numberLecturesCompleted / course.totalLectures) * 100)
-              : 0;
-
-          return (
-            <div
-              key={course.id}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-              onClick={() => {
-                const courseRoute = STUDENT_WEB_ROUTES.RESOURCE_COURSE.replace(':id', course.courseId);
-                navigate(courseRoute);
-              }}
-            >
-              {/* Thumbnail */}
-              {course.thumbnailUrl && (
-                <div className="aspect-video bg-gray-200">
-                  <img
-                    src={course.thumbnailUrl}
-                    alt={course.courseTitle}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
-
-              {/* Content */}
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                  {course.courseTitle}
-                </h3>
-
-                {/* Progress */}
-                <div className="mb-3">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-sm text-gray-600">Progress</span>
-                    <span className="text-sm font-medium text-gray-900">
-                      {progressPercentage}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-blue-600 h-2 rounded-full transition-all"
-                      style={{ width: `${progressPercentage}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Stats */}
-                <div className="flex justify-between items-center text-sm text-gray-600">
-                  <span>
-                    {course.numberLecturesCompleted} / {course.totalLectures} lectures
-                  </span>
-                  {progressPercentage === 100 && (
-                    <span className="text-green-600 font-medium">✓ Completed</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          );
-        })}
+        {courses.map((course) => (
+          <SmartCourseCard
+            key={course.id}
+            course={course}
+            userInfoId={userInfoId}
+          />
+        ))}
       </div>
     </div>
   );

@@ -11,7 +11,11 @@ export const addNewCourseQuestionAsync = createAsyncThunk(
   'course-tests/addNewCourseQuestionAsync',
   async ({ testId }: IAddNewCourseQuestionPayload, { dispatch }) => {
     if (!testId) return null;
-    const newQuestion = new QuestionBuilder().build();
+    // Pre-populate with two empty answers so users immediately see answer inputs
+    const newQuestion = new QuestionBuilder()
+      .addAnswer()
+      .addAnswer()
+      .build();
     dispatch(addCourseQuestion(newQuestion));
     return { testId, question: newQuestion };
   },

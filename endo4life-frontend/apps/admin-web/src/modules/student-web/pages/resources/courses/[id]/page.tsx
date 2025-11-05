@@ -1,18 +1,21 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '@endo4life/feature-auth';
 import {
   useUserCourseDetail,
   useCourseEnrollment,
   useCourseLectures,
+  useCourseProgressStatus,
 } from '@endo4life/feature-resources';
 import { Button } from '@endo4life/ui-common';
 import { toast } from 'react-toastify';
 import { useState, useEffect } from 'react';
+import { STUDENT_WEB_ROUTES } from '@endo4life/feature-config';
 
 export function ResourceCoursePage() {
   const { id = '' } = useParams<{ id: string }>();
   const { userProfile } = useAuthContext();
   const userInfoId = userProfile?.id || '';
+  const navigate = useNavigate();
 
   console.log('Current user profile:', userProfile);
 
@@ -25,6 +28,11 @@ export function ResourceCoursePage() {
   const isEnrolled = course?.isEnrolledCourse ?? false;
 
   const {
+    data: progressStatus,
+    loading: progressLoading,
+  } = useCourseProgressStatus(userInfoId, id, isEnrolled);
+
+  const {
     data: lectures,
     loading: lecturesLoading,
     error: lecturesError,
@@ -33,6 +41,8 @@ export function ResourceCoursePage() {
   const { mutation: enrollMutation } = useCourseEnrollment();
 
   const [enrolling, setEnrolling] = useState(false);
+
+  const hasCompletedEntranceTest = progressStatus?.isCompletedEntranceTest ?? false;
 
   // Debug logging
   useEffect(() => {
@@ -187,23 +197,78 @@ export function ResourceCoursePage() {
                 <span className="px-4 py-2 bg-green-100 text-green-800 rounded-lg font-medium">
                   ✓ Enrolled
                 </span>
-                <Button
-                  onClick={() => {
-                    // Navigate to first incomplete lecture
-                    // TODO: Implement navigation to next lecture
-                  }}
-                  className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
-                >
-                  Continue Learning
-                </Button>
+                {!hasCompletedEntranceTest ? (
+                  <Button
+                    onClick={() => {
+                      const entranceTestRoute = STUDENT_WEB_ROUTES.COURSE_ENTRANCE_TEST.replace(':courseId', id);
+                      navigate(entranceTestRoute);
+                    }}
+                    className="px-8 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg"
+                  >
+                    Take Entrance Test
+                  </Button>
+                ) : progressStatus?.isCompletedTotalCourseSection && !progressStatus?.isCompletedFinalCourseTest ? (
+                  <Button
+                    onClick={() => {
+                      const finalExamRoute = STUDENT_WEB_ROUTES.COURSE_FINAL_EXAM.replace(':courseId', id);
+                      navigate(finalExamRoute);
+                    }}
+                    className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg flex items-center gap-2"
+                  >
+                    🎯 Take Final Exam
+                  </Button>
+                ) : progressStatus?.isCompletedCourse ? (
+                  <Button
+                    onClick={() => {
+                      const finalExamRoute = STUDENT_WEB_ROUTES.COURSE_FINAL_EXAM.replace(':courseId', id);
+                      navigate(finalExamRoute);
+                    }}
+                    className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg flex items-center gap-2"
+                  >
+                    🎓 View Certificate
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      // Navigate to first incomplete lecture
+                      const firstIncompleteLecture = lectures?.find(l => !l.isCompletedCourseSection);
+                      if (firstIncompleteLecture) {
+                        const lectureRoute = STUDENT_WEB_ROUTES.COURSE_LECTURE
+                          .replace(':courseId', id)
+                          .replace(':lectureId', firstIncompleteLecture.courseSectionId);
+                        navigate(lectureRoute);
+                      }
+                    }}
+                    className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
+                  >
+                    Continue Learning
+                  </Button>
+                )}
               </div>
             )}
           </div>
+
+          {/* Entrance Test Requirement Notice */}
+          {isEnrolled && !hasCompletedEntranceTest && (
+            <div className="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded-lg">
+              <div className="flex items-center gap-2">
+                <span className="text-yellow-700 text-xl">⚠️</span>
+                <div>
+                  <h3 className="text-sm font-semibold text-yellow-800">
+                    Entrance Test Required
+                  </h3>
+                  <p className="text-sm text-yellow-700 mt-1">
+                    You must complete the entrance test before accessing the course lectures.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Course Lectures */}
-      {isEnrolled && (
+      {isEnrolled && hasCompletedEntranceTest && (
         <div className="flex flex-col gap-4 mt-8">
           <h2 className="text-2xl font-bold">Course Content</h2>
 
@@ -214,7 +279,13 @@ export function ResourceCoursePage() {
               {lectures.map((lecture, index) => (
                 <div
                   key={lecture.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                  onClick={() => {
+                    const lectureRoute = STUDENT_WEB_ROUTES.COURSE_LECTURE
+                      .replace(':courseId', id)
+                      .replace(':lectureId', lecture.courseSectionId);
+                    navigate(lectureRoute);
+                  }}
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors hover:border-blue-500"
                 >
                   <div className="flex items-center gap-4">
                     <span className="text-gray-500 font-medium">

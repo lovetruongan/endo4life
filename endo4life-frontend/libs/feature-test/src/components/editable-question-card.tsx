@@ -126,6 +126,12 @@ export function EditableQuestionCard({
     onChange && onChange(builder.build());
   };
 
+  const handleInstructionChange = (value?: IRichText) => {
+    const builder = new QuestionBuilder(data);
+    builder.updateInstruction(value);
+    onChange && onChange(builder.build());
+  };
+
   const handleContentChange = (value?: IRichText) => {
     const builder = new QuestionBuilder(data);
     builder.updateContent(value);
@@ -158,6 +164,14 @@ export function EditableQuestionCard({
         },
       )}
     >
+      <div className="flex items-start gap-4">
+        <EditableRichText
+          className="flex-auto font-semibold"
+          placeholder="Nhập tiêu đề câu hỏi (Q1, Q2...)"
+          value={data.instruction}
+          onChange={handleInstructionChange}
+        />
+      </div>
       <div className="flex items-start gap-4">
         <EditableRichText
           className="flex-auto"

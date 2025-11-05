@@ -12,3 +12,4 @@ export * from './resource-skeleton/ResourceDiscussionSkeleton';
 export * from './resource-skeleton/ResourceMediaViewSkeleton';
 export * from './resource-skeleton/ResourceMultiTextSkeleton';
 export * from './resource-skeleton/ResourceTextSkeleton';
+export * from './student-test';

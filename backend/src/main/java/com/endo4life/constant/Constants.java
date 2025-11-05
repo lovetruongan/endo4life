@@ -98,6 +98,8 @@ public class Constants {
         /* percentage */
         public static final float ONE_HUNDRED = 100.0f;
         public static final float COMPLETION_THRESHOLD = 30.0f;
+        // When course section video duration is unknown, consider video completed after N seconds watched
+        public static final int MIN_WATCH_SECONDS_TO_COMPLETE_FALLBACK = 5;
 
         /* test */
         public static final Integer ONE_HUNDRED_INTEGER = 100;
