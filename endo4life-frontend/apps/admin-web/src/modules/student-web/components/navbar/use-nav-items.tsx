@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiPlayList2Fill } from 'react-icons/ri';
+import { RiPlayList2Fill, RiRobot2Line } from 'react-icons/ri';
 import {
   TbPhoto,
   TbVideo,
@@ -40,6 +40,17 @@ export function useNavItems() {
             label: t('navigation.txtMenuItemCourse'),
             link: STUDENT_WEB_ROUTES.HOME,
             icon: RiPlayList2Fill,
+          },
+        ],
+      },
+      {
+        id: 'ai',
+        label: 'AI Tools',
+        children: [
+          {
+            label: 'AI Assistant',
+            link: STUDENT_WEB_ROUTES.RAG_ASK,
+            icon: RiRobot2Line,
           },
         ],
       },

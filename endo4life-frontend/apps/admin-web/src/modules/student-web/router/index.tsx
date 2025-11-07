@@ -50,6 +50,12 @@ const WatchHistoryPage = lazy(() => import('../pages/watch-history/page'));
 const MyProfilePage = lazy(() => import('../pages/my-profile/page'));
 const LoginPage = lazy(() => import('../pages/login/page'));
 
+// RAG Pages
+const RagPageLayout = lazy(() => import('../pages/rag/layout'));
+const RagAskPage = lazy(() => import('../pages/rag/ask/page'));
+const RagIngestPage = lazy(() => import('../pages/rag/ingest/page'));
+const RagSearchPage = lazy(() => import('../pages/rag/search/page'));
+
 export const studentWebRouter = createBrowserRouter([
   // LOGIN PAGE - No Layout (no header/footer)
   {
@@ -264,6 +270,44 @@ export const studentWebRouter = createBrowserRouter([
             </Suspense>
           </ProtectedRoute>
         ),
+      },
+
+      // RAG
+      {
+        path: STUDENT_WEB_ROUTES.RAG,
+        element: (
+          <ProtectedRoute roles={[]}>
+            <Suspense>
+              <RagPageLayout />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            path: STUDENT_WEB_ROUTES.RAG_ASK,
+            element: (
+              <Suspense>
+                <RagAskPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: STUDENT_WEB_ROUTES.RAG_INGEST,
+            element: (
+              <Suspense>
+                <RagIngestPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: STUDENT_WEB_ROUTES.RAG_SEARCH,
+            element: (
+              <Suspense>
+                <RagSearchPage />
+              </Suspense>
+            ),
+          },
+        ],
       },
     ],
   },
