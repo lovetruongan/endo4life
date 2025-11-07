@@ -1,0 +1,10 @@
+{
+  "name": "feature-rag",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/student-web/feature-rag/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project feature-rag --web",
+  "targets": {}
+}
+

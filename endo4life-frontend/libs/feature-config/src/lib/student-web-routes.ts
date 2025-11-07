@@ -16,4 +16,9 @@ export const STUDENT_WEB_ROUTES = {
   ABOUT_US: '/about-us',
   MY_PROFILE: '/my-profile',
   NOT_FOUND: '/not-found',
+  // RAG Routes
+  RAG: '/rag',
+  RAG_ASK: '/rag/ask',
+  RAG_INGEST: '/rag/ingest',
+  RAG_SEARCH: '/rag/search',
 };

@@ -7,4 +7,6 @@ export const EnvConfig = {
   Endo4LifeClient: import.meta.env.VITE_ENDO4LIFE_APP_CLIENT,
   Endo4LifeClientSecret: import.meta.env.VITE_ENDO4LIFE_CLIENT_SECRET || '0LsxczPTGzHaGeZI8N9mIWn0XbtNfF4d',
   UserServiceUrl: import.meta.env.VITE_ENDO4LIFE_USER_SERVICE_URL,
+  RagRetrieverBaseUrl: import.meta.env.VITE_RAG_RETRIEVER_BASE_URL || 'http://localhost:8081',
+  RagIngestorBaseUrl: import.meta.env.VITE_RAG_INGESTOR_BASE_URL || 'http://localhost:8082',
 };

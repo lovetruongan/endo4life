@@ -47,6 +47,9 @@
       "@endo4life/feature-discussion": [
         "libs/student-web/feature-discussion/src/index.ts"
       ],
+      "@endo4life/feature-rag": [
+        "libs/student-web/feature-rag/src/index.ts"
+      ],
       "@endo4life/feature-richtext-editor": [
         "libs/feature-richtext-editor/src/index.ts"
       ],
