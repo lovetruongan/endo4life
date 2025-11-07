@@ -39,6 +39,7 @@
     "commentViewing": "Xem nhận xét",
     "txtHome": "Trang chủ",
     "txtResources": "Kho dữ liệu số",
+    "txtMyLearning": "Khóa học của tôi",
     "txtMyLibrary": "Thư viện của tôi",
     "txtAboutUs": "Về chúng tôi"
   },
@@ -68,5 +69,42 @@
     "txtFilter": "Bộ lọc",
     "txtNewest": "Mới nhất",
     "txtMostPopular": "Phổ biến nhất"
+  },
+  "library": {
+    "txtTitle": "Thư viện của tôi",
+    "txtDescription": "Khám phá bộ sưu tập sách y khoa đa dạng và phong phú",
+    "txtBooksAvailable": "Sách có sẵn",
+    "txtCategories": "Danh mục",
+    "txtTotalViews": "Lượt xem",
+    "txtSearchPlaceholder": "Tìm kiếm sách theo tên, tác giả...",
+    "txtNoBooks": "Chưa có sách nào trong thư viện",
+    "txtNoBooksDescription": "Dữ liệu sách sẽ được cập nhật sớm",
+    "txtAuthor": "Tác giả",
+    "txtPages": "trang",
+    "txtYear": "Năm",
+    "txtViewDetails": "Xem chi tiết",
+    "txtFoundResults": "Tìm thấy",
+    "txtResults": "kết quả",
+    "txtAllCategories": "Tất cả danh mục",
+    "txtSortBy": "Sắp xếp theo",
+    "txtCategory": "Danh mục",
+    "txtAppliedFilters": "Bộ lọc đang áp dụng",
+    "txtClearFilters": "Xóa bộ lọc",
+    "txtLibraryUnderConstruction": "Thư viện đang được xây dựng",
+    "txtLibraryUnderConstructionDesc": "Chúng tôi đang tích cực bổ sung các tài liệu, sách y khoa chất lượng cao vào thư viện. Hãy quay lại sau để khám phá những nguồn tài liệu hữu ích!",
+    "categories": {
+      "anatomy": "Giải phẫu học",
+      "physiology": "Sinh lý học",
+      "pathology": "Bệnh lý học",
+      "pharmacology": "Dược lý học",
+      "surgery": "Phẫu thuật",
+      "internalMedicine": "Nội khoa",
+      "pediatrics": "Nhi khoa",
+      "gynecology": "Sản phụ khoa",
+      "cardiology": "Tim mạch",
+      "neurology": "Thần kinh",
+      "endoscopy": "Nội soi",
+      "others": "Khác"
+    }
   }
 }

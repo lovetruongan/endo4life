@@ -11,8 +11,10 @@ import {
   useResourceFilters,
   useResources,
   useResourcesAccessed,
+  useCourses,
 } from '@endo4life/feature-resources';
 import { useMemo } from 'react';
+import VideosByCourse from './components/VideosByCourse';
 
 enum ResourceType {
   Image = 'IMAGE',
@@ -70,6 +72,9 @@ export function ResourcesPage() {
       <div className="mt-6">
         {currentResourceType === ResourceType.Course ? (
           <CoursesList loading={resourcesLoading} data={resourcesData} />
+        ) : currentResourceType === ResourceType.Video ? (
+          // Hiển thị videos theo courses
+          <VideosByCourse filter={resourceFilter} loading={resourcesLoading} />
         ) : (
           <ResourcesList
             filter={resourceFilter}
