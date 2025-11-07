@@ -33,7 +33,7 @@ export function SmartCourseCard({ course, userInfoId }: SmartCourseCardProps) {
     // If course is completed
     if (progressStatus?.isCompletedCourse) {
       return {
-        label: '🎓 View Certificate',
+        label: '🎓 Xem chứng chỉ',
         route: STUDENT_WEB_ROUTES.COURSE_FINAL_EXAM.replace(':courseId', course.courseId),
         color: 'bg-green-600 hover:bg-green-700',
       };
@@ -42,7 +42,7 @@ export function SmartCourseCard({ course, userInfoId }: SmartCourseCardProps) {
     // If entrance test not completed
     if (!progressStatus?.isCompletedEntranceTest) {
       return {
-        label: 'Take Entrance Test',
+        label: 'Làm bài kiểm tra đầu vào',
         route: STUDENT_WEB_ROUTES.COURSE_ENTRANCE_TEST.replace(':courseId', course.courseId),
         color: 'bg-yellow-600 hover:bg-yellow-700',
       };
@@ -51,7 +51,7 @@ export function SmartCourseCard({ course, userInfoId }: SmartCourseCardProps) {
     // If all lectures done but final exam not done
     if (progressStatus?.isCompletedTotalCourseSection && !progressStatus?.isCompletedFinalCourseTest) {
       return {
-        label: '🎯 Take Final Exam',
+        label: '🎯 Làm bài thi cuối khóa',
         route: STUDENT_WEB_ROUTES.COURSE_FINAL_EXAM.replace(':courseId', course.courseId),
         color: 'bg-purple-600 hover:bg-purple-700',
       };
@@ -63,7 +63,7 @@ export function SmartCourseCard({ course, userInfoId }: SmartCourseCardProps) {
       // Check if the lecture has review questions that need to be completed
       if (nextLecture.isCompletedVideoCourseSection && !nextLecture.isCompletedLectureReviewQuestion) {
         return {
-          label: 'Complete Review Questions',
+          label: 'Hoàn thành câu hỏi ôn tập',
           route: STUDENT_WEB_ROUTES.COURSE_LECTURE_REVIEW
             .replace(':courseId', course.courseId)
             .replace(':lectureId', nextLecture.courseSectionId),
@@ -73,7 +73,7 @@ export function SmartCourseCard({ course, userInfoId }: SmartCourseCardProps) {
 
       // Continue with lecture video
       return {
-        label: 'Continue Lecture',
+        label: 'Tiếp tục bài học',
         route: STUDENT_WEB_ROUTES.COURSE_LECTURE
           .replace(':courseId', course.courseId)
           .replace(':lectureId', nextLecture.courseSectionId),
@@ -83,7 +83,7 @@ export function SmartCourseCard({ course, userInfoId }: SmartCourseCardProps) {
 
     // Default: go to course detail
     return {
-      label: 'View Course',
+      label: 'Xem khóa học',
       route: courseRoute,
       color: 'bg-gray-600 hover:bg-gray-700',
     };
@@ -109,7 +109,7 @@ export function SmartCourseCard({ course, userInfoId }: SmartCourseCardProps) {
           />
           <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
             <div className="text-white opacity-0 group-hover:opacity-100 transition-opacity">
-              <span className="text-sm">View Course</span>
+              <span className="text-sm">Xem khóa học</span>
             </div>
           </div>
         </div>
@@ -130,7 +130,7 @@ export function SmartCourseCard({ course, userInfoId }: SmartCourseCardProps) {
         {/* Progress */}
         <div className="mb-3">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-sm text-gray-600">Progress</span>
+            <span className="text-sm text-gray-600">Tiến độ</span>
             <span className="text-sm font-medium text-gray-900">
               {progressPercentage}%
             </span>
@@ -146,12 +146,12 @@ export function SmartCourseCard({ course, userInfoId }: SmartCourseCardProps) {
         {/* Stats */}
         <div className="flex justify-between items-center text-sm text-gray-600 mb-3">
           <span>
-            {course.numberLecturesCompleted} / {course.totalLectures} lectures
+            {course.numberLecturesCompleted} / {course.totalLectures} bài học
           </span>
           {progressStatus?.isCompletedCourse && (
             <span className="flex items-center gap-1 text-green-600 font-medium">
               <MdCheckCircle size={16} />
-              Completed
+              Đã hoàn thành
             </span>
           )}
         </div>
@@ -171,4 +171,3 @@ export function SmartCourseCard({ course, userInfoId }: SmartCourseCardProps) {
     </div>
   );
 }
-

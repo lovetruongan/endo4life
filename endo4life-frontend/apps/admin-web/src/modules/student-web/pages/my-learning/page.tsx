@@ -16,7 +16,7 @@ export function MyLearningPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center gap-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="text-gray-600">Loading your courses...</p>
+          <p className="text-gray-600">Đang tải khóa học của bạn...</p>
         </div>
       </div>
     );
@@ -26,8 +26,8 @@ export function MyLearningPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="text-red-600 text-lg">Failed to load your courses</p>
-          <p className="text-gray-600">Please try again later</p>
+          <p className="text-red-600 text-lg">Không thể tải khóa học</p>
+          <p className="text-gray-600">Vui lòng thử lại sau</p>
         </div>
       </div>
     );
@@ -53,16 +53,16 @@ export function MyLearningPage() {
             </svg>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            No Enrolled Courses Yet
+            Chưa có khóa học nào
           </h2>
           <p className="text-gray-600 mb-6">
-            Start your learning journey by enrolling in a course from our library
+            Bắt đầu hành trình học tập bằng cách đăng ký khóa học từ thư viện của chúng tôi
           </p>
           <button
             onClick={() => navigate(STUDENT_WEB_ROUTES.RESOURCES)}
             className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
           >
-            Browse Courses
+            Khám phá khóa học
           </button>
         </div>
       </div>
@@ -72,9 +72,9 @@ export function MyLearningPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">My Learning</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Khóa học của tôi</h1>
         <p className="text-gray-600">
-          Track your progress and continue learning
+          Theo dõi tiến độ và tiếp tục học tập
         </p>
       </div>
 
