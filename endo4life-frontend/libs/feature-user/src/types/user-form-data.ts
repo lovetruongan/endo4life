@@ -20,6 +20,8 @@ export interface IUserFormData {
 
 export interface IUserInviteFormData {
   email: string;
+  firstName: string;
+  lastName: string;
   role?: UserInfoRole;
   state?: UserInfoState;
 }
@@ -52,16 +54,11 @@ export interface IUserUpdateAccountFormData {
     firstName?: string;
   };
   avatar?: File;
-  deleteCertificatePaths?: string[];
-  newCertificates?: File[];
   avatarLink?: string;
-  certificateLinks?: string[];
 }
 
 export interface IUpdateUserParameters {
   id: string;
   user?: IUserUpdateEntity;
   avatar?: File;
-  deleteCertificatePaths?: string[];
-  newCertificates?: File[];
 }

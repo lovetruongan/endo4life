@@ -1,6 +1,7 @@
 import {
   IImageCreateFormData,
   UploadZipModal,
+  ZipUploadProgress,
 } from '@endo4life/feature-image';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -16,9 +17,10 @@ import { useTranslation } from 'react-i18next';
 interface Props {
   loading?: boolean;
   onSubmit(data: IImageCreateFormData): void;
+  progress?: ZipUploadProgress | null;
 }
 
-export function ImageImportForm({ loading, onSubmit }: Props) {
+export function ImageImportForm({ loading, onSubmit, progress }: Props) {
   const { t } = useTranslation(['common', 'image']);
   const navigate = useNavigate();
 
@@ -80,7 +82,7 @@ export function ImageImportForm({ loading, onSubmit }: Props) {
                 {t('image:imageImportForm.subtitle')}
               </p>
             </div>
-            <UploadZipModal loading={loading} onSubmit={onSubmit} />
+            <UploadZipModal loading={loading} onSubmit={onSubmit} progress={progress} />
           </div>
         </div>
       </div>

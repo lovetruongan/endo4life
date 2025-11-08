@@ -73,6 +73,8 @@
     "title": "Mời người dùng",
     "emailFieldLabel": "Email",
     "emailFieldPlaceholder": "example@gmail.com",
+    "firstNamePlaceholder": "Nhập tên",
+    "lastNamePlaceholder": "Nhập họ",
     "roleFieldLabel": "Vai trò",
     "roleFieldPlaceholder": "Chọn vai trò",
     "statusFieldLabel": "Trạng thái",

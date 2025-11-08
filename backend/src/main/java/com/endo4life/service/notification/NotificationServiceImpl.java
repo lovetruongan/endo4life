@@ -28,12 +28,44 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    public void notifyUploadProgress(String sessionId, int processed, int total, String message) {
+        String destination = "/topic/zip-upload-progress/" + sessionId;
+        Map<String, Object> progressUpdate = Map.of(
+                "sessionId", sessionId,
+                "processed", processed,
+                "total", total,
+                "message", message,
+                "progress", total > 0 ? (processed * 100 / total) : 0);
+        log.info("Sending ZIP progress to {}: {}/{}", destination, processed, total);
+        try {
+            messagingTemplate.convertAndSend(destination, progressUpdate);
+        } catch (Exception e) {
+            log.error("Failed to send ZIP progress update: {}", e.getMessage());
+        }
+    }
+
+    @Override
     public void notifyUploadSuccess(String fileName) {
         try {
             messagingTemplate.convertAndSend("/topic/upload-status",
                     "Upload successful: " + fileName);
         } catch (Exception e) {
             log.error("Failed to send upload success notification: {}", e.getMessage());
+        }
+    }
+    
+    @Override
+    public void notifyUploadSuccess(String sessionId, String message) {
+        String destination = "/topic/zip-upload-progress/" + sessionId;
+        Map<String, Object> successUpdate = Map.of(
+                "sessionId", sessionId,
+                "status", "SUCCESS",
+                "message", message);
+        log.info("Sending ZIP success to {}: {}", destination, message);
+        try {
+            messagingTemplate.convertAndSend(destination, successUpdate);
+        } catch (Exception e) {
+            log.error("Failed to send ZIP success notification: {}", e.getMessage());
         }
     }
 
@@ -44,6 +76,21 @@ public class NotificationServiceImpl implements NotificationService {
                     "Upload failed: " + fileName + ", Error: " + errorMessage);
         } catch (Exception e) {
             log.error("Failed to send upload failure notification: {}", e.getMessage());
+        }
+    }
+    
+    @Override
+    public void notifyZipUploadFailure(String sessionId, String errorMessage) {
+        String destination = "/topic/zip-upload-progress/" + sessionId;
+        Map<String, Object> failureUpdate = Map.of(
+                "sessionId", sessionId,
+                "status", "FAILED",
+                "message", errorMessage);
+        log.error("Sending ZIP failure to {}: {}", destination, errorMessage);
+        try {
+            messagingTemplate.convertAndSend(destination, failureUpdate);
+        } catch (Exception e) {
+            log.error("Failed to send ZIP failure notification: {}", e.getMessage());
         }
     }
 }

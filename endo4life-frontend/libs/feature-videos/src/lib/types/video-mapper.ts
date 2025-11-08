@@ -176,12 +176,9 @@ export class VideoMapper implements IVideoMapper {
   toUploadResourceRequest(
     data: IVideoCreateFormData
   ): ResourceV1ApiCreateResourceRequest {
-    if (data.type === UploadType.Compressed) {
-      return {
-        type: data.type,
-        compressedFile: data.compressedFile,
-      };
-    }
+    // Note: ZIP/Compressed imports are now handled directly in video-api.ts
+    // by uploading to MinIO PROCESS bucket. This method is only used for
+    // non-ZIP bulk imports (IMAGE/VIDEO types with multiple files)
     return {
       type: data.type,
       files: data.files || [],
@@ -193,7 +190,6 @@ export class VideoMapper implements IVideoMapper {
           tag: data?.metadata[index]?.tag || [],
           detailTag: data?.metadata[index]?.detailTag || [],
         })) || [],
-      compressedFile: data.compressedFile,
     };
   }
 

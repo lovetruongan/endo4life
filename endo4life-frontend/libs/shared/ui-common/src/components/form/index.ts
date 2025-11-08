@@ -1,6 +1,7 @@
 export * from './form-input-date/form-input-date';
 export * from './form-input-certificate/form-input-certificate';
 export * from './form-input-certificate/form-input-new-certificate';
+export * from './form-certificate-manager';
 export * from './form-input-number/form-input-number';
 export * from './form-input-select/form-input-multi-select';
 export * from './form-input-select/form-input-select';

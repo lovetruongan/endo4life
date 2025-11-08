@@ -3,6 +3,7 @@ package com.endo4life.service.resource;
 import com.endo4life.domain.dto.ExtractedFile;
 import com.endo4life.service.file.FileService;
 import com.endo4life.service.minio.MinioService;
+import com.endo4life.service.notification.NotificationService;
 import com.endo4life.service.tag.TagService;
 import com.endo4life.utils.FileUtil;
 import com.endo4life.utils.ResourceUtil;
@@ -53,6 +54,7 @@ public class ResourceServiceImpl implements ResourceService {
     private final MinioService minioService;
     private final FileService fileService;
     private final TagService tagService;
+    private final NotificationService notificationService;
     private final ApplicationProperties applicationProperties;
     private ApplicationProperties.MinioConfiguration minioConfig;
 
@@ -309,38 +311,72 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public void handleCompressedFile(MultipartFile file) {
-        var fileMap = fileService.processCompressedFile(file);
-        log.info("Handle compressed file with {} files", fileMap.size());
-        List<MultipartFile> files = fileMap.keySet().stream().map(ExtractedFile::getFile).toList();
-        List<CreateResourceRequestDto> metadataList = fileMap.entrySet().stream().map(entry -> {
-            ExtractedFile extractedFile = entry.getKey();
-            CreateResourceRequestDto metadata = entry.getValue();
+        // Extract session ID from filename (format: sessionId_originalName.zip)
+        String fileName = file.getOriginalFilename();
+        String sessionId = extractSessionId(fileName);
 
-            List<String> tags = extractedFile.getTag();
-            if (CollectionUtils.isEmpty(tags)) {
-                return metadata;
-            }
-            List<String> regularTags = new ArrayList<>();
-            List<String> detailTags = new ArrayList<>();
+        try {
+            var fileMap = fileService.processCompressedFile(file);
+            int totalFiles = fileMap.size();
+            log.info("Handle compressed file with {} files, session: {}", totalFiles, sessionId);
 
-            for (String tag : tags) {
-                if (tagService.isDetailTag(tag)) {
-                    detailTags.add(tag);
-                } else {
-                    regularTags.add(tag);
+            // Notify start
+            notificationService.notifyUploadProgress(sessionId, 0, totalFiles,
+                    "Starting extraction...");
+
+            List<MultipartFile> files = fileMap.keySet().stream().map(ExtractedFile::getFile).toList();
+            List<CreateResourceRequestDto> metadataList = fileMap.entrySet().stream().map(entry -> {
+                ExtractedFile extractedFile = entry.getKey();
+                CreateResourceRequestDto metadata = entry.getValue();
+
+                List<String> tags = extractedFile.getTag();
+                if (CollectionUtils.isEmpty(tags)) {
+                    return metadata;
                 }
-            }
-            metadata.setTag(regularTags);
-            metadata.setDetailTag(detailTags);
+                List<String> regularTags = new ArrayList<>();
+                List<String> detailTags = new ArrayList<>();
 
-            return metadata;
-        }).toList();
-        handleMultipleFile(files, metadataList);
+                for (String tag : tags) {
+                    if (tagService.isDetailTag(tag)) {
+                        detailTags.add(tag);
+                    } else {
+                        regularTags.add(tag);
+                    }
+                }
+                metadata.setTag(regularTags);
+                metadata.setDetailTag(detailTags);
+
+                return metadata;
+            }).toList();
+
+            handleMultipleFile(files, metadataList, sessionId);
+
+            // Notify completion
+            notificationService.notifyUploadSuccess(sessionId, totalFiles + " files imported successfully");
+        } catch (Exception e) {
+            log.error("Failed to process compressed file: {}", e.getMessage(), e);
+            notificationService.notifyZipUploadFailure(sessionId, "Failed to process ZIP file: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    private String extractSessionId(String fileName) {
+        if (fileName != null && fileName.contains("_")) {
+            return fileName.substring(0, fileName.indexOf("_"));
+        }
+        return UUID.randomUUID().toString(); // Fallback
     }
 
     @Override
     public void handleMultipleFile(List<MultipartFile> files, List<CreateResourceRequestDto> metadataList) {
-        log.info("Handle multiple files: {}", files.size());
+        handleMultipleFile(files, metadataList, null);
+    }
+
+    private void handleMultipleFile(List<MultipartFile> files, List<CreateResourceRequestDto> metadataList,
+            String sessionId) {
+        int totalFiles = files.size();
+        log.info("Handle multiple files: {}, session: {}", totalFiles, sessionId);
+
         for (int i = 0; i < files.size(); i++) {
             MultipartFile file = files.get(i);
             CreateResourceRequestDto metadata = metadataList.get(i);
@@ -352,6 +388,13 @@ public class ResourceServiceImpl implements ResourceService {
             // Upload file to MinIO with progress tracking
             UUID id = UUID.randomUUID();
             String fileName = id + Constants.UNDERSCORE + file.getOriginalFilename();
+
+            // Send progress update
+            if (sessionId != null) {
+                int processed = i + 1;
+                notificationService.notifyUploadProgress(sessionId, processed, totalFiles,
+                        "Processing " + file.getOriginalFilename() + " (" + processed + "/" + totalFiles + ")");
+            }
 
             // Use chunked upload for compressed file extraction (always has progress)
             minioService.uploadChunk(file, bucketName, fileName);

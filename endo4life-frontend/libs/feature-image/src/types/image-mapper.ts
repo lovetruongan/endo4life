@@ -213,12 +213,9 @@ export class ImageMapper implements IImageMapper {
   toUploadResourceRequest(
     data: IImageCreateFormData
   ): ResourceV1ApiCreateResourceRequest {
-    if (data.type === UploadType.Compressed) {
-      return {
-        type: data.type,
-        compressedFile: data.compressedFile,
-      };
-    }
+    // Note: ZIP/Compressed imports are now handled directly in image-api.ts
+    // by uploading to MinIO PROCESS bucket. This method is only used for
+    // non-ZIP bulk imports (IMAGE/VIDEO types with multiple files)
     return {
       type: data.type,
       files: data.files || [],
@@ -230,7 +227,6 @@ export class ImageMapper implements IImageMapper {
           tag: data?.metadata[index]?.tag || [],
           detailTag: data?.metadata[index]?.detailTag || [],
         })) || [],
-      compressedFile: data.compressedFile,
     };
   }
 

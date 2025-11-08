@@ -34,6 +34,8 @@ export class UserMapper implements IUserMapper {
   toInviteRequestDto(data: IUserInviteFormData): InviteUserRequestDto {
     return {
       email: data.email,
+      firstName: data.firstName,
+      lastName: data.lastName,
       state: data.state as UserInfoState,
       role: data.role as UserInfoRole,
     };
@@ -50,7 +52,6 @@ export class UserMapper implements IUserMapper {
       state: dto.state,
       isUpdatedProfile: dto.isUpdatedProfile,
       avatarLink: dto.avatarLink,
-      certificateLinks: dto.certificateLinks,
       createdAt: dto.createdAt,
       createdBy: dto.createdBy,
       metadata: dto,
@@ -83,9 +84,7 @@ export class UserMapper implements IUserMapper {
         role: res?.role,
         state: res?.state,
       },
-      newCertificates: res?.certificate,
       avatarLink: res?.avatarLink,
-      certificateLinks: res?.metadata?.certificateLinks,
     };
   }
   toUpdateRequest(
@@ -96,8 +95,6 @@ export class UserMapper implements IUserMapper {
       id: data.id,
       user: data.user,
       avatar: data.avatar,
-      deleteCertificatePaths: data.deleteCertificatePaths,
-      newCertificates: data.newCertificates,
     };
   }
   toCreateRequestDto(data: IUserFormData): CreateUserRequestDto {

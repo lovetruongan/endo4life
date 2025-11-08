@@ -44,12 +44,6 @@ export function useHeaderItems() {
             link: STUDENT_WEB_ROUTES.RAG_ASK,
             isAuthRequired: true,
           },
-          {
-            id: 'common6',
-            label: t('navigation.txtAboutUs'),
-            name: 'ABOUT_US',
-            link: STUDENT_WEB_ROUTES.ABOUT_US,
-          },
         ],
       },
     ];

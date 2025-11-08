@@ -164,6 +164,39 @@ export class VideoApiImpl extends BaseApi implements IVideoApi {
 
   async importFileVideo(data: IVideoCreateFormData): Promise<void> {
     const config = await this.getApiConfiguration();
+    
+    // For ZIP files, upload directly to MinIO PROCESS bucket
+    // The webhook will automatically extract and create resources
+    if (data.type === UploadType.Compressed && data.compressedFile) {
+      const minioApi = new MinioV1Api(config);
+      
+      // Get presigned URL for PROCESS bucket
+      const presignedUrls = await minioApi.generatePreSignedUrls({
+        resourceType: ResourceType.Process,
+        numberOfUrls: 1,
+      });
+      
+      if (!presignedUrls || presignedUrls.length === 0) {
+        throw new Error('Failed to generate presigned URL');
+      }
+      
+      // Upload ZIP directly to MinIO
+      const response = await fetch(presignedUrls[0], {
+        method: 'PUT',
+        body: data.compressedFile,
+        headers: {
+          'Content-Type': 'application/zip',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to upload file: ${response.statusText}`);
+      }
+      
+      return;
+    }
+    
+    // For non-ZIP imports, use the regular createResource flow
     const api = new ResourceV1Api(config);
     const videoMapper = new VideoMapper();
     await api.createResource(videoMapper.toUploadResourceRequest(data));
