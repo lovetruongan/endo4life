@@ -26,6 +26,107 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
+ * @interface CertificateResponseDto
+ */
+export interface CertificateResponseDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof CertificateResponseDto
+     */
+    'id'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CertificateResponseDto
+     */
+    'title'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CertificateResponseDto
+     */
+    'description'?: string;
+    /**
+     * 
+     * @type {CertificateType}
+     * @memberof CertificateResponseDto
+     */
+    'type'?: CertificateType;
+    /**
+     * 
+     * @type {string}
+     * @memberof CertificateResponseDto
+     */
+    'filePath'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CertificateResponseDto
+     */
+    'fileUrl'?: string;
+    /**
+     * URL to preview image (PNG) for displaying certificate
+     * @type {string}
+     * @memberof CertificateResponseDto
+     */
+    'previewImageUrl'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CertificateResponseDto
+     */
+    'issuedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CertificateResponseDto
+     */
+    'expiresAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CertificateResponseDto
+     */
+    'userId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CertificateResponseDto
+     */
+    'courseId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CertificateResponseDto
+     */
+    'courseName'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CertificateResponseDto
+     */
+    'createdAt'?: string;
+}
+
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const CertificateType = {
+    Professional: 'PROFESSIONAL',
+    CourseCompletion: 'COURSE_COMPLETION'
+} as const;
+
+export type CertificateType = typeof CertificateType[keyof typeof CertificateType];
+
+
+/**
+ * 
+ * @export
  * @interface CommentCriteria
  */
 export interface CommentCriteria {
@@ -461,6 +562,43 @@ export const CourseState = {
 export type CourseState = typeof CourseState[keyof typeof CourseState];
 
 
+/**
+ * 
+ * @export
+ * @interface CreateCertificateRequestDto
+ */
+export interface CreateCertificateRequestDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateCertificateRequestDto
+     */
+    'title': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateCertificateRequestDto
+     */
+    'description'?: string;
+    /**
+     * MinIO object key (UUID) of the uploaded certificate file
+     * @type {string}
+     * @memberof CreateCertificateRequestDto
+     */
+    'filePath': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateCertificateRequestDto
+     */
+    'expiresAt'?: string;
+    /**
+     * Optional - if not provided, uses current user. Admin can create for other users.
+     * @type {string}
+     * @memberof CreateCertificateRequestDto
+     */
+    'userId'?: string;
+}
 /**
  * 
  * @export
@@ -3773,6 +3911,488 @@ export class ActuatorApi extends BaseAPI {
      */
     public actuatorHealth(options?: RawAxiosRequestConfig) {
         return ActuatorApiFp(this.configuration).actuatorHealth(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * CertificateV1Api - axios parameter creator
+ * @export
+ */
+export const CertificateV1ApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Create a professional certificate (admin or user uploading their own)
+         * @param {CreateCertificateRequestDto} createCertificateRequestDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createProfessionalCertificate: async (createCertificateRequestDto: CreateCertificateRequestDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createCertificateRequestDto' is not null or undefined
+            assertParamExists('createProfessionalCertificate', 'createCertificateRequestDto', createCertificateRequestDto)
+            const localVarPath = `/api/v1/certificates`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createCertificateRequestDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Delete a professional certificate (soft delete)
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteCertificate: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('deleteCertificate', 'id', id)
+            const localVarPath = `/api/v1/certificates/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get certificate by ID
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCertificateById: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getCertificateById', 'id', id)
+            const localVarPath = `/api/v1/certificates/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get course completion certificate for a user
+         * @param {string} courseId 
+         * @param {string} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCourseCertificate: async (courseId: string, userId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'courseId' is not null or undefined
+            assertParamExists('getCourseCertificate', 'courseId', courseId)
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('getCourseCertificate', 'userId', userId)
+            const localVarPath = `/api/v1/certificates/course/{courseId}/user/{userId}`
+                .replace(`{${"courseId"}}`, encodeURIComponent(String(courseId)))
+                .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get certificates for the current user or specified user (admin only)
+         * @param {string} [userId] 
+         * @param {CertificateType} [type] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserCertificates: async (userId?: string, type?: CertificateType, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/certificates`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
+
+            if (type !== undefined) {
+                localVarQueryParameter['type'] = type;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * CertificateV1Api - functional programming interface
+ * @export
+ */
+export const CertificateV1ApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = CertificateV1ApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Create a professional certificate (admin or user uploading their own)
+         * @param {CreateCertificateRequestDto} createCertificateRequestDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createProfessionalCertificate(createCertificateRequestDto: CreateCertificateRequestDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IdWrapperDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createProfessionalCertificate(createCertificateRequestDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CertificateV1Api.createProfessionalCertificate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Delete a professional certificate (soft delete)
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteCertificate(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteCertificate(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CertificateV1Api.deleteCertificate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Get certificate by ID
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCertificateById(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CertificateResponseDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCertificateById(id, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CertificateV1Api.getCertificateById']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Get course completion certificate for a user
+         * @param {string} courseId 
+         * @param {string} userId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCourseCertificate(courseId: string, userId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CertificateResponseDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCourseCertificate(courseId, userId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CertificateV1Api.getCourseCertificate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Get certificates for the current user or specified user (admin only)
+         * @param {string} [userId] 
+         * @param {CertificateType} [type] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getUserCertificates(userId?: string, type?: CertificateType, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<CertificateResponseDto>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getUserCertificates(userId, type, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['CertificateV1Api.getUserCertificates']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * CertificateV1Api - factory interface
+ * @export
+ */
+export const CertificateV1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = CertificateV1ApiFp(configuration)
+    return {
+        /**
+         * Create a professional certificate (admin or user uploading their own)
+         * @param {CertificateV1ApiCreateProfessionalCertificateRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createProfessionalCertificate(requestParameters: CertificateV1ApiCreateProfessionalCertificateRequest, options?: RawAxiosRequestConfig): AxiosPromise<IdWrapperDto> {
+            return localVarFp.createProfessionalCertificate(requestParameters.createCertificateRequestDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Delete a professional certificate (soft delete)
+         * @param {CertificateV1ApiDeleteCertificateRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteCertificate(requestParameters: CertificateV1ApiDeleteCertificateRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteCertificate(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get certificate by ID
+         * @param {CertificateV1ApiGetCertificateByIdRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCertificateById(requestParameters: CertificateV1ApiGetCertificateByIdRequest, options?: RawAxiosRequestConfig): AxiosPromise<CertificateResponseDto> {
+            return localVarFp.getCertificateById(requestParameters.id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get course completion certificate for a user
+         * @param {CertificateV1ApiGetCourseCertificateRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCourseCertificate(requestParameters: CertificateV1ApiGetCourseCertificateRequest, options?: RawAxiosRequestConfig): AxiosPromise<CertificateResponseDto> {
+            return localVarFp.getCourseCertificate(requestParameters.courseId, requestParameters.userId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get certificates for the current user or specified user (admin only)
+         * @param {CertificateV1ApiGetUserCertificatesRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserCertificates(requestParameters: CertificateV1ApiGetUserCertificatesRequest = {}, options?: RawAxiosRequestConfig): AxiosPromise<Array<CertificateResponseDto>> {
+            return localVarFp.getUserCertificates(requestParameters.userId, requestParameters.type, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * Request parameters for createProfessionalCertificate operation in CertificateV1Api.
+ * @export
+ * @interface CertificateV1ApiCreateProfessionalCertificateRequest
+ */
+export interface CertificateV1ApiCreateProfessionalCertificateRequest {
+    /**
+     * 
+     * @type {CreateCertificateRequestDto}
+     * @memberof CertificateV1ApiCreateProfessionalCertificate
+     */
+    readonly createCertificateRequestDto: CreateCertificateRequestDto
+}
+
+/**
+ * Request parameters for deleteCertificate operation in CertificateV1Api.
+ * @export
+ * @interface CertificateV1ApiDeleteCertificateRequest
+ */
+export interface CertificateV1ApiDeleteCertificateRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof CertificateV1ApiDeleteCertificate
+     */
+    readonly id: string
+}
+
+/**
+ * Request parameters for getCertificateById operation in CertificateV1Api.
+ * @export
+ * @interface CertificateV1ApiGetCertificateByIdRequest
+ */
+export interface CertificateV1ApiGetCertificateByIdRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof CertificateV1ApiGetCertificateById
+     */
+    readonly id: string
+}
+
+/**
+ * Request parameters for getCourseCertificate operation in CertificateV1Api.
+ * @export
+ * @interface CertificateV1ApiGetCourseCertificateRequest
+ */
+export interface CertificateV1ApiGetCourseCertificateRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof CertificateV1ApiGetCourseCertificate
+     */
+    readonly courseId: string
+
+    /**
+     * 
+     * @type {string}
+     * @memberof CertificateV1ApiGetCourseCertificate
+     */
+    readonly userId: string
+}
+
+/**
+ * Request parameters for getUserCertificates operation in CertificateV1Api.
+ * @export
+ * @interface CertificateV1ApiGetUserCertificatesRequest
+ */
+export interface CertificateV1ApiGetUserCertificatesRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof CertificateV1ApiGetUserCertificates
+     */
+    readonly userId?: string
+
+    /**
+     * 
+     * @type {CertificateType}
+     * @memberof CertificateV1ApiGetUserCertificates
+     */
+    readonly type?: CertificateType
+}
+
+/**
+ * CertificateV1Api - object-oriented interface
+ * @export
+ * @class CertificateV1Api
+ * @extends {BaseAPI}
+ */
+export class CertificateV1Api extends BaseAPI {
+    /**
+     * Create a professional certificate (admin or user uploading their own)
+     * @param {CertificateV1ApiCreateProfessionalCertificateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CertificateV1Api
+     */
+    public createProfessionalCertificate(requestParameters: CertificateV1ApiCreateProfessionalCertificateRequest, options?: RawAxiosRequestConfig) {
+        return CertificateV1ApiFp(this.configuration).createProfessionalCertificate(requestParameters.createCertificateRequestDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Delete a professional certificate (soft delete)
+     * @param {CertificateV1ApiDeleteCertificateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CertificateV1Api
+     */
+    public deleteCertificate(requestParameters: CertificateV1ApiDeleteCertificateRequest, options?: RawAxiosRequestConfig) {
+        return CertificateV1ApiFp(this.configuration).deleteCertificate(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get certificate by ID
+     * @param {CertificateV1ApiGetCertificateByIdRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CertificateV1Api
+     */
+    public getCertificateById(requestParameters: CertificateV1ApiGetCertificateByIdRequest, options?: RawAxiosRequestConfig) {
+        return CertificateV1ApiFp(this.configuration).getCertificateById(requestParameters.id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get course completion certificate for a user
+     * @param {CertificateV1ApiGetCourseCertificateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CertificateV1Api
+     */
+    public getCourseCertificate(requestParameters: CertificateV1ApiGetCourseCertificateRequest, options?: RawAxiosRequestConfig) {
+        return CertificateV1ApiFp(this.configuration).getCourseCertificate(requestParameters.courseId, requestParameters.userId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get certificates for the current user or specified user (admin only)
+     * @param {CertificateV1ApiGetUserCertificatesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CertificateV1Api
+     */
+    public getUserCertificates(requestParameters: CertificateV1ApiGetUserCertificatesRequest = {}, options?: RawAxiosRequestConfig) {
+        return CertificateV1ApiFp(this.configuration).getUserCertificates(requestParameters.userId, requestParameters.type, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

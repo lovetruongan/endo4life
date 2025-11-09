@@ -8,15 +8,22 @@ import {
   BaseApi,
   ResourceType,
   StorageApiImpl,
+  CertificateType,
 } from '@endo4life/data-access';
 import { EnvConfig } from '@endo4life/feature-config';
-import { Avatar, Button, TextField, CircularProgress } from '@mui/material';
+import { Avatar, Button, TextField, CircularProgress, Chip } from '@mui/material';
+import { FormCertificateManager } from '@endo4life/ui-common';
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { PiCamera } from 'react-icons/pi';
+import { PiCamera, PiCertificate, PiDownload } from 'react-icons/pi';
 import clsx from 'clsx';
-import { useNameInitial } from '@endo4life/feature-user';
+import {
+  useNameInitial,
+  useCertificates,
+  useCertificateUpload,
+  useCertificateDelete,
+} from '@endo4life/feature-user';
 
 // Helper class to use UserV1Api with proper base URL
 class UserApiHelper extends BaseApi {
@@ -42,12 +49,51 @@ export default function MyProfilePage() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
   const firstCharacterName = useNameInitial(authUserProfile);
+  
+  // Fetch certificates
+  const { data: certificates, isLoading: loadingCertificates } = useCertificates(authUserProfile?.id);
+  const uploadCertificate = useCertificateUpload();
+  const deleteCertificate = useCertificateDelete();
 
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     phoneNumber: '',
   });
+
+  // Certificate upload handler
+  const handleCertificateUpload = (files: File[]) => {
+    if (!authUserProfile?.id) return;
+    
+    uploadCertificate.mutate(
+      { userId: authUserProfile.id, files },
+      {
+        onSuccess: () => {
+          toast.success('Tải lên chứng chỉ thành công!');
+        },
+        onError: (error: any) => {
+          console.error('Upload error:', error);
+          toast.error('Không thể tải lên chứng chỉ');
+        },
+      }
+    );
+  };
+
+  // Certificate delete handler
+  const handleCertificateDelete = (certificateId: string) => {
+    deleteCertificate.mutate(
+      { certificateId, userId: authUserProfile?.id },
+      {
+        onSuccess: () => {
+          toast.success('Đã xóa chứng chỉ');
+        },
+        onError: (error: any) => {
+          console.error('Delete error:', error);
+          toast.error('Không thể xóa chứng chỉ');
+        },
+      }
+    );
+  };
 
   // Load user info on mount
   useEffect(() => {
@@ -347,6 +393,18 @@ export default function MyProfilePage() {
                 />
               </div>
             </div>
+          </div>
+
+          {/* Certificates Section */}
+          <div className="px-6 py-8 border-t border-gray-200">
+            <FormCertificateManager
+              label="Chứng chỉ của tôi"
+              userId={authUserProfile?.id}
+              certificates={certificates}
+              loading={loadingCertificates || uploadCertificate.isLoading || deleteCertificate.isLoading}
+              onUpload={handleCertificateUpload}
+              onDelete={handleCertificateDelete}
+            />
           </div>
 
           {/* Actions */}

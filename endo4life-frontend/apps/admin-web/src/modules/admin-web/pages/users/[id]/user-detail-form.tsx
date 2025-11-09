@@ -8,7 +8,7 @@ import {
   FormInputAvatar,
   PageHeaderUserDetail,
   FormInputSelect,
-  FormInputNewCertificate,
+  FormCertificateManager,
 } from '@endo4life/ui-common';
 import { Button } from '@endo4life/ui-common';
 import { useTranslation } from 'react-i18next';
@@ -21,9 +21,13 @@ import {
   UserDeleteConfirmDialog,
   useUserNewStatusOptions,
   useUserRoleOptions,
+  useCertificates,
+  useCertificateUpload,
+  useCertificateDelete,
 } from '@endo4life/feature-user';
 import { useToggle } from 'ahooks';
 import { stringUtils } from '@endo4life/util-common';
+import { toast } from 'react-toastify';
 interface Props {
   loading?: boolean;
   data?: IUserUpdateAccountFormData;
@@ -37,6 +41,46 @@ export function UserDetailForm({ loading, data, onSubmit }: Props) {
   const { options: roleOptions } = useUserRoleOptions();
   const { options: stateOptions } = useUserNewStatusOptions();
   const [open, openDialogAction] = useToggle(false);
+
+  // Certificate management
+  const { data: certificates, isLoading: loadingCertificates } = useCertificates(id);
+  const uploadCertificate = useCertificateUpload();
+  const deleteCertificate = useCertificateDelete();
+
+  const handleCertificateUpload = (files: File[]) => {
+    if (!id) {
+      toast.error('Không có ID người dùng');
+      return;
+    }
+    
+    uploadCertificate.mutate(
+      { userId: id, files },
+      {
+        onSuccess: () => {
+          toast.success('Tải lên chứng chỉ thành công!');
+        },
+        onError: (error: any) => {
+          console.error('Upload error:', error);
+          toast.error('Không thể tải lên chứng chỉ');
+        },
+      }
+    );
+  };
+
+  const handleCertificateDelete = (certificateId: string) => {
+    deleteCertificate.mutate(
+      { certificateId, userId: id },
+      {
+        onSuccess: () => {
+          toast.success('Đã xóa chứng chỉ');
+        },
+        onError: (error) => {
+          console.error('Delete error:', error);
+          toast.error('Không thể xóa chứng chỉ');
+        },
+      }
+    );
+  };
 
   const schema = yup.object({
     id: yup.string().optional().default(id),
@@ -83,7 +127,6 @@ export function UserDetailForm({ loading, data, onSubmit }: Props) {
           ),
         ),
     }),
-    newCertificates: yup.array().of(yup.mixed()).default([]).required(),
   });
 
   const { control, handleSubmit, formState, setValue, getValues } =
@@ -263,37 +306,15 @@ export function UserDetailForm({ loading, data, onSubmit }: Props) {
                   />
                 </div>
 
-                <Controller
-                  name="newCertificates"
-                  control={control}
-                  render={({ field: { onChange, value, name } }) => (
-                    <FormInputNewCertificate
-                      key={name}
-                      label={t('user:basicInfo.certificate')}
-                      value={value}
-                      onChange={onChange}
-                      certificateLinks={data?.certificateLinks || []}
-                      errMessage={formState.errors.newCertificates?.message}
-                      idUser={data?.id}
-                      className="flex flex-col"
-                      onRemoveLink={(link) => {
-                        const deletePaths = getValues('deleteCertificatePaths');
-
-                        const validDeletePaths = Array.isArray(deletePaths)
-                          ? deletePaths
-                          : [];
-
-                        const newLink = link.split('/').pop();
-
-                        if (newLink) {
-                          setValue('deleteCertificatePaths', [
-                            ...validDeletePaths,
-                            newLink,
-                          ]);
-                        }
-                      }}
-                    />
-                  )}
+                {/* New Certificate Management */}
+                <FormCertificateManager
+                  label={t('user:basicInfo.certificate')}
+                  userId={id}
+                  certificates={certificates}
+                  loading={loadingCertificates || uploadCertificate.isLoading || deleteCertificate.isLoading}
+                  onUpload={handleCertificateUpload}
+                  onDelete={handleCertificateDelete}
+                  className="flex flex-col"
                 />
               </div>
               <div id="security" className="grid gap-4">

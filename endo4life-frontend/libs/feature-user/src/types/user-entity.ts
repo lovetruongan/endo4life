@@ -16,7 +16,6 @@ export interface IUserEntity extends BaseEntity<UserResponseDto> {
   certificate?: File[];
   isUpdatedProfile?: boolean;
   avatarLink?: string;
-  certificateLinks?: string[];
 }
 
 export interface IUserUpdateEntity {

@@ -19,6 +19,10 @@ export default defineConfig({
 
   plugins: [react(), nxViteTsPaths()],
 
+  define: {
+    global: 'globalThis',
+  },
+
   // Uncomment this if you are using workers.
   // worker: {
   //  plugins: [ nxViteTsPaths() ],

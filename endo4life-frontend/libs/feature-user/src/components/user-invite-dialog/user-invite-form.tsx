@@ -30,6 +30,8 @@ export const UserInviteForm = ({
   data = {
     state: UserInfoState.Pending,
     email: '',
+    firstName: '',
+    lastName: '',
     role: UserInfoRole.Customer,
   },
   onSubmit,
@@ -55,6 +57,22 @@ export const UserInviteForm = ({
             t('user:basicInfo.email'),
           ),
           (val) => isEmail(val || ''),
+        ),
+      firstName: yup
+        .string()
+        .required(
+          t('common:txtRequiredField').replace(
+            '{{field_name}}',
+            t('user:basicInfo.firstName'),
+          ),
+        ),
+      lastName: yup
+        .string()
+        .required(
+          t('common:txtRequiredField').replace(
+            '{{field_name}}',
+            t('user:basicInfo.lastName'),
+          ),
         ),
       role: yup
         .mixed<UserInfoRole>()
@@ -116,6 +134,47 @@ export const UserInviteForm = ({
             );
           }}
         />
+
+        <div className="flex justify-between gap-4">
+          <Controller
+            name="firstName"
+            control={control}
+            render={({ field: { onChange, value, name } }) => {
+              return (
+                <FormInputText
+                  key={name}
+                  type="text"
+                  className="flex-1 text-gray-600"
+                  label={t('user:basicInfo.firstName')}
+                  placeholder={t('user:inviteForm.firstNamePlaceholder')}
+                  isRequired
+                  value={value}
+                  onChange={onChange}
+                  errMessage={formState.errors.firstName?.message}
+                />
+              );
+            }}
+          />
+          <Controller
+            name="lastName"
+            control={control}
+            render={({ field: { onChange, value, name } }) => {
+              return (
+                <FormInputText
+                  key={name}
+                  type="text"
+                  className="flex-1 text-gray-600"
+                  label={t('user:basicInfo.lastName')}
+                  placeholder={t('user:inviteForm.lastNamePlaceholder')}
+                  isRequired
+                  value={value}
+                  onChange={onChange}
+                  errMessage={formState.errors.lastName?.message}
+                />
+              );
+            }}
+          />
+        </div>
 
         <div className="flex justify-between gap-4">
           <Controller

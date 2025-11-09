@@ -9,23 +9,42 @@ import clsx from 'clsx';
 import { DoctorUserConversationFormInput } from './DoctorUserConversationFormInput';
 import { MediaGallery, mediaGalleryUtils } from '@endo4life/ui-common';
 import { arrayUtils } from '@endo4life/util-common';
+import { Link } from 'react-router-dom';
+import { STUDENT_WEB_ROUTES } from '@endo4life/feature-config';
+import { TbExternalLink } from 'react-icons/tb';
 
 interface IDoctorUserConversationBoxProps {
   conversation: IDoctorUserConversationEntity;
   children?: IDoctorUserConversationEntity[];
   onSubmit?: (formData: IDoctorUserConversationCreateFormData) => void;
+  replyAcceptable?: boolean;
 }
 
 export function DoctorUserConversationBox({
   conversation,
   children = [],
   onSubmit,
+  replyAcceptable = true,
 }: IDoctorUserConversationBoxProps) {
   const [openReplyBox, openReplyBoxToggle] = useToggle(false);
 
   const displayName = conversation.questionerInfo
     ? `${conversation.questionerInfo.firstName || ''} ${conversation.questionerInfo.lastName || ''}`.trim()
     : 'Người dùng';
+
+  // Generate resource link based on type and resourceId
+  const getResourceLink = () => {
+    if (!conversation.resourceId) return null;
+    
+    if (conversation.type === 'VIDEO') {
+      return STUDENT_WEB_ROUTES.RESOURCE_VIDEO.replace(':id', conversation.resourceId);
+    } else if (conversation.type === 'IMAGE') {
+      return STUDENT_WEB_ROUTES.RESOURCE_IMAGE.replace(':id', conversation.resourceId);
+    }
+    return null;
+  };
+
+  const resourceLink = getResourceLink();
 
   return (
     <div
@@ -61,6 +80,19 @@ export function DoctorUserConversationBox({
             )}
           </div>
           <span>{conversation.content}</span>
+          
+          {/* Resource link - only show for parent conversations */}
+          {!conversation.parentId && resourceLink && (
+            <Link
+              to={resourceLink}
+              className="flex items-center gap-1 text-xs text-blue-600 hover:underline mt-2"
+            >
+              <TbExternalLink size={14} />
+              <span>
+                View {conversation.type === 'VIDEO' ? 'video' : 'image'} resource
+              </span>
+            </Link>
+          )}
         </div>
         {/* attachment(s) box */}
         <div
@@ -76,7 +108,7 @@ export function DoctorUserConversationBox({
         </div>
         {/* action */}
         <div className="flex items-start">
-          {!conversation.parentId && (
+          {!conversation.parentId && replyAcceptable && (
             <button
               type="button"
               title="reply-button"

@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 import { IoIosLogOut } from 'react-icons/io';
 import { PiGearSix, PiUserCircle } from 'react-icons/pi';
+import { TbMessage2Question } from 'react-icons/tb';
 import { Link } from 'react-router-dom';
 
 interface IProfileMenu {
@@ -58,8 +59,19 @@ export default function ProfileMenu({ opened }: IProfileMenu) {
           </div>
         </div>
         <Link
-          to={STUDENT_WEB_ROUTES.MY_PROFILE}
+          to={STUDENT_WEB_ROUTES.MY_QUESTIONS}
           className="flex items-center w-full gap-3 px-4 py-2 mt-2 hover:bg-slate-100"
+        >
+          <TbMessage2Question size={20} color="gray" />
+        <span className="flex-auto text-sm text-left">
+          {userProfile?.roles?.[0] === 'SPECIALIST'
+            ? 'Assigned Questions'
+            : t('navigation.txtMenuItemQ&A')}
+        </span>
+        </Link>
+        <Link
+          to={STUDENT_WEB_ROUTES.MY_PROFILE}
+          className="flex items-center w-full gap-3 px-4 py-2 hover:bg-slate-100"
         >
           <PiUserCircle size={20} color="gray" />
           <span className="flex-auto text-sm text-left">

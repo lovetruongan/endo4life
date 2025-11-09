@@ -5,7 +5,7 @@ import { FaUser } from 'react-icons/fa';
 import { IoMdSettings } from 'react-icons/io';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
-import { TbLogout2 } from 'react-icons/tb';
+import { TbLogout2, TbMessage2Question } from 'react-icons/tb';
 import { Link } from 'react-router-dom';
 
 interface IProfileMenu {
@@ -47,8 +47,19 @@ export default function ProfileMenu({ opened }: IProfileMenu) {
           </div>
         </div>
         <Link
-          to={STUDENT_WEB_ROUTES.MY_PROFILE}
+          to={STUDENT_WEB_ROUTES.MY_QUESTIONS}
           className="flex items-center w-full gap-4 px-4 py-2 mt-2 hover:bg-slate-100"
+        >
+          <TbMessage2Question color="gray" />
+          <span className="flex-auto text-sm text-left">
+            {userProfile?.roles?.[0] === 'SPECIALIST'
+              ? 'Assigned Questions'
+              : t('navigation.txtMenuItemQ&A')}
+          </span>
+        </Link>
+        <Link
+          to={STUDENT_WEB_ROUTES.MY_PROFILE}
+          className="flex items-center w-full gap-4 px-4 py-2 hover:bg-slate-100"
         >
           <FaUser color="gray" />
           <span className="flex-auto text-sm text-left">

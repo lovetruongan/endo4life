@@ -3,12 +3,17 @@ import { ImageApiImpl } from '../api';
 import { REACT_QUERY_KEYS } from '../constants';
 import { IImageCreateFormData } from '../types';
 
+interface ImportParams {
+  data: IImageCreateFormData;
+  sessionId?: string;
+}
+
 export function useImageImport() {
   const client = useQueryClient();
   const mutation = useMutation({
-    mutationFn: async (data: IImageCreateFormData) => {
+    mutationFn: async ({ data, sessionId }: ImportParams) => {
       const api = new ImageApiImpl();
-      return api.importFileImage(data);
+      return api.importFileImage(data, sessionId);
     },
     onSuccess(data) {
       client.invalidateQueries([REACT_QUERY_KEYS.CREATE_IMAGE]);

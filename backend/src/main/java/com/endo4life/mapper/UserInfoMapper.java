@@ -38,11 +38,13 @@ public abstract class UserInfoMapper {
     @Mapping(target = "username", source = "email", qualifiedByName = "emailToUsername")
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "userRegistrationCourses", ignore = true)
+    @Mapping(target = "certificates", ignore = true)
     public abstract UserInfo toUserInfo(CreateUserRequestDto createUserRequestDto);
 
     @Mapping(target = "username", source = "email", qualifiedByName = "emailToUsername")
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "userRegistrationCourses", ignore = true)
+    @Mapping(target = "certificates", ignore = true)
     public abstract UserInfo toUserInfo(InviteUserRequestDto inviteUserRequestDto);
 
     @Mapping(target = "createdAt", source = "createdAt", qualifiedByName = "toOffsetDateTime")
@@ -69,6 +71,7 @@ public abstract class UserInfoMapper {
     @Mapping(target = "disabledAt", ignore = true)
     @Mapping(target = "isDeleted", ignore = true)
     @Mapping(target = "userRegistrationCourses", ignore = true)
+    @Mapping(target = "certificates", ignore = true)
     public abstract void updateUserInfo(@MappingTarget UserInfo userInfo,
             UpdateUserRequestDto updateUserRequestDto);
 

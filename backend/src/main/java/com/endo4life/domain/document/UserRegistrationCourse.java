@@ -17,6 +17,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -48,6 +49,9 @@ public class UserRegistrationCourse extends AbstractEntity {
 
     @Column(name = "is_completed_course")
     private Boolean isCompletedCourse;
+
+    @Column(name = "course_certificate_id")
+    private UUID courseCertificateId; // Links to Certificate entity for completion certificate
 
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = false)

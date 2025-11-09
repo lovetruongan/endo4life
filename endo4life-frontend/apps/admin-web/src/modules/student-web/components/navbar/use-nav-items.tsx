@@ -64,7 +64,7 @@ export function useNavItems() {
           },
           {
             label: t('navigation.txtMenuItemQ&A'),
-            link: STUDENT_WEB_ROUTES.HOME,
+            link: STUDENT_WEB_ROUTES.MY_QUESTIONS,
             icon: TbMessage2Question,
           },
           {

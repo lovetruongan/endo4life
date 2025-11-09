@@ -19,13 +19,15 @@ import {
   formatFileSize,
   getImageDimensions,
 } from '@endo4life/util-common';
+import { ZipUploadProgress } from '../../hooks/use-zip-upload-progress';
 
 interface Props {
   loading?: boolean;
   onSubmit(data: IImageCreateFormData): void;
+  progress?: ZipUploadProgress | null;
 }
 
-export function UploadZipModal({ loading, onSubmit }: Props) {
+export function UploadZipModal({ loading, onSubmit, progress }: Props) {
   const { t } = useTranslation(['common', 'image']);
   const imageMapper = new ImageMapper();
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -99,6 +101,40 @@ export function UploadZipModal({ loading, onSubmit }: Props) {
           </div>
         </div>
       )}
+      
+      {/* Progress Display */}
+      {progress && progress.status === 'PROCESSING' && (
+        <div className="space-y-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-blue-900">Processing ZIP file...</span>
+            <span className="text-sm text-blue-700">
+              {progress.processed || 0}/{progress.total || 0}
+            </span>
+          </div>
+          <div className="w-full bg-blue-200 rounded-full h-2.5">
+            <div
+              className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+              style={{ width: `${progress.progress || 0}%` }}
+            />
+          </div>
+          {progress.message && (
+            <p className="text-xs text-blue-700">{progress.message}</p>
+          )}
+        </div>
+      )}
+      
+      {progress && progress.status === 'SUCCESS' && (
+        <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+          <p className="text-sm font-medium text-green-900">✓ {progress.message}</p>
+        </div>
+      )}
+      
+      {progress && progress.status === 'FAILED' && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-sm font-medium text-red-900">✗ {progress.message}</p>
+        </div>
+      )}
+      
       <Button
         type="submit"
         text={t('image:imageImportZipModal.uploadZip')}

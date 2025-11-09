@@ -214,6 +214,48 @@ public class UserInfoServiceImpl implements UserInfoService {
                 .findByEmailIgnoreCase(kcUser.getEmail())
                 .orElseThrow(UserNotFoundException::new);
 
+        // Sync profile data from Keycloak if user was invited and completed their
+        // profile
+        boolean needsSync = false;
+        if (Boolean.FALSE.equals(userInfo.getIsUpdatedProfile())) {
+            // Check if Keycloak has data that our DB doesn't have (user completed profile
+            // in Keycloak)
+            boolean keycloakHasFirstName = StringUtils.isNotBlank(kcUser.getFirstName());
+            boolean keycloakHasLastName = StringUtils.isNotBlank(kcUser.getLastName());
+            boolean dbHasFirstName = StringUtils.isNotBlank(userInfo.getFirstName());
+            boolean dbHasLastName = StringUtils.isNotBlank(userInfo.getLastName());
+
+            // Sync if Keycloak has data and DB doesn't, OR if the data is different
+            if ((keycloakHasFirstName && !dbHasFirstName) ||
+                    (keycloakHasLastName && !dbHasLastName) ||
+                    (keycloakHasFirstName && !kcUser.getFirstName().equals(userInfo.getFirstName())) ||
+                    (keycloakHasLastName && !kcUser.getLastName().equals(userInfo.getLastName()))) {
+
+                if (keycloakHasFirstName) {
+                    userInfo.setFirstName(kcUser.getFirstName());
+                }
+                if (keycloakHasLastName) {
+                    userInfo.setLastName(kcUser.getLastName());
+                }
+                userInfo.setIsUpdatedProfile(Boolean.TRUE);
+                userInfo.setState(UserInfoState.ACTIVE);
+                needsSync = true;
+                log.info("Synced profile from Keycloak for invited user: {}", userInfo.getEmail());
+            }
+        }
+
+        // Also sync username from Keycloak if it changed
+        if (StringUtils.isNotBlank(kcUser.getUsername()) &&
+                !kcUser.getUsername().equals(userInfo.getUsername())) {
+            userInfo.setUsername(kcUser.getUsername());
+            needsSync = true;
+            log.info("Synced username from Keycloak: {} -> {}", userInfo.getUsername(), kcUser.getUsername());
+        }
+
+        if (needsSync) {
+            userInfoRepository.save(userInfo);
+        }
+
         return userInfoMapper.toUserResponseDto(userInfo);
     }
 
@@ -326,6 +368,13 @@ public class UserInfoServiceImpl implements UserInfoService {
 
             userInfo.setCertificatePath(currentCertificates);
             userInfo.setUpdatedBy(UserContextHolder.getEmail().orElse(Constants.SYSTEM));
+
+            // Mark profile as updated if this is the first update
+            if (Boolean.FALSE.equals(userInfo.getIsUpdatedProfile())) {
+                userInfo.setIsUpdatedProfile(Boolean.TRUE);
+                log.info("Marking profile as updated for user: {}", id);
+            }
+
             userInfoRepository.saveAndFlush(userInfo);
 
             log.info("Successfully updated user: {}", id);
@@ -368,6 +417,8 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         userInfo.setFirstName(updatedFirstName);
         userInfo.setLastName(updatedLastname);
+        userInfo.setIsUpdatedProfile(Boolean.TRUE);
+        userInfo.setState(UserInfoState.ACTIVE);
         userInfoRepository.save(userInfo);
     }
 

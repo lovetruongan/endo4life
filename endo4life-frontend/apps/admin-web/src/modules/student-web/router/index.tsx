@@ -10,14 +10,15 @@ import LibraryPageError from '../pages/library/error';
 import LibraryPageLoading from '../pages/library/loading';
 import LibraryPageLayout from '../pages/library/layout';
 import { ResourcesPageLayout } from '../pages/resources/layout';
-import AboutUsPageError from '../pages/about-us/error';
-import AboutUsLoading from '../pages/about-us/loading';
 import MyLearningPageError from '../pages/my-learning/error';
 import MyLearningPageLoading from '../pages/my-learning/loading';
 import MyLearningPageLayout from '../pages/my-learning/layout';
 import WatchHistoryPageError from '../pages/watch-history/error';
 import WatchHistoryPageLoading from '../pages/watch-history/loading';
 import WatchHistoryPageLayout from '../pages/watch-history/layout';
+import MyQuestionsPageError from '../pages/my-questions/error';
+import MyQuestionsPageLoading from '../pages/my-questions/loading';
+import MyQuestionsPageLayout from '../pages/my-questions/layout';
 
 const HomePage = lazy(() => import('../pages/home/page'));
 const ResourcesPage = lazy(() => import('../pages/resources/page'));
@@ -34,19 +35,23 @@ const EntranceTestPage = lazy(
   () => import('../pages/resources/courses/[courseId]/entrance-test/page'),
 );
 const LecturePlayerPage = lazy(
-  () => import('../pages/resources/courses/[courseId]/lectures/[lectureId]/page'),
+  () =>
+    import('../pages/resources/courses/[courseId]/lectures/[lectureId]/page'),
 );
 const LectureReviewPage = lazy(
-  () => import('../pages/resources/courses/[courseId]/lectures/[lectureId]/review/page'),
+  () =>
+    import(
+      '../pages/resources/courses/[courseId]/lectures/[lectureId]/review/page'
+    ),
 );
 const FinalExamPage = lazy(
   () => import('../pages/resources/courses/[courseId]/final-exam/page'),
 );
 
-const AboutUsPage = lazy(() => import('../pages/about-us/page'));
 const LibraryPage = lazy(() => import('../pages/library/page'));
 const MyLearningPage = lazy(() => import('../pages/my-learning/page'));
 const WatchHistoryPage = lazy(() => import('../pages/watch-history/page'));
+const MyQuestionsPage = lazy(() => import('../pages/my-questions/page'));
 const MyProfilePage = lazy(() => import('../pages/my-profile/page'));
 const LoginPage = lazy(() => import('../pages/login/page'));
 
@@ -248,16 +253,26 @@ export const studentWebRouter = createBrowserRouter([
         ],
       },
 
-      // ABOUT_US
+      // MY_QUESTIONS
       {
-        path: STUDENT_WEB_ROUTES.ABOUT_US,
-        index: true,
-        errorElement: <AboutUsPageError />,
+        path: STUDENT_WEB_ROUTES.MY_QUESTIONS,
         element: (
-          <Suspense fallback={<AboutUsLoading />}>
-            <AboutUsPage />
-          </Suspense>
+          <ProtectedRoute roles={[]}>
+            <MyQuestionsPageLayout />
+          </ProtectedRoute>
         ),
+        children: [
+          {
+            path: STUDENT_WEB_ROUTES.MY_QUESTIONS,
+            index: true,
+            errorElement: <MyQuestionsPageError />,
+            element: (
+              <Suspense fallback={<MyQuestionsPageLoading />}>
+                <MyQuestionsPage />
+              </Suspense>
+            ),
+          },
+        ],
       },
 
       // MY_PROFILE

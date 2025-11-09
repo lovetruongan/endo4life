@@ -14,6 +14,7 @@ import NotificationMenu from './notification-menu';
 import ProfileMenu from './profile-menu';
 import { useHeaderItems } from './use-header-items';
 import { useNameInitial } from '@endo4life/feature-user';
+import { useNotifications } from '../../hooks/use-notifications';
 
 const MENUS = {
   PROFILE: 'profile',
@@ -31,6 +32,7 @@ export default function Header() {
 
   const { menuSections } = useHeaderItems();
   const firstCharacterName = useNameInitial(userProfile);
+  const { unreadCount } = useNotifications();
 
   useClickAway(
     (evt) => {
@@ -129,7 +131,11 @@ export default function Header() {
                 'bg-slate-200': openMenu === MENUS.NOTIFICATION,
               })}
             >
-              <Badge badgeContent={5} color="error" invisible={false}>
+              <Badge
+                badgeContent={unreadCount}
+                color="error"
+                invisible={unreadCount === 0}
+              >
                 <VscBell size={20} color="gray" />
               </Badge>
             </button>

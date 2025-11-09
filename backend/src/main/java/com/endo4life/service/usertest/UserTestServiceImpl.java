@@ -2,6 +2,7 @@ package com.endo4life.service.usertest;
 
 import com.endo4life.domain.document.*;
 import com.endo4life.repository.*;
+import com.endo4life.service.certificate.CertificateService;
 import com.endo4life.service.minio.MinioService;
 import com.endo4life.web.rest.model.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -34,6 +35,7 @@ public class UserTestServiceImpl implements UserTestService {
     private final UserProgressCourseSectionRepository userProgressCourseSectionRepository;
     private final MinioService minioService;
     private final ObjectMapper objectMapper;
+    private final CertificateService certificateService;
 
     private static final int DEFAULT_PASSING_SCORE = 70; // 70%
 
@@ -496,6 +498,19 @@ public class UserTestServiceImpl implements UserTestService {
             case "FINAL_EXAM_COURSE":
                 registration.setIsCompletedFinalCourseTest(true);
                 registration.setIsCompletedCourse(true);
+
+                // Generate course completion certificate
+                try {
+                    Certificate certificate = certificateService.generateCourseCompletionCertificate(userInfo, course);
+                    registration.setCourseCertificateId(certificate.getId());
+                    log.info("Generated course completion certificate {} for user {} in course {}",
+                            certificate.getId(), userInfo.getId(), course.getId());
+                } catch (Exception e) {
+                    log.error("Failed to generate course completion certificate for user {} in course {}: {}",
+                            userInfo.getId(), course.getId(), e.getMessage(), e);
+                    // Continue even if certificate generation fails
+                }
+
                 log.info("Updated final exam completion for user {} in course {}", userInfo.getId(), course.getId());
                 break;
 

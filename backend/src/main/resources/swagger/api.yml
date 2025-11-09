@@ -789,6 +789,116 @@ paths:
               schema:
                 $ref: '#/components/schemas/IdWrapperDto'
 
+  # Certificate APIs
+  /api/v1/certificates:
+    get:
+      description: Get certificates for the current user or specified user (admin only)
+      operationId: getUserCertificates
+      tags:
+        - 'certificate-v1'
+      parameters:
+        - name: userId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: type
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/CertificateType'
+      responses:
+        200:
+          description: Certificates fetched successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CertificateResponseDto'
+    post:
+      description: Create a professional certificate (admin or user uploading their own)
+      operationId: createProfessionalCertificate
+      tags:
+        - 'certificate-v1'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCertificateRequestDto'
+      responses:
+        201:
+          description: Certificate created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdWrapperDto'
+
+  /api/v1/certificates/{id}:
+    get:
+      description: Get certificate by ID
+      operationId: getCertificateById
+      tags:
+        - 'certificate-v1'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Certificate found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CertificateResponseDto'
+    delete:
+      description: Delete a professional certificate (soft delete)
+      operationId: deleteCertificate
+      tags:
+        - 'certificate-v1'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: Certificate deleted successfully
+
+  /api/v1/certificates/course/{courseId}/user/{userId}:
+    get:
+      description: Get course completion certificate for a user
+      operationId: getCourseCertificate
+      tags:
+        - 'certificate-v1'
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Course certificate found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CertificateResponseDto'
+
   # Webhook APIs
   /api/v1/webhooks/minio:
     post:
@@ -2238,6 +2348,74 @@ components:
           type: string
         avatarUrl:
           type: string
+
+    # Certificate schemas
+    CertificateResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          $ref: '#/components/schemas/CertificateType'
+        filePath:
+          type: string
+        fileUrl:
+          type: string
+        previewImageUrl:
+          type: string
+          description: URL to preview image (PNG) for displaying certificate
+        issuedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        userId:
+          type: string
+          format: uuid
+        courseId:
+          type: string
+          format: uuid
+        courseName:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    CreateCertificateRequestDto:
+      type: object
+      required:
+        - title
+        - filePath
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        filePath:
+          type: string
+          description: MinIO object key (UUID) of the uploaded certificate file
+        fileType:
+          type: string
+          description: MIME type of the uploaded file (e.g., application/pdf, image/jpeg, image/png)
+        expiresAt:
+          type: string
+          format: date-time
+        userId:
+          type: string
+          format: uuid
+          description: Optional - if not provided, uses current user. Admin can create for other users.
+
+    CertificateType:
+      type: string
+      enum:
+        - PROFESSIONAL
+        - COURSE_COMPLETION
 
     # Test schemas
     TestResponseDto:

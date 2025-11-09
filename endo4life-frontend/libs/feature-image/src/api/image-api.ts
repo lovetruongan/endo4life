@@ -29,7 +29,7 @@ export interface IImageApi {
   createImage(data: IImageCreateFormData): Promise<void>;
   deleteImage(id: string): Promise<void>;
   deleteImages(ids: string[]): Promise<void>;
-  importFileImage(data: IImageCreateFormData): Promise<void>;
+  importFileImage(data: IImageCreateFormData, sessionId?: string): Promise<void>;
   getImageById(imageId: string): Promise<IResponse<IImageEntity>>;
 }
 
@@ -271,8 +271,52 @@ export class ImageApiImpl extends BaseApi implements IImageApi {
     }
   }
 
-  async importFileImage(data: IImageCreateFormData): Promise<void> {
+  async importFileImage(data: IImageCreateFormData, sessionId?: string): Promise<void> {
     const config = await this.getApiConfiguration();
+    
+    // For ZIP files, upload directly to MinIO PROCESS bucket
+    // The webhook will automatically extract and create resources
+    if (data.type === UploadType.Compressed && data.compressedFile) {
+      const minioApi = new MinioV1Api(config);
+      
+      // Get presigned URL for PROCESS bucket
+      const presignedUrls = await minioApi.generatePreSignedUrls({
+        resourceType: ResourceType.Process,
+        numberOfUrls: 1,
+      });
+      
+      if (!presignedUrls || presignedUrls.length === 0) {
+        throw new Error('Failed to generate presigned URL');
+      }
+      
+      // Rename file to include session ID: sessionId_originalName.zip
+      // This allows the backend to send progress updates to the correct WebSocket topic
+      let fileToUpload = data.compressedFile;
+      if (sessionId) {
+        const originalName = data.compressedFile.name;
+        const newName = `${sessionId}_${originalName}`;
+        fileToUpload = new File([data.compressedFile], newName, {
+          type: data.compressedFile.type,
+        });
+      }
+      
+      // Upload ZIP directly to MinIO
+      const response = await fetch(presignedUrls[0], {
+        method: 'PUT',
+        body: fileToUpload,
+        headers: {
+          'Content-Type': 'application/zip',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to upload file: ${response.statusText}`);
+      }
+      
+      return;
+    }
+    
+    // For non-ZIP imports, use the regular createResource flow
     const api = new ResourceV1Api(config);
     await api.createResource(ImageMapper.getInstance().toUploadResourceRequest(data));
     return;

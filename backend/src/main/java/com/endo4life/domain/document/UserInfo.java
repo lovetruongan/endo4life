@@ -81,6 +81,9 @@ public class UserInfo extends AbstractEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<UserRegistrationCourse> userRegistrationCourses = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Certificate> certificates = new ArrayList<>();
+
     @PrePersist
     public void prePersist() {
         if (this.isUpdatedProfile == null) {

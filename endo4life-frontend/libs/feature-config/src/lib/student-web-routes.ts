@@ -13,8 +13,8 @@ export const STUDENT_WEB_ROUTES = {
   COURSE_LECTURE_REVIEW: '/resources/courses/:courseId/lectures/:lectureId/review',
   COURSE_FINAL_EXAM: '/resources/courses/:courseId/final-exam',
   MY_LIBRARY: '/my-library',
-  ABOUT_US: '/about-us',
   MY_PROFILE: '/my-profile',
+  MY_QUESTIONS: '/my-questions',
   NOT_FOUND: '/not-found',
   // RAG Routes
   RAG: '/rag',
