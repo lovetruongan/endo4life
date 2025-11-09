@@ -17,6 +17,7 @@ import {
 
 interface IDoctorUserConversationSectionProps {
   discussAcceptable?: boolean;
+  replyAcceptable?: boolean;
   data?: IDoctorUserConversationEntity[];
   loading?: boolean;
   onRefresh?: () => void;
@@ -24,6 +25,7 @@ interface IDoctorUserConversationSectionProps {
 
 export function DoctorUserConversationSection({
   discussAcceptable,
+  replyAcceptable = true,
   data = [],
   loading,
   onRefresh,
@@ -94,6 +96,7 @@ export function DoctorUserConversationSection({
                     conversation={conversation}
                     children={childrenConversations}
                     onSubmit={createConversation}
+                    replyAcceptable={replyAcceptable}
                   />
                 );
               })}

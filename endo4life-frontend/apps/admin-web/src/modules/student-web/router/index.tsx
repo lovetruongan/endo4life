@@ -16,6 +16,9 @@ import MyLearningPageLayout from '../pages/my-learning/layout';
 import WatchHistoryPageError from '../pages/watch-history/error';
 import WatchHistoryPageLoading from '../pages/watch-history/loading';
 import WatchHistoryPageLayout from '../pages/watch-history/layout';
+import MyQuestionsPageError from '../pages/my-questions/error';
+import MyQuestionsPageLoading from '../pages/my-questions/loading';
+import MyQuestionsPageLayout from '../pages/my-questions/layout';
 
 const HomePage = lazy(() => import('../pages/home/page'));
 const ResourcesPage = lazy(() => import('../pages/resources/page'));
@@ -48,6 +51,7 @@ const FinalExamPage = lazy(
 const LibraryPage = lazy(() => import('../pages/library/page'));
 const MyLearningPage = lazy(() => import('../pages/my-learning/page'));
 const WatchHistoryPage = lazy(() => import('../pages/watch-history/page'));
+const MyQuestionsPage = lazy(() => import('../pages/my-questions/page'));
 const MyProfilePage = lazy(() => import('../pages/my-profile/page'));
 const LoginPage = lazy(() => import('../pages/login/page'));
 
@@ -243,6 +247,28 @@ export const studentWebRouter = createBrowserRouter([
             element: (
               <Suspense fallback={<LibraryPageLoading />}>
                 <LibraryPage />
+              </Suspense>
+            ),
+          },
+        ],
+      },
+
+      // MY_QUESTIONS
+      {
+        path: STUDENT_WEB_ROUTES.MY_QUESTIONS,
+        element: (
+          <ProtectedRoute roles={[]}>
+            <MyQuestionsPageLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            path: STUDENT_WEB_ROUTES.MY_QUESTIONS,
+            index: true,
+            errorElement: <MyQuestionsPageError />,
+            element: (
+              <Suspense fallback={<MyQuestionsPageLoading />}>
+                <MyQuestionsPage />
               </Suspense>
             ),
           },
