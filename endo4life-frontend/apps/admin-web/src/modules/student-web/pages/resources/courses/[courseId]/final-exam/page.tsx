@@ -8,7 +8,7 @@ import {
 import { StudentTestContainer } from '@endo4life/feature-resources';
 import { STUDENT_WEB_ROUTES } from '@endo4life/feature-config';
 import { toast } from 'react-toastify';
-import { MdEmojiEvents, MdDownload } from 'react-icons/md';
+import { MdEmojiEvents, MdDownload, MdWarning, MdSchool, MdGpsFixed, MdCheck } from 'react-icons/md';
 import { useState } from 'react';
 
 export function FinalExamPage() {
@@ -37,7 +37,7 @@ export function FinalExamPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center max-w-md">
-          <div className="text-yellow-600 text-6xl mb-4">⚠️</div>
+          <MdWarning className="text-yellow-600 mx-auto mb-4" size={72} />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Lectures Not Complete
           </h2>
@@ -82,7 +82,7 @@ export function FinalExamPage() {
   const handleTestComplete = (result: any) => {
     if (result.passed) {
       setShowCongratulations(true);
-      toast.success('🎉 Congratulations! You passed the final exam and completed the course!', {
+      toast.success('Congratulations! You passed the final exam and completed the course!', {
         position: 'top-right',
         autoClose: 10000,
       });
@@ -122,7 +122,7 @@ export function FinalExamPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center max-w-md">
-          <div className="text-red-600 text-6xl mb-4">⚠️</div>
+          <MdWarning className="text-red-600 mx-auto mb-4" size={72} />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Failed to Load Final Exam
           </h2>
@@ -168,22 +168,22 @@ export function FinalExamPage() {
               {/* Achievement Stats */}
               <div className="grid grid-cols-3 gap-4 mb-8">
                 <div className="bg-blue-50 rounded-lg p-4">
-                  <p className="text-3xl font-bold text-blue-600">✓</p>
+                  <MdCheck className="text-3xl font-bold text-blue-600 mx-auto" size={32} />
                   <p className="text-sm text-gray-600 mt-2">Entrance Test</p>
                 </div>
                 <div className="bg-green-50 rounded-lg p-4">
-                  <p className="text-3xl font-bold text-green-600">✓</p>
+                  <MdCheck className="text-3xl font-bold text-green-600 mx-auto" size={32} />
                   <p className="text-sm text-gray-600 mt-2">All Lectures</p>
                 </div>
                 <div className="bg-purple-50 rounded-lg p-4">
-                  <p className="text-3xl font-bold text-purple-600">✓</p>
+                  <MdCheck className="text-3xl font-bold text-purple-600 mx-auto" size={32} />
                   <p className="text-sm text-gray-600 mt-2">Final Exam</p>
                 </div>
               </div>
 
               {/* Certificate Badge */}
               <div className="bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl p-6 mb-6 border-2 border-blue-300">
-                <p className="text-2xl mb-2">🎓</p>
+                <MdSchool className="mx-auto mb-2 text-blue-700" size={40} />
                 <p className="font-semibold text-gray-900">Certificate of Completion</p>
                 <p className="text-sm text-gray-600 mt-2">
                   Awarded to {userProfile?.firstName} {userProfile?.lastName}
@@ -228,7 +228,7 @@ export function FinalExamPage() {
       {/* Header Notice */}
       <div className="bg-purple-50 border-b border-purple-200 px-6 py-3">
         <div className="max-w-7xl mx-auto flex items-center gap-2">
-          <span className="text-purple-700 text-xl">🎯</span>
+          <MdGpsFixed className="text-purple-700" size={24} />
           <div>
             <p className="text-sm font-medium text-purple-800">
               Final Exam - Course Completion Test

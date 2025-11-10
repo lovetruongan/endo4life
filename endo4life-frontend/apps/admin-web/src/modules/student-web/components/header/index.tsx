@@ -32,7 +32,7 @@ export default function Header() {
 
   const { menuSections } = useHeaderItems();
   const firstCharacterName = useNameInitial(userProfile);
-  const { unreadCount } = useNotifications();
+  const { notifications, unreadCount, loading, markAsRead, markAllAsRead } = useNotifications();
 
   useClickAway(
     (evt) => {
@@ -121,7 +121,19 @@ export default function Header() {
       </div>
 
       {isAuthenticated && (
-        <div className="flex items-center">
+        <div className="flex items-center gap-2">
+          {/* My Questions Button */}
+          <Link
+            to={STUDENT_WEB_ROUTES.MY_QUESTIONS}
+            className={clsx(
+              'hidden md:flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors',
+              'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+            )}
+          >
+            <span>Câu hỏi của tôi</span>
+          </Link>
+
+          {/* Notification Button */}
           <div className="relative">
             <button
               id="notification-button"
@@ -140,7 +152,14 @@ export default function Header() {
               </Badge>
             </button>
             <div ref={notificationRef}>
-              <NotificationMenu opened={openMenu === MENUS.NOTIFICATION} />
+              <NotificationMenu 
+                opened={openMenu === MENUS.NOTIFICATION}
+                notifications={notifications}
+                loading={loading}
+                unreadCount={unreadCount}
+                markAsRead={markAsRead}
+                markAllAsRead={markAllAsRead}
+              />
             </div>
           </div>
 

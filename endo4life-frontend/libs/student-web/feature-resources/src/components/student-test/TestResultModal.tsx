@@ -131,46 +131,62 @@ export function TestResultModal({
                     <div className="font-medium text-gray-900 mb-2">
                       <RichTextContent value={toRich(questionResult.question.title)} />
                     </div>
-                    <div className="text-sm space-y-1">
-                      <p>
-                        <span className="font-medium">Your answer:</span>{' '}
-                        <span
-                          className={
+                    <div className="text-sm space-y-2">
+                      <div>
+                        <span className="font-medium">Your answer:</span>
+                        <div
+                          className={`mt-1 ${
                             questionResult.correct
                               ? 'text-green-700'
                               : 'text-red-700'
-                          }
+                          }`}
                         >
-                          {questionResult.selectedAnswers.length > 0
-                            ? questionResult.selectedAnswers
-                                .map((aid) => {
-                                  const answer = questionResult.question.answers.find(
-                                    (a) => a.id === aid
-                                  );
-                                  if (!answer) return 'Unknown';
-                                  const content = (answer as any).content?.content ?? (answer as any).content;
-                                  return typeof content === 'string' ? content : content?.text || 'Answer';
-                                })
-                                .join(', ')
-                            : 'No answer'}
-                        </span>
-                      </p>
-                      {!questionResult.correct && (
-                        <p>
-                          <span className="font-medium">Correct answer:</span>{' '}
-                          <span className="text-green-700">
-                            {questionResult.correctAnswers
-                              .map((aid) => {
+                          {questionResult.selectedAnswers.length > 0 ? (
+                            <div className="space-y-1">
+                              {questionResult.selectedAnswers.map((aid, idx) => {
                                 const answer = questionResult.question.answers.find(
                                   (a) => a.id === aid
                                 );
-                                if (!answer) return 'Unknown';
-                                const content = (answer as any).content?.content ?? (answer as any).content;
-                                return typeof content === 'string' ? content : content?.text || 'Answer';
-                              })
-                              .join(', ')}
-                          </span>
-                        </p>
+                                if (!answer) return <span key={aid}>Unknown</span>;
+                                const content = (answer as any).content;
+                                return (
+                                  <div key={aid} className="flex items-start gap-1">
+                                    {questionResult.selectedAnswers.length > 1 && (
+                                      <span>{idx + 1}. </span>
+                                    )}
+                                    <RichTextContent value={toRich(content)} />
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <span>No answer</span>
+                          )}
+                        </div>
+                      </div>
+                      {!questionResult.correct && (
+                        <div>
+                          <span className="font-medium">Correct answer:</span>
+                          <div className="text-green-700 mt-1">
+                            <div className="space-y-1">
+                              {questionResult.correctAnswers.map((aid, idx) => {
+                                const answer = questionResult.question.answers.find(
+                                  (a) => a.id === aid
+                                );
+                                if (!answer) return <span key={aid}>Unknown</span>;
+                                const content = (answer as any).content;
+                                return (
+                                  <div key={aid} className="flex items-start gap-1">
+                                    {questionResult.correctAnswers.length > 1 && (
+                                      <span>{idx + 1}. </span>
+                                    )}
+                                    <RichTextContent value={toRich(content)} />
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
                       )}
                     </div>
                   </div>

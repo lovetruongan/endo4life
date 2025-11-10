@@ -1,6 +1,6 @@
 import { useAuthContext } from '@endo4life/feature-auth';
 import { useDoctorUserConversations } from '@endo4life/feature-discussion';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import { useCommentNotifications } from './use-comment-notifications';
 
 export type NotificationType = 'CONVERSATION' | 'COMMENT';
@@ -17,6 +17,26 @@ export interface INotification {
   resourceId?: string;
 }
 
+const READ_NOTIFICATIONS_KEY = 'read_notifications';
+
+// Helper functions for localStorage
+const getReadNotifications = (): string[] => {
+  try {
+    const stored = localStorage.getItem(READ_NOTIFICATIONS_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveReadNotifications = (readIds: string[]) => {
+  try {
+    localStorage.setItem(READ_NOTIFICATIONS_KEY, JSON.stringify(readIds));
+  } catch (error) {
+    console.error('Failed to save read notifications:', error);
+  }
+};
+
 /**
  * Unified notification hook that handles both:
  * - Doctor-User Conversations (Q&A)
@@ -24,6 +44,12 @@ export interface INotification {
  */
 export function useNotifications() {
   const { userProfile } = useAuthContext();
+  const [readNotificationIds, setReadNotificationIds] = useState<string[]>([]);
+
+  // Load read notifications from localStorage on mount
+  useEffect(() => {
+    setReadNotificationIds(getReadNotifications());
+  }, []);
 
   // Determine filter based on user role
   const isSpecialist = userProfile?.roles?.[0] === 'SPECIALIST';
@@ -138,18 +164,41 @@ export function useNotifications() {
   
   const commentNotifications = commentNotifs;
 
-  // Combine all notifications
+  // Combine all notifications and apply read status
   const allNotifications = useMemo(() => {
     const combined = [...conversationNotifications, ...commentNotifications];
     
+    // Mark notifications as read if they're in readNotificationIds
+    const withReadStatus = combined.map((notif) => ({
+      ...notif,
+      isUnread: !readNotificationIds.includes(notif.id),
+    }));
+    
     // Sort by date descending
-    return combined.sort(
+    return withReadStatus.sort(
       (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
     );
-  }, [conversationNotifications, commentNotifications]);
+  }, [conversationNotifications, commentNotifications, readNotificationIds]);
 
   const unreadCount = useMemo(() => {
     return allNotifications.filter((n) => n.isUnread).length;
+  }, [allNotifications]);
+
+  // Mark a single notification as read
+  const markAsRead = useCallback((notificationId: string) => {
+    setReadNotificationIds((prev) => {
+      if (prev.includes(notificationId)) return prev;
+      const updated = [...prev, notificationId];
+      saveReadNotifications(updated);
+      return updated;
+    });
+  }, []);
+
+  // Mark all notifications as read
+  const markAllAsRead = useCallback(() => {
+    const allIds = allNotifications.map((n) => n.id);
+    setReadNotificationIds(allIds);
+    saveReadNotifications(allIds);
   }, [allNotifications]);
 
   const refetch = () => {
@@ -162,6 +211,8 @@ export function useNotifications() {
     unreadCount,
     loading: conversationsLoading || commentsLoading,
     refetch,
+    markAsRead,
+    markAllAsRead,
   };
 }
 

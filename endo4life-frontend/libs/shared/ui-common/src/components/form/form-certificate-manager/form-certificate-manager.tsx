@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MdOutlineFileUpload } from 'react-icons/md';
+import { MdOutlineFileUpload, MdMenuBook, MdCalendarToday } from 'react-icons/md';
 import { AiOutlineClose } from 'react-icons/ai';
 import { PiCertificate, PiDownload } from 'react-icons/pi';
 import { toast } from 'react-toastify';
@@ -140,13 +140,15 @@ export function FormCertificateManager({
                   />
                 </div>
                 {cert.courseName && (
-                  <p className="text-sm text-gray-600 mb-2 font-medium">
-                    📚 {cert.courseName}
+                  <p className="text-sm text-gray-600 mb-2 font-medium flex items-center gap-1">
+                    <MdMenuBook size={16} />
+                    {cert.courseName}
                   </p>
                 )}
                 {cert.issuedAt && (
-                  <p className="text-sm text-gray-500 mb-3">
-                    📅 Cấp ngày: {new Date(cert.issuedAt).toLocaleDateString('vi-VN', { 
+                  <p className="text-sm text-gray-500 mb-3 flex items-center gap-1">
+                    <MdCalendarToday size={14} />
+                    Cấp ngày: {new Date(cert.issuedAt).toLocaleDateString('vi-VN', { 
                       day: '2-digit', 
                       month: '2-digit', 
                       year: 'numeric' 

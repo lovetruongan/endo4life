@@ -27,7 +27,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { VscRefresh, VscTrash } from 'react-icons/vsc';
 import { IoMdEye } from 'react-icons/io';
-import { MdFilterList } from 'react-icons/md';
+import { MdFilterList, MdWarning } from 'react-icons/md';
 import { useQuery, useMutation } from 'react-query';
 import { toast } from 'react-toastify';
 import moment from 'moment';
@@ -564,20 +564,16 @@ export default function CommentsPage() {
               </p>
               {selectedComment.replies &&
                 selectedComment.replies.length > 0 && (
-                  <p className="text-xs text-orange-600">
-                    <span role="img" aria-label="warning">
-                      ⚠️
-                    </span>{' '}
+                  <p className="text-xs text-orange-600 flex items-center gap-1">
+                    <MdWarning size={16} />
                     Bình luận này có {selectedComment.replies.length} phản hồi
                     sẽ bị xóa cùng
                   </p>
                 )}
             </div>
           )}
-          <p className="mt-3 text-sm text-red-600 font-medium">
-            <span role="img" aria-label="warning">
-              ⚠️
-            </span>{' '}
+          <p className="mt-3 text-sm text-red-600 font-medium flex items-center gap-1">
+            <MdWarning size={16} />
             Hành động này không thể hoàn tác!
           </p>
         </DialogContent>

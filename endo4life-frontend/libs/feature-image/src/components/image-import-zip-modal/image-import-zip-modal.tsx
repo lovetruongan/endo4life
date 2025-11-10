@@ -8,6 +8,7 @@ import {
 import { UploadType } from '@endo4life/data-access';
 import { IImageCreateFormData, ImageMapper } from '../../types';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { MdCheckCircle, MdCancel } from 'react-icons/md';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useImageTagOptions } from '../../hooks';
@@ -125,13 +126,19 @@ export function UploadZipModal({ loading, onSubmit, progress }: Props) {
       
       {progress && progress.status === 'SUCCESS' && (
         <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-sm font-medium text-green-900">✓ {progress.message}</p>
+          <p className="text-sm font-medium text-green-900 flex items-center gap-1">
+            <MdCheckCircle size={16} />
+            {progress.message}
+          </p>
         </div>
       )}
       
       {progress && progress.status === 'FAILED' && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm font-medium text-red-900">✗ {progress.message}</p>
+          <p className="text-sm font-medium text-red-900 flex items-center gap-1">
+            <MdCancel size={16} />
+            {progress.message}
+          </p>
         </div>
       )}
       

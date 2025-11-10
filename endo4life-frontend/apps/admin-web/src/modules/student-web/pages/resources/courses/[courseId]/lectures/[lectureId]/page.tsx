@@ -4,7 +4,7 @@ import { useCourseLectures, useLectureProgressRecord } from '@endo4life/feature-
 import { STUDENT_WEB_ROUTES } from '@endo4life/feature-config';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
-import { MdArrowBack, MdArrowForward, MdCheckCircle } from 'react-icons/md';
+import { MdArrowBack, MdArrowForward, MdCheckCircle, MdWarning, MdCheck } from 'react-icons/md';
 import { RichTextContent } from '@endo4life/feature-richtext-editor';
 import { stringToRichText } from '@endo4life/util-common';
 
@@ -144,7 +144,7 @@ export function LecturePlayerPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center max-w-md">
-          <div className="text-red-600 text-6xl mb-4">⚠️</div>
+          <MdWarning className="text-red-600 mx-auto mb-4" size={72} />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Lecture Not Found</h2>
           <p className="text-gray-600 mb-6">
             The lecture you're looking for could not be found or you don't have access to it.
@@ -233,8 +233,9 @@ export function LecturePlayerPage() {
                   />
                 </div>
                 {!isVideoComplete && isVideoWatchedEnough && (
-                  <p className="text-sm text-green-600 mt-2">
-                    ✓ You've watched enough to proceed!
+                  <p className="text-sm text-green-600 mt-2 flex items-center gap-1">
+                    <MdCheck size={16} />
+                    You've watched enough to proceed!
                   </p>
                 )}
               </div>

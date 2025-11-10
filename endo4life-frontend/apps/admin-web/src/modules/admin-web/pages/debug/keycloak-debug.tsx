@@ -1,9 +1,13 @@
 import { EnvConfig } from '@endo4life/feature-config';
+import { MdWarning, MdSearch } from 'react-icons/md';
 
 export default function KeycloakDebugPage() {
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">🔍 Keycloak Debug Info</h1>
+      <h1 className="text-2xl font-bold mb-4 flex items-center gap-2">
+        <MdSearch size={28} />
+        Keycloak Debug Info
+      </h1>
 
       <div className="bg-white p-4 rounded-lg shadow">
         <h2 className="text-lg font-semibold mb-2">
@@ -64,8 +68,9 @@ export default function KeycloakDebugPage() {
       </div>
 
       <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <h3 className="text-md font-semibold text-yellow-800 mb-2">
-          ⚠️ Troubleshooting Steps
+        <h3 className="text-md font-semibold text-yellow-800 mb-2 flex items-center gap-1">
+          <MdWarning size={20} />
+          Troubleshooting Steps
         </h3>
         <ol className="list-decimal list-inside space-y-2 text-yellow-700">
           <li>

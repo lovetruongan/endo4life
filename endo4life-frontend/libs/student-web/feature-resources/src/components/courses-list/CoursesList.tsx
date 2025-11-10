@@ -11,15 +11,95 @@ interface Props {
   data?: ICourseEntity[];
 }
 
+// Helper function to validate if a URL is a valid image URL
+const isValidImageUrl = (url: string | undefined | null): boolean => {
+  if (!url || typeof url !== 'string') return false;
+  // Check if it's JSON (starts with { or [)
+  if (url.trim().startsWith('{') || url.trim().startsWith('[')) return false;
+  // Check if it's a valid URL format
+  try {
+    const urlObj = new URL(url);
+    // Check for common image extensions or data URLs
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'];
+    const pathname = urlObj.pathname.toLowerCase();
+    const isImageExtension = imageExtensions.some(ext => pathname.endsWith(ext));
+    const isDataUrl = url.startsWith('data:image/');
+    return isImageExtension || isDataUrl || url.startsWith('http://') || url.startsWith('https://');
+  } catch {
+    return false;
+  }
+};
+
+// Helper function to parse JSON description and extract readable text
+const parseDescription = (description: string | undefined): string => {
+  if (!description || typeof description !== 'string') return '';
+  
+  // Check if it's JSON
+  const trimmed = description.trim();
+  if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+    try {
+      const parsed = JSON.parse(description);
+      // Try to extract text from common JSON structures
+      if (typeof parsed === 'object') {
+        // Check for rich text editor format (Lexical)
+        if (parsed.root?.children) {
+          const extractText = (node: any): string => {
+            if (node.text) return node.text;
+            if (node.children && Array.isArray(node.children)) {
+              return node.children.map(extractText).join(' ');
+            }
+            return '';
+          };
+          const text = parsed.root.children.map(extractText).join(' ').trim();
+          if (text) return text;
+        }
+        // Check for metadata structure
+        if (parsed.metadata) {
+          const meta = parsed.metadata;
+          if (meta.mainContent) return parseDescription(meta.mainContent);
+          if (meta.content) return parseDescription(meta.content);
+          if (meta.description) return parseDescription(meta.description);
+        }
+        // Try to find any text field
+        if (parsed.content) return parseDescription(parsed.content);
+        if (parsed.text) return parseDescription(parsed.text);
+        if (parsed.description) return parseDescription(parsed.description);
+      }
+    } catch (e) {
+      // If parsing fails, return empty string or fallback
+      return '';
+    }
+  }
+  
+  return description;
+};
+
 export function CoursesList({ loading, data }: Props) {
   const { t } = useTranslation('common');
 
   const truncateDescription = (text: string | undefined, maxLength: number) => {
-    if (!text || typeof text !== 'string') return '';
-    if (text.length > maxLength) {
-      return text.substring(0, maxLength) + '...';
+    const parsedText = parseDescription(text);
+    if (!parsedText) return '';
+    if (parsedText.length > maxLength) {
+      return parsedText.substring(0, maxLength) + '...';
     }
-    return text;
+    return parsedText;
+  };
+
+  const getThumbnailUrl = (course: ICourseEntity): string => {
+    // Try thumbnail object first
+    const thumbnailSrc = (course as any).thumbnail?.src;
+    if (thumbnailSrc && isValidImageUrl(thumbnailSrc)) {
+      return thumbnailSrc;
+    }
+    
+    // Try thumbnailUrl
+    if (course.thumbnailUrl && isValidImageUrl(course.thumbnailUrl)) {
+      return course.thumbnailUrl;
+    }
+    
+    // Return placeholder
+    return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect width="400" height="300" fill="%23f0f0f0"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23999"%3ENo Image%3C/text%3E%3C/svg%3E';
   };
 
   return (
@@ -39,12 +119,8 @@ export function CoursesList({ loading, data }: Props) {
                 className="flex items-center justify-center"
               >
                 <img
-                  src={
-                    (course as any).thumbnail?.src ||
-                    course.thumbnailUrl ||
-                    'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect width="400" height="300" fill="%23f0f0f0"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23999"%3ENo Image%3C/text%3E%3C/svg%3E'
-                  }
-                  alt={course.title}
+                  src={getThumbnailUrl(course)}
+                  alt={course.title || 'Course thumbnail'}
                   className="w-full h-60 mb-2 object-cover rounded-lg bg-gray-100"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
