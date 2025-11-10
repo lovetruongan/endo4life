@@ -73,12 +73,18 @@ export default function ImagesPage() {
       let sort: IFilterSort | undefined = undefined;
       for (const col of colsState ?? []) {
         if (col.sort) {
+          // Map UI column ids to backend sort fields when needed
+          const backendField =
+            col.colId === 'updatedAt' ? 'createdAt' : (col.colId as string);
           sort = {
-            field: col.colId,
+            field: backendField,
             order: col.sort.toUpperCase(),
           };
         }
       }
+      // Reset to first page on sort change to avoid out-of-range pages
+      newFilter.setPage(0);
+      // Clear sort if none selected; otherwise apply mapped sort
       newFilter.setSort(sort?.field, sort?.order);
       updateFilter(newFilter.toFilter());
     },

@@ -84,6 +84,11 @@ function useVideoManagementColumns({
         hide: false,
         flex: 0.35,
         minWidth: 100,
+        comparator: (valueA: any, valueB: any) => {
+          const a = (valueA ?? '').toString();
+          const b = (valueB ?? '').toString();
+          return a.localeCompare(b, undefined, { sensitivity: 'base' });
+        },
         cellRenderer: (params: ICellRendererParams<IVideoEntity>) => (
           <Link
             to={ADMIN_WEB_ROUTES.VIDEO_DETAIL.replace(

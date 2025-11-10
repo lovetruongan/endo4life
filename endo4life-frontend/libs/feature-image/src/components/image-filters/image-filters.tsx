@@ -23,7 +23,10 @@ export function ImageFilters({ filter, onChange }: Props) {
 
   const handleSearchChange = (value: string) => {
     const imageFilter = new ImageFilter(filter);
+    // Persist generic search text for URL/state
     imageFilter.setSearch(value);
+    // Also filter explicitly by title to ensure backend matches by name
+    imageFilter.setQuery('title', value?.trim() || undefined);
     imageFilter.setPage(0);
     onChange(imageFilter.toFilter());
   };

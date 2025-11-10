@@ -68,6 +68,11 @@ function useImageManagementColumns({
         hide: false,
         initialFlex: 0.35,
         minWidth: 100,
+        comparator: (valueA: any, valueB: any) => {
+          const a = (valueA ?? '').toString();
+          const b = (valueB ?? '').toString();
+          return a.localeCompare(b, undefined, { sensitivity: 'base' });
+        },
         cellRenderer: (params: ICellRendererParams<IImageEntity>) => (
           <Link
             to={ADMIN_WEB_ROUTES.IMAGE_DETAIL.replace(

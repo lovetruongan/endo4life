@@ -24,6 +24,7 @@ export function VideoFilters({ filter, onChange }: Props) {
   const handleSearchChange = (value: string) => {
     const videoFilter = new VideoFilter(filter);
     videoFilter.setSearch(value);
+    videoFilter.setQuery('title', value?.trim() || undefined);
     videoFilter.setPage(0);
     onChange(videoFilter.toFilter());
   };
