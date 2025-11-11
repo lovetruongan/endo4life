@@ -21,6 +21,8 @@ import {
   EnvConfig,
   LOCALE_STORAGE_KEYS,
   STUDENT_WEB_ROUTES,
+  WEB_CLIENT_ADMIN,
+  WEB_CLIENT_STUDENT,
 } from '@endo4life/feature-config';
 import { stringUtils } from '@endo4life/util-common';
 
@@ -365,16 +367,34 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Clear keycloak instance
     keycloakUtils.dispose();
     
-    if (useDirectLogin && keycloak?.logout) {
-      // For direct login, use the simple logout function
-      keycloak.logout();
-    } else if (keycloak?.logout) {
-      // For redirect login, use Keycloak's logout
-      keycloak.logout({ redirectUri: window.location.origin });
+    // Check if we're in admin context and redirect to student home
+    const currentWebClientId = localStorage.getItem(LOCALE_STORAGE_KEYS.WEB_CLIENT_ID);
+    const isAdmin = currentWebClientId === WEB_CLIENT_ADMIN;
+    
+    // If logging out from admin, set web client to student
+    if (isAdmin) {
+      localStorage.setItem(LOCALE_STORAGE_KEYS.WEB_CLIENT_ID, WEB_CLIENT_STUDENT);
     }
     
-    // Force reload to clear all state
-    window.location.href = '/';
+    // Determine redirect URI - if admin, redirect to student home
+    const redirectUri = isAdmin 
+      ? `${window.location.origin}${STUDENT_WEB_ROUTES.ROOT}`
+      : window.location.origin;
+    
+    if (useDirectLogin && keycloak?.logout) {
+      // For direct login, redirect to student home if admin, otherwise use default
+      if (isAdmin) {
+        window.location.href = STUDENT_WEB_ROUTES.ROOT;
+      } else {
+        keycloak.logout();
+      }
+    } else if (keycloak?.logout) {
+      // For redirect login, use Keycloak's logout with redirect URI
+      keycloak.logout({ redirectUri });
+    } else {
+      // Fallback: redirect directly
+      window.location.href = isAdmin ? STUDENT_WEB_ROUTES.ROOT : '/';
+    }
   }, [keycloak, useDirectLogin]);
 
   const changeWebClientId = useCallback((webClientId: string) => {

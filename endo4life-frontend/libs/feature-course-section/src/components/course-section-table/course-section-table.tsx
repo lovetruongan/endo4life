@@ -7,6 +7,7 @@ import { RefObject, useState } from 'react';
 import { CourseState } from '@endo4life/data-access';
 import { AgGridReact } from 'ag-grid-react';
 import { ICourseSectionEntity } from '../../types';
+import CourseSectionStateDialog from '../course-section-state-dialog/course-section-state-dialog';
 
 interface Props {
   gridRef: RefObject<AgGridReact>;
@@ -67,6 +68,13 @@ export function CourseSectionTable({
         onSelectionChanged={handleSelectionChanged}
         animateRows={false}
       />
+      {openStateDialog && selectCourse && (
+        <CourseSectionStateDialog
+          courseSectionId={selectCourse}
+          state={stateCourse}
+          onClose={() => openStateDialogAction.setLeft()}
+        />
+      )}
     </div>
   );
 }

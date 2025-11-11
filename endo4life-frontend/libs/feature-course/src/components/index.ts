@@ -9,3 +9,4 @@ export * from './course-delete-confirm-dialog/course-delete-multiple-confirm-dia
 export * from './course-test/course-test';
 export * from './course-provider/course-provider';
 export * from './course-lectures/course-lectures';
+export * from './course-state-dialog/course-state-dialog';

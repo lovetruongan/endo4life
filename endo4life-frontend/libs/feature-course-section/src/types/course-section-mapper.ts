@@ -160,25 +160,48 @@ export class CourseSectionMapper implements ICourseSectionMapper {
     data: ICourseSectionFormData,
   ): CourseSectionV1ApiUpdateCourseSectionRequest {
     if (!data.id) throw new Error('Invalid course section id');
+    
+    const metadata: any = {};
+    
+    // Only include fields that are explicitly provided
+    if (data.state !== undefined && data.state !== null) {
+      metadata.state = data.state as CourseState;
+    }
+    if (data.title !== undefined && data.title !== null) {
+      metadata.title = data.title;
+    }
+    if (data.tags !== undefined && data.tags !== null) {
+      metadata.tags = data.tags;
+    }
+    if (data.detailTags !== undefined && data.detailTags !== null) {
+      metadata.tagsDetail = data.detailTags;
+    }
+    if (data.numCredits !== undefined && data.numCredits !== null) {
+      metadata.totalCredits = data.numCredits;
+    }
+    if (data.description?.content !== undefined || 
+        data.content?.content !== undefined || 
+        data.requirement?.content !== undefined || 
+        data.target?.content !== undefined) {
+      metadata.attribute = {
+        metadata: {
+          description: data.description?.content,
+          mainContent: data.content?.content,
+          lessonObjectives: data.requirement?.content,
+          target: data.target?.content,
+        },
+      };
+    }
+    if (data.thumbnail?.id !== undefined && data.thumbnail?.id !== null) {
+      metadata.thumbnail = toResourceObjectKey(data.thumbnail.id);
+    }
+    if (data.video?.id !== undefined && data.video?.id !== null) {
+      metadata.attachments = toResourceObjectKey(data.video.id);
+    }
+    
     return {
       id: data.id,
-      metadata: {
-        state: data.state as CourseState,
-        title: data.title,
-        tags: data.tags,
-        tagsDetail: data.detailTags,
-        totalCredits: data.numCredits,
-        attribute: {
-          metadata: {
-            description: data.description?.content,
-            mainContent: data.content?.content,
-            lessonObjectives: data.requirement?.content,
-            target: data.target?.content,
-          },
-        },
-        thumbnail: toResourceObjectKey(data.thumbnail?.id),
-        attachments: toResourceObjectKey(data.video?.id),
-      },
+      metadata,
     };
   }
 }

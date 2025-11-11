@@ -48,6 +48,7 @@
   },
   "state": {
     "PUBLIC": "Công khai",
+    "PRIVATE": "Ẩn",
     "UNLISTED": "Ẩn",
     "DRAFT": "Nháp"
   },

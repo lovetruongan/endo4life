@@ -19,30 +19,34 @@ export function CourseStatusCell({
 }: CourseStateCellProps) {
   const { t } = useTranslation('course');
 
+  const currentState = course?.state || CourseState.Draft.toString();
+  const stateAsEnum = currentState as CourseState;
+
   return (
     <div
       className="flex items-center justify-center space-x-1 py-2 hover:cursor-pointer hover:text-gray-400 hover:duration-300"
       onClick={() => {
         onSelectCourse(course.id);
-        onSetStateCourse(course.state as CourseState);
+        onSetStateCourse(stateAsEnum);
         openStateDialogAction.toggle();
       }}
     >
-      {course?.state === CourseState.Public.toString() && (
+      {currentState === CourseState.Public.toString() && (
         <>
           <FaGlobe />
           <span>{t(`state.${CourseState.Public.toString()}`)}</span>
           <IoChevronDown />
         </>
       )}
-      {course?.state === CourseState.Private.toString() && (
+      {currentState === CourseState.Private.toString() && (
         <>
           <FaLock />
           <span>{t(`state.${CourseState.Private.toString()}`)}</span>
           <IoChevronDown />
         </>
       )}
-      {course?.state === CourseState.Draft.toString() && (
+      {(currentState === CourseState.Draft.toString() ||
+        !course?.state) && (
         <>
           <FaFileAlt />
           <span>{t(`state.${CourseState.Draft.toString()}`)}</span>

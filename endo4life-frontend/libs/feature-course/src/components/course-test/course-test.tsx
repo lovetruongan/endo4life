@@ -14,6 +14,7 @@ import {
   EditableQuestionCard,
   IQuestionEntity,
   QuestionCard,
+  QuestionTypeEnum,
 } from '@endo4life/feature-test';
 import {
   selectCourseQuestion,
@@ -48,6 +49,44 @@ export function CourseTest({ courseId, type, testId }: Props) {
 
   const handleSaveTest = async () => {
     if (!courseTest) return;
+    
+    // Validate: Check if all multiple choice questions have at least one correct answer
+    const invalidQuestions: IQuestionEntity[] = [];
+    const allQuestions = editingQuestion 
+      ? [...questions.filter(q => q.id !== editingQuestion.id), editingQuestion]
+      : questions;
+    
+    for (const question of allQuestions) {
+      if (!question || question.isDeleted) continue;
+      
+      // Only validate SINGLE_CHOICE and MULTIPLE_CHOICE questions
+      if (
+        question.type === QuestionTypeEnum.SINGLE_CHOICE ||
+        question.type === QuestionTypeEnum.MULTIPLE_CHOICE
+      ) {
+        const hasCorrectAnswer = question.answers?.some(
+          (answer) => answer.isCorrect === true
+        );
+        
+        if (!hasCorrectAnswer) {
+          invalidQuestions.push(question);
+        }
+      }
+    }
+    
+    if (invalidQuestions.length > 0) {
+      toast.error(
+        `Vui lòng chọn ít nhất 1 đáp án đúng cho ${invalidQuestions.length} câu hỏi trắc nghiệm!`,
+        {
+          position: 'top-right',
+          autoClose: 3000,
+          hideProgressBar: false,
+        }
+      );
+      setSaving(false);
+      return;
+    }
+    
     try {
       setSaving(true);
       await dispatch(saveCourseTestAsync({ testId: courseTest.id }));
@@ -98,8 +137,8 @@ export function CourseTest({ courseId, type, testId }: Props) {
   };
 
   return (
-    <div className="relative flex flex-col h-full">
-      <div className="flex-1 pb-24 overflow-y-auto">
+    <div className="relative flex flex-col h-full min-h-0">
+      <div className="flex-1 pb-24 overflow-y-auto min-h-0">
         {questions.length === 0 && (
           <div className="p-4 text-center">
             <div className="flex items-center justify-center">

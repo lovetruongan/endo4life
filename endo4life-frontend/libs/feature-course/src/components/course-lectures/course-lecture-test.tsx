@@ -46,8 +46,8 @@ export function CourseLectureTestModal({
       onClose={onClose}
       className="flex items-center justify-center p-4"
     >
-      <div className="bg-white rounded shadow w-full max-w-4xl h-4/5 relative flex flex-col">
-        <div className="flex items-center gap-2 p-4">
+      <div className="bg-white rounded shadow w-full max-w-4xl h-4/5 relative flex flex-col min-h-0">
+        <div className="flex items-center gap-2 p-4 flex-none">
           <h3 className="text-lg font-semibold flex-auto">{lecture?.title}</h3>
           <Link
             className="flex-none px-3 py-1 text-sm bg-white border rounded-lg border-slate-300"
@@ -61,15 +61,17 @@ export function CourseLectureTestModal({
             <VscClose size={18} />
           </IconButton>
         </div>
-        {!loading && test && (
-          <CourseTest
-            courseId={courseId}
-            type={CourseTestTypeEnum.LECTURE_REVIEW_QUESTIONS_COURSE}
-            testId={test.id}
-          />
-        )}
+        <div className="flex-1 min-h-0">
+          {!loading && test && (
+            <CourseTest
+              courseId={courseId}
+              type={CourseTestTypeEnum.LECTURE_REVIEW_QUESTIONS_COURSE}
+              testId={test.id}
+            />
+          )}
 
-        {loading && <div className="p-4 text-center">Đang tải dữ liệu...</div>}
+          {loading && <div className="p-4 text-center">Đang tải dữ liệu...</div>}
+        </div>
       </div>
     </Modal>
   );

@@ -6,3 +6,4 @@ export * from './course-delete-confirm-dialog/course-delete-confirm-dialog';
 export * from './course-delete-confirm-dialog/course-delete-multiple-confirm-dialog';
 export * from './course-section-create/course-section-modal';
 export * from './course-section-form/course-section-form';
+export * from './course-section-state-dialog/course-section-state-dialog';
