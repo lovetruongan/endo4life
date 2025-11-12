@@ -73,12 +73,15 @@ export default function VideosPage() {
       let sort: IFilterSort | undefined = undefined;
       for (const col of colsState ?? []) {
         if (col.sort) {
+          const backendField =
+            col.colId === 'updatedAt' ? 'createdAt' : (col.colId as string);
           sort = {
-            field: col.colId,
+            field: backendField,
             order: col.sort.toUpperCase(),
           };
         }
       }
+      newFilter.setPage(0);
       newFilter.setSort(sort?.field, sort?.order);
       updateFilter(newFilter.toFilter());
     },

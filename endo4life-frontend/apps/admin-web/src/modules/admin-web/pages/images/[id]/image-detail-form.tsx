@@ -17,6 +17,7 @@ import { ADMIN_WEB_ROUTES } from '@endo4life/feature-config';
 import { VscArrowLeft } from 'react-icons/vsc';
 import { IconButton, Tooltip } from '@mui/material';
 import { useMemo, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import {
   IImageUpdateFormData,
   ImageDeleteConfirmDialog,
@@ -62,6 +63,7 @@ export function ImageDetailForm({ loading, formData, onSubmit }: Props) {
   const [currentDimensions, setCurrentDimensions] = useState(
     formData?.entity?.dimension,
   );
+  const [remoteSize, setRemoteSize] = useState<string | undefined>(undefined);
 
   const { control, handleSubmit, formState, watch } =
     useForm<IImageUpdateFormData>({
@@ -204,6 +206,12 @@ export function ImageDetailForm({ loading, formData, onSubmit }: Props) {
                 )}
               />
             </div>
+            {/* derive dimension/size from resourceUrl if not provided by backend */}
+            <DerivedInfoFromResourceUrl
+              resourceUrl={formData?.resourceUrl || ''}
+              setCurrentDimensions={setCurrentDimensions}
+              setRemoteSize={setRemoteSize}
+            />
             {/* info box */}
             <div className="grid items-center grid-cols-1 gap-4 px-5 py-4 rounded-lg md:grid-cols-2 h-fit bg-neutral-background-layer-2">
               {/* left */}
@@ -213,15 +221,19 @@ export function ImageDetailForm({ loading, formData, onSubmit }: Props) {
                   content={
                     formData?.entity?.createdAt
                       ? formatDate(
-                          new Date(formData.entity.createdAt),
-                          DATE_FORMAT,
-                        )
+                        new Date(formData.entity.createdAt),
+                        DATE_FORMAT,
+                      )
                       : '-'
                   }
                 />
                 <InfoCard
                   label={t('image:basicInfo.size')}
-                  content={getFileSizeFormatted(selectedFile, formData)}
+                  content={
+                    isFileValid(selectedFile)
+                      ? getFileSizeFormatted(selectedFile, formData)
+                      : remoteSize || getFileSizeFormatted(selectedFile, formData)
+                  }
                 />
               </div>
               {/* right */}
@@ -235,13 +247,13 @@ export function ImageDetailForm({ loading, formData, onSubmit }: Props) {
                   content={
                     isFileValid(selectedFile)
                       ? getFileExtension(
-                          objectUtils.defaultObject(selectedFile),
-                        )
+                        objectUtils.defaultObject(selectedFile),
+                      )
                       : getFileExtensionFromUrl(
-                          formData?.resourceUrl || '',
-                          EnvConfig.Endo4LifeServiceUrl,
-                          'images',
-                        )
+                        formData?.resourceUrl || '',
+                        EnvConfig.Endo4LifeServiceUrl,
+                        'images',
+                      )
                   }
                 />
               </div>
@@ -415,3 +427,58 @@ export function ImageDetailForm({ loading, formData, onSubmit }: Props) {
   );
 }
 export default ImageDetailForm;
+
+interface DerivedInfoProps {
+  resourceUrl: string;
+  setCurrentDimensions: (val?: string) => void;
+  setRemoteSize: (val?: string) => void;
+}
+
+function DerivedInfoFromResourceUrl({
+  resourceUrl,
+  setCurrentDimensions,
+  setRemoteSize,
+}: DerivedInfoProps) {
+  useEffect(() => {
+    let aborted = false;
+    async function derive() {
+      if (!resourceUrl) return;
+      // Try to infer image dimensions by loading the image (if same-origin or CORS allowed)
+      try {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.src = resourceUrl;
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = resolve; // ignore errors silently
+        });
+        if (!aborted && img.naturalWidth && img.naturalHeight) {
+          setCurrentDimensions(`${img.naturalWidth} x ${img.naturalHeight}`);
+        }
+      } catch { }
+
+      // Try to get size via HEAD request
+      try {
+        const resp = await fetch(resourceUrl, { method: 'HEAD' });
+        const len = resp.headers.get('content-length');
+        if (!aborted && len) {
+          const bytes = parseInt(len, 10);
+          // Simple formatter (KB/MB)
+          const k = 1000;
+          const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+          const formatted =
+            bytes && isFinite(i)
+              ? `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`
+              : '0 B';
+          setRemoteSize(formatted);
+        }
+      } catch { }
+    }
+    derive();
+    return () => {
+      aborted = true;
+    };
+  }, [resourceUrl, setCurrentDimensions, setRemoteSize]);
+  return null;
+}

@@ -216,8 +216,10 @@ export class ImageApiImpl extends BaseApi implements IImageApi {
       let objectKey: string | undefined;
       try {
         const urlObj = new URL(uploadUrl);
-        const pathSegments = urlObj.pathname.split('/').filter(Boolean);
-        objectKey = decodeURIComponent(pathSegments.slice(1).join('/'));
+        // Support both virtual-hosted-style (/<objectKey>) and path-style (/<bucket>/<objectKey>)
+        const path = decodeURIComponent(urlObj.pathname.replace(/^\/+/, ''));
+        const segments = path.split('/').filter(Boolean);
+        objectKey = segments.length >= 2 ? segments.slice(1).join('/') : segments.join('/');
       } catch (e) {
         console.warn('[createImage] cannot parse objectKey from url', e);
       }
@@ -374,8 +376,10 @@ export class ImageApiImpl extends BaseApi implements IImageApi {
       // derive objectKey from presigned url
       try {
         const urlObj = new URL(uploadUrl);
-        const pathSegments = urlObj.pathname.split('/').filter(Boolean);
-        uploadedFileKey = decodeURIComponent(pathSegments.slice(1).join('/')); // drop bucket
+        // Support both virtual-hosted-style (/<objectKey>) and path-style (/<bucket>/<objectKey>)
+        const path = decodeURIComponent(urlObj.pathname.replace(/^\/+/, ''));
+        const segments = path.split('/').filter(Boolean);
+        uploadedFileKey = segments.length >= 2 ? segments.slice(1).join('/') : segments.join('/');
       } catch (e) {
         console.warn('[image-api] cannot parse objectKey from url', e);
       }

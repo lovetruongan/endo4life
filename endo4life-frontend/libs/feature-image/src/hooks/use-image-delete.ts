@@ -11,7 +11,8 @@ export function useImageDelete() {
       return api.deleteImage(id);
     },
     onSuccess(data) {
-      client.invalidateQueries([REACT_QUERY_KEYS.DELETE_IMAGE]);
+      // Refresh the images list after deletion to prevent stale rows causing follow-up errors
+      client.invalidateQueries([REACT_QUERY_KEYS.IMAGES]);
       console.log('data', data);
     },
     onError(error) {
