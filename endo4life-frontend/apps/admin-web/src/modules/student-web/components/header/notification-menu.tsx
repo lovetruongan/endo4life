@@ -1,19 +1,30 @@
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
-import { VscArrowRight } from 'react-icons/vsc';
+import { VscArrowRight, VscCheck } from 'react-icons/vsc';
 import { TbMessage2Question, TbMessage } from 'react-icons/tb';
 import { Link } from 'react-router-dom';
 import { STUDENT_WEB_ROUTES } from '@endo4life/feature-config';
-import { useNotifications } from '../../hooks/use-notifications';
+import { INotification } from '../../hooks/use-notifications';
 import { formatDistanceToNow } from 'date-fns';
 
 interface INotificationMenu {
   opened: boolean;
+  notifications: INotification[];
+  loading: boolean;
+  unreadCount: number;
+  markAsRead: (notificationId: string) => void;
+  markAllAsRead: () => void;
 }
 
-export default function NotificationMenu({ opened }: INotificationMenu) {
+export default function NotificationMenu({ 
+  opened, 
+  notifications, 
+  loading, 
+  unreadCount, 
+  markAsRead, 
+  markAllAsRead 
+}: INotificationMenu) {
   const { t } = useTranslation('common');
-  const { notifications, loading } = useNotifications();
 
   // Show max 5 notifications
   const displayNotifications = notifications.slice(0, 5);
@@ -21,15 +32,25 @@ export default function NotificationMenu({ opened }: INotificationMenu) {
   return (
     <div
       className={clsx(
-        'absolute right-0 top-full z-10 mt-2 border border-slate-100 bg-white shadow min-w-320 rounded-xl max-h-96 overflow-hidden',
+        'absolute right-0 top-full z-[9999] mt-2 border border-slate-100 bg-white shadow-2xl min-w-320 rounded-xl max-h-96 overflow-hidden',
         { hidden: !opened }
       )}
     >
       <div className="w-96">
-        <div className="flex items-center px-4 py-3">
-          <span className="w-full text-lg text-center font-semibold text-slate-700">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
+          <span className="text-lg font-semibold text-slate-700">
             {t('notification.txtNotification')}
           </span>
+          {unreadCount > 0 && (
+            <button
+              onClick={markAllAsRead}
+              className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
+              title="Đánh dấu tất cả đã đọc"
+            >
+              <VscCheck size={16} />
+              Đọc tất cả
+            </button>
+          )}
         </div>
 
         {loading && (
@@ -49,10 +70,17 @@ export default function NotificationMenu({ opened }: INotificationMenu) {
                  displayNotifications.map((notification) => {
                    const Icon = notification.type === 'CONVERSATION' ? TbMessage2Question : TbMessage;
                    
+                   const handleNotificationClick = () => {
+                     if (notification.isUnread) {
+                       markAsRead(notification.id);
+                     }
+                   };
+                   
                    return (
                      <Link
                        key={notification.id}
                        to={notification.link}
+                       onClick={handleNotificationClick}
                        className={clsx(
                          'flex gap-3 w-full px-4 py-3 border-b border-slate-200 hover:bg-slate-50 transition-colors',
                          {

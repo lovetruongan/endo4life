@@ -3,13 +3,69 @@ import { useCourseProgress } from '@endo4life/feature-resources';
 import { useNavigate } from 'react-router-dom';
 import { STUDENT_WEB_ROUTES } from '@endo4life/feature-config';
 import { SmartCourseCard } from './components/SmartCourseCard';
+import { useState, useMemo } from 'react';
+import { MdSearch, MdFilterList, MdCheckCircle, MdPlayArrow, MdSchool } from 'react-icons/md';
+
+type FilterType = 'all' | 'in-progress' | 'completed';
 
 export function MyLearningPage() {
   const { userProfile } = useAuthContext();
   const userInfoId = userProfile?.id || '';
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState<FilterType>('all');
 
   const { data: courses, loading, error } = useCourseProgress(userInfoId);
+
+  // Filter and search courses
+  const filteredCourses = useMemo(() => {
+    if (!courses) return [];
+
+    return courses.filter((course) => {
+      // Search filter
+      const matchesSearch = course.courseTitle
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+
+      // Status filter
+      const progressPercentage =
+        course.totalLectures > 0
+          ? (course.numberLecturesCompleted / course.totalLectures) * 100
+          : 0;
+
+      let matchesFilter = true;
+      if (filterType === 'completed') {
+        matchesFilter = progressPercentage === 100;
+      } else if (filterType === 'in-progress') {
+        matchesFilter = progressPercentage > 0 && progressPercentage < 100;
+      }
+
+      return matchesSearch && matchesFilter;
+    });
+  }, [courses, searchQuery, filterType]);
+
+  // Calculate statistics
+  const stats = useMemo(() => {
+    if (!courses) return { total: 0, inProgress: 0, completed: 0 };
+
+    return courses.reduce(
+      (acc, course) => {
+        const progressPercentage =
+          course.totalLectures > 0
+            ? (course.numberLecturesCompleted / course.totalLectures) * 100
+            : 0;
+
+        acc.total += 1;
+        if (progressPercentage === 100) {
+          acc.completed += 1;
+        } else if (progressPercentage > 0) {
+          acc.inProgress += 1;
+        }
+        return acc;
+      },
+      { total: 0, inProgress: 0, completed: 0 }
+    );
+  }, [courses]);
 
   if (loading) {
     return (
@@ -70,22 +126,143 @@ export function MyLearningPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Khóa học của tôi</h1>
-        <p className="text-gray-600">
-          Theo dõi tiến độ và tiếp tục học tập
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Header Section */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Khóa học của tôi
+          </h1>
+          <p className="text-gray-600 text-lg">
+            Theo dõi tiến độ và tiếp tục hành trình học tập của bạn
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {courses.map((course) => (
-          <SmartCourseCard
-            key={course.id}
-            course={course}
-            userInfoId={userInfoId}
-          />
-        ))}
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm mb-1">Tổng khóa học</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
+              </div>
+              <div className="bg-blue-100 rounded-full p-3">
+                <MdSchool className="text-blue-600 text-2xl" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm mb-1">Đang học</p>
+                <p className="text-3xl font-bold text-orange-600">{stats.inProgress}</p>
+              </div>
+              <div className="bg-orange-100 rounded-full p-3">
+                <MdPlayArrow className="text-orange-600 text-2xl" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm mb-1">Hoàn thành</p>
+                <p className="text-3xl font-bold text-green-600">{stats.completed}</p>
+              </div>
+              <div className="bg-green-100 rounded-full p-3">
+                <MdCheckCircle className="text-green-600 text-2xl" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Search and Filter Bar */}
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-8 border border-gray-100">
+          <div className="flex flex-col md:flex-row gap-4">
+            {/* Search Bar */}
+            <div className="flex-1 relative">
+              <MdSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
+              <input
+                type="text"
+                placeholder="Tìm kiếm khóa học..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            {/* Filter Buttons */}
+            <div className="flex items-center gap-2">
+              <MdFilterList className="text-gray-500 text-xl" />
+              <button
+                onClick={() => setFilterType('all')}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  filterType === 'all'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Tất cả
+              </button>
+              <button
+                onClick={() => setFilterType('in-progress')}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  filterType === 'in-progress'
+                    ? 'bg-orange-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Đang học
+              </button>
+              <button
+                onClick={() => setFilterType('completed')}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  filterType === 'completed'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Hoàn thành
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Course Results Info */}
+        {searchQuery && (
+          <div className="mb-4 text-gray-600">
+            Tìm thấy <span className="font-semibold text-gray-900">{filteredCourses.length}</span> kết quả
+            {searchQuery && ` cho "${searchQuery}"`}
+          </div>
+        )}
+
+        {/* Courses Grid */}
+        {filteredCourses.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredCourses.map((course) => (
+              <SmartCourseCard
+                key={course.id}
+                course={course}
+                userInfoId={userInfoId}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16">
+            <div className="mb-4">
+              <MdSearch className="mx-auto text-gray-300 text-6xl" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+              Không tìm thấy khóa học nào
+            </h3>
+            <p className="text-gray-500">
+              {searchQuery
+                ? `Không có khóa học nào phù hợp với "${searchQuery}"`
+                : 'Thử thay đổi bộ lọc để xem các khóa học khác'}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

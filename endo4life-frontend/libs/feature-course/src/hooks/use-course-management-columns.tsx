@@ -42,7 +42,12 @@ function useCourseManagementColumns({
         hide: false,
         initialFlex: 0.25,
         cellRenderer: (params: ICellRendererParams<ICourseEntity>) => (
-          <Link to={ADMIN_WEB_ROUTES.COURSE_DETAIL}>
+          <Link
+            to={ADMIN_WEB_ROUTES.COURSE_DETAIL.replace(
+              ':id',
+              stringUtils.defaultString(params?.data?.id),
+            )}
+          >
             <div className="flex items-center justify-center h-full">
               <img
                 src={params?.data?.thumbnail?.src}
@@ -82,12 +87,15 @@ function useCourseManagementColumns({
         hide: false,
         initialFlex: 0.75,
         cellRenderer: (params: ICellRendererParams<ICourseEntity>) => (
-          <div
-            className="flex items-center justify-center h-full"
-          >
-            <CourseStatusCell
-              course={objectUtils.defaultObject(params?.data)}
-            />
+          <div className="flex items-center justify-center h-full">
+            {params?.data && (
+              <CourseStatusCell
+                course={objectUtils.defaultObject(params?.data)}
+                openStateDialogAction={openStateDialogAction}
+                onSelectCourse={onSelectCourse}
+                onSetStateCourse={onSetStateCourse}
+              />
+            )}
           </div>
         ),
       },

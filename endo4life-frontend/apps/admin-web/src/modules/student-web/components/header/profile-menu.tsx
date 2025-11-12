@@ -32,7 +32,7 @@ export default function ProfileMenu({ opened }: IProfileMenu) {
   return (
     <div
       className={clsx(
-        'absolute right-0 top-full z-10 mt-2 border border-slate-100 bg-white shadow min-w-320 rounded-xl',
+        'absolute right-0 top-full z-[9999] mt-2 border border-slate-100 bg-white shadow-2xl min-w-320 rounded-xl',
         { hidden: !opened },
       )}
     >

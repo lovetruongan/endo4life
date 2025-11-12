@@ -60,7 +60,7 @@ export function CourseLectureDetailRecapQuestionsPage() {
   }
 
   return (
-    <div className="flex flex-col h-full p-6 bg-white rounded-lg border border-slate-100">
+    <div className="flex flex-col h-full min-h-0 p-6 bg-white rounded-lg border border-slate-100">
       {!loading && test && (
         <CourseTest
           courseId={courseId}

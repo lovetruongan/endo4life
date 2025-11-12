@@ -40,7 +40,7 @@ export function CourseRequiredTestsPage() {
           Khảo sát
         </button>
       </div>
-      <div className="flex flex-col flex-auto">
+      <div className="flex flex-col flex-auto min-h-0">
         {id && type === CourseTestTypeEnum.ENTRANCE_TEST_COURSE && (
           <CourseTest
             courseId={id}

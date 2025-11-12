@@ -25,10 +25,9 @@ import {
 } from '@dnd-kit/sortable';
 import { PiImage } from 'react-icons/pi';
 import { useQuestionTypeOptions } from '../hooks';
-import { ResizableBox } from 'react-resizable';
-import 'react-resizable/css/styles.css';
 import { IRichText } from '@endo4life/types';
 import { EditableRichText } from './editable-richtext';
+import { QuestionImageCropDialog } from './question-image-crop-dialog/question-image-crop-dialog';
 
 interface Props {
   data: IQuestionEntity;
@@ -46,6 +45,9 @@ export function EditableQuestionCard({
   const inputFileRef = useRef<HTMLInputElement>(null);
   const answers = useMemo(() => data.answers || [], [data]);
   const [loaded, setLoaded] = useState(false);
+  const [cropDialogOpen, setCropDialogOpen] = useState(false);
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [imageSrcForCrop, setImageSrcForCrop] = useState<string>('');
   const { options: typeOptions } = useQuestionTypeOptions(data.type);
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -107,17 +109,73 @@ export function EditableQuestionCard({
 
     const selectedFile = files.item(0);
     if (selectedFile) {
-      const builder = new QuestionBuilder(data);
-      builder.onFileSelected(selectedFile);
-      onChange && onChange(builder.build());
+      // Open crop dialog instead of directly setting the image
+      setSelectedImageFile(selectedFile);
+      setImageSrcForCrop(URL.createObjectURL(selectedFile));
+      setCropDialogOpen(true);
       if (inputFileRef.current) inputFileRef.current.value = '';
     }
   };
 
-  const onImageSizeChange = (width: number, height: number) => {
+  const handleCropConfirm = (croppedFile: File) => {
     const builder = new QuestionBuilder(data);
-    builder.updateImageSize(width, height);
+    builder.onFileSelected(croppedFile);
     onChange && onChange(builder.build());
+    setCropDialogOpen(false);
+    // Cleanup blob URL if it was created from file
+    if (imageSrcForCrop && imageSrcForCrop.startsWith('blob:')) {
+      URL.revokeObjectURL(imageSrcForCrop);
+    }
+    setSelectedImageFile(null);
+    setImageSrcForCrop('');
+  };
+
+  const handleCropCancel = () => {
+    setCropDialogOpen(false);
+    // Cleanup blob URL if it was created from file
+    if (imageSrcForCrop && imageSrcForCrop.startsWith('blob:')) {
+      URL.revokeObjectURL(imageSrcForCrop);
+    }
+    setSelectedImageFile(null);
+    setImageSrcForCrop('');
+  };
+
+  // Convert image URL to File for cropping
+  const handleImageClick = async () => {
+    if (!data.image?.src) return;
+    
+    try {
+      // If image has a file, use it directly
+      if (data.image.file) {
+        const blobUrl = URL.createObjectURL(data.image.file);
+        setSelectedImageFile(data.image.file);
+        setImageSrcForCrop(blobUrl);
+        setCropDialogOpen(true);
+        return;
+      }
+      
+      // Otherwise, fetch the image from URL and convert to File
+      // This ensures we have a blob URL instead of external URL to avoid CORS issues
+      const response = await fetch(data.image.src);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.statusText}`);
+      }
+      const blob = await response.blob();
+      const fileName = data.image.fileName || 'question-image.jpg';
+      const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
+      
+      // Create blob URL from the file to avoid CORS issues
+      const blobUrl = URL.createObjectURL(file);
+      setSelectedImageFile(file);
+      setImageSrcForCrop(blobUrl);
+      setCropDialogOpen(true);
+    } catch (error) {
+      console.error('Error loading image for crop:', error);
+      // Fallback: try to use the src directly (may have CORS issues with canvas)
+      setSelectedImageFile(null);
+      setImageSrcForCrop(data.image.src);
+      setCropDialogOpen(true);
+    }
   };
 
   const onClickRemoveImage = () => {
@@ -203,44 +261,34 @@ export function EditableQuestionCard({
         />
       </div>
       {data.image && (
-        <div>
-          <ResizableBox
-            axis="both"
-            resizeHandles={['w', 's', 'n', 'e']}
-            className="relative flex-none"
-            height={data.image?.height || 480}
-            width={data.image?.width || 320}
-            onResizeStop={(evt, data) => {
-              evt.preventDefault();
-              evt.stopPropagation();
-              setTimeout(
-                () => onImageSizeChange(data.size.width, data.size.height),
-                100,
-              );
+        <div className="relative inline-block group">
+          <div
+            className="border bg-slate-300 border-slate-300 cursor-pointer hover:opacity-90 transition-opacity rounded-lg overflow-hidden"
+            style={{
+              width: data.image?.width || 320,
+              height: data.image?.height || 240,
+              backgroundImage: `url(${data.image.src})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
             }}
-          >
-            <div className="relative w-full h-full group">
-              <div
-                className="w-full h-full border bg-slate-300 border-slate-300"
-                style={{
-                  backgroundImage: `url(${data.image.src})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
+            onClick={handleImageClick}
+            title="Nhấn để cắt ảnh"
+          />
+          <div className="absolute z-10 opacity-0 group-hover:opacity-100 top-1 right-1">
+            <button
+              className="flex items-center justify-center w-8 h-8 bg-white border rounded-full border-slate-300 hover:bg-red-50 transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClickRemoveImage();
+              }}
+              title="Xóa ảnh"
+            >
+              <VscClose
+                className="text-slate-500 hover:text-red-500"
+                size={18}
               />
-              <div className="absolute z-10 opacity-0 group-hover:opacity-100 top-1 right-1">
-                <button
-                  className="flex items-center justify-center w-8 h-8 bg-white border rounded-full border-slate-300"
-                  onClick={onClickRemoveImage}
-                >
-                  <VscClose
-                    className="text-slate-500 hover:text-red-500"
-                    size={18}
-                  />
-                </button>
-              </div>
-            </div>
-          </ResizableBox>
+            </button>
+          </div>
         </div>
       )}
       {data.type !== QuestionTypeEnum.FREE_TEXT && (
@@ -305,6 +353,14 @@ export function EditableQuestionCard({
           <VscTrash size={20} />
         </IconButton>
       </div>
+
+      <QuestionImageCropDialog
+        open={cropDialogOpen}
+        imageFile={selectedImageFile}
+        imageSrc={imageSrcForCrop}
+        onClose={handleCropCancel}
+        onConfirm={handleCropConfirm}
+      />
     </div>
   );
 }

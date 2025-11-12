@@ -1,4 +1,5 @@
 import { useAuthContext } from '@endo4life/feature-auth';
+import { MdCheckCircle, MdCancel } from 'react-icons/md';
 
 export default function DashboardPage() {
   const { userProfile, isAuthenticated } = useAuthContext();
@@ -9,9 +10,17 @@ export default function DashboardPage() {
 
       <div className="bg-white p-4 rounded-lg shadow">
         <h2 className="text-lg font-semibold mb-2">Authentication Status</h2>
-        <p className="mb-2">
+        <p className="mb-2 flex items-center gap-2">
           Status:{' '}
-          {isAuthenticated ? '✅ Authenticated' : '❌ Not Authenticated'}
+          {isAuthenticated ? (
+            <span className="flex items-center gap-1 text-green-600">
+              <MdCheckCircle size={16} /> Authenticated
+            </span>
+          ) : (
+            <span className="flex items-center gap-1 text-red-600">
+              <MdCancel size={16} /> Not Authenticated
+            </span>
+          )}
         </p>
 
         {userProfile && (

@@ -18,6 +18,7 @@ export function useCourseUpdate() {
     },
     onSuccess(data) {
       client.invalidateQueries([REACT_QUERY_KEYS.GET_COURSE_BY_ID]);
+      client.invalidateQueries([REACT_QUERY_KEYS.COURSES]);
     },
     onError(error) {
       console.log('error', error);

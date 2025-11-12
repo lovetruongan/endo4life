@@ -8,16 +8,95 @@ import {
 } from '@endo4life/feature-resources';
 import { Button } from '@endo4life/ui-common';
 import { toast } from 'react-toastify';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { STUDENT_WEB_ROUTES } from '@endo4life/feature-config';
+import { RichTextContent } from '@endo4life/feature-richtext-editor';
+import { stringToRichText } from '@endo4life/util-common';
+import { 
+  MdCheckCircle, 
+  MdSchool, 
+  MdPeople, 
+  MdWarning,
+  MdLibraryBooks,
+  MdEdit,
+  MdEmojiEvents,
+  MdPlayArrow,
+  MdVideocam,
+  MdStar
+} from 'react-icons/md';
+
+// Helper function to validate if a URL is a valid image URL
+const isValidImageUrl = (url: string | undefined | null): boolean => {
+  if (!url || typeof url !== 'string') return false;
+  // Check if it's JSON (starts with { or [)
+  if (url.trim().startsWith('{') || url.trim().startsWith('[')) return false;
+  // Check if it's a valid URL format
+  try {
+    const urlObj = new URL(url);
+    // Check for common image extensions or data URLs
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'];
+    const pathname = urlObj.pathname.toLowerCase();
+    const isImageExtension = imageExtensions.some(ext => pathname.endsWith(ext));
+    const isDataUrl = url.startsWith('data:image/');
+    return isImageExtension || isDataUrl || url.startsWith('http://') || url.startsWith('https://');
+  } catch {
+    return false;
+  }
+};
+
+// Helper function to parse JSON description and extract readable content
+const parseDescription = (description: string | undefined): { text: string; isRichText: boolean; richTextContent?: any } => {
+  if (!description || typeof description !== 'string') return { text: '', isRichText: false };
+  
+  // Check if it's JSON
+  const trimmed = description.trim();
+  if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+    try {
+      const parsed = JSON.parse(description);
+      // Check for rich text editor format (Lexical)
+      if (parsed.root?.children) {
+        // This is a rich text format, return it for RichTextContent
+        return { text: '', isRichText: true, richTextContent: { content: description } };
+      }
+      // Check for metadata structure
+      if (parsed.metadata) {
+        const meta = parsed.metadata;
+        if (meta.mainContent) {
+          const mainResult = parseDescription(meta.mainContent);
+          if (mainResult.isRichText) return mainResult;
+          if (mainResult.text) return mainResult;
+        }
+        if (meta.content) {
+          const contentResult = parseDescription(meta.content);
+          if (contentResult.isRichText) return contentResult;
+          if (contentResult.text) return contentResult;
+        }
+        if (meta.description) {
+          return parseDescription(meta.description);
+        }
+      }
+      // Try to find any text field
+      if (parsed.content) {
+        const contentResult = parseDescription(parsed.content);
+        if (contentResult.isRichText) return contentResult;
+        if (contentResult.text) return contentResult;
+      }
+      if (parsed.text) return parseDescription(parsed.text);
+      if (parsed.description) return parseDescription(parsed.description);
+    } catch (e) {
+      // If parsing fails, return empty
+      return { text: '', isRichText: false };
+    }
+  }
+  
+  return { text: description, isRichText: false };
+};
 
 export function ResourceCoursePage() {
   const { id = '' } = useParams<{ id: string }>();
   const { userProfile } = useAuthContext();
   const userInfoId = userProfile?.id || '';
   const navigate = useNavigate();
-
-  console.log('Current user profile:', userProfile);
 
   const {
     data: course,
@@ -44,7 +123,7 @@ export function ResourceCoursePage() {
 
   const hasCompletedEntranceTest = progressStatus?.isCompletedEntranceTest ?? false;
 
-  // Debug logging
+  // Error logging
   useEffect(() => {
     if (courseError) {
       console.error('Course detail error:', courseError);
@@ -54,11 +133,16 @@ export function ResourceCoursePage() {
     }
   }, [courseError, lecturesError]);
 
-  useEffect(() => {
-    if (lectures) {
-      console.log('Lectures data:', lectures);
-    }
-  }, [lectures]);
+  // Parse description for display
+  const descriptionContent = useMemo(() => {
+    return parseDescription(course?.description);
+  }, [course?.description]);
+
+  // Get valid thumbnail URL
+  const thumbnailUrl = useMemo(() => {
+    if (!course?.thumbnailUrl) return null;
+    return isValidImageUrl(course.thumbnailUrl) ? course.thumbnailUrl : null;
+  }, [course?.thumbnailUrl]);
 
   const handleEnroll = async () => {
     if (!userInfoId) {
@@ -130,81 +214,93 @@ export function ResourceCoursePage() {
 
   return (
     <div className="flex flex-col w-full max-w-7xl mx-auto gap-8 p-6">
-      {/* Course Header */}
-      <div className="flex flex-col gap-6">
-        {/* Thumbnail */}
-        {course.thumbnailUrl && (
-          <div className="w-full aspect-video rounded-lg overflow-hidden bg-gray-200">
-            <img
-              src={course.thumbnailUrl}
-              alt={course.title}
-              className="w-full h-full object-cover"
-            />
+      {/* Course Header - Thumbnail and Basic Info Side by Side */}
+      <div className="flex flex-col lg:flex-row gap-6 bg-white rounded-lg shadow-sm p-6">
+        {/* Thumbnail - Left Side */}
+        {thumbnailUrl && (
+          <div className="flex-shrink-0">
+            <div className="w-full lg:w-80 aspect-video rounded-lg overflow-hidden bg-gray-200 shadow-md">
+              <img
+                src={thumbnailUrl}
+                alt={course.title || 'Course thumbnail'}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                }}
+              />
+            </div>
           </div>
         )}
 
-        {/* Course Info */}
-        <div className="flex flex-col gap-4">
-          <h1 className="text-4xl font-bold">{course.title}</h1>
+        {/* Course Basic Info - Right Side */}
+        <div className="flex-1 flex flex-col gap-4">
+          <div>
+            <h1 className="text-3xl lg:text-4xl font-bold mb-3">{course.title}</h1>
+            
+            {course.lecturer && (
+              <p className="text-base text-gray-600">
+                <span className="font-semibold">Instructor:</span>{' '}
+                <span className="font-medium">{course.lecturer}</span>
+              </p>
+            )}
+          </div>
 
-          {course.lecturer && (
-            <p className="text-lg text-gray-600">
-              Instructor: <span className="font-medium">{course.lecturer}</span>
-            </p>
-          )}
+          {/* Enrollment Status and Info */}
+          <div className="flex flex-wrap items-center gap-3">
+            {isEnrolled && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                <MdCheckCircle size={16} /> Enrolled
+              </span>
+            )}
+            
+            {isEnrolled && hasCompletedEntranceTest && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                <MdCheckCircle size={16} /> Entrance Test Completed
+              </span>
+            )}
 
-          {course.description && (
-            <p className="text-gray-700 leading-relaxed">
-              {course.description}
-            </p>
-          )}
+            {isEnrolled && progressStatus?.isCompletedCourse && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
+                <MdSchool size={16} /> Course Completed
+              </span>
+            )}
 
-          {/* Tags */}
-          {course.tags && course.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {course.tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Enrollment Info */}
-          <div className="flex items-center gap-4">
             {course.participantsCount !== undefined && (
-              <span className="text-gray-600">
-                {course.participantsCount} students enrolled
+              <span className="inline-flex items-center gap-1 text-sm text-gray-600 px-3 py-1 bg-gray-100 rounded-full">
+                <MdPeople size={16} /> {course.participantsCount} students
               </span>
             )}
           </div>
 
-          {/* Enrollment Button */}
-          <div className="flex gap-4 mt-4">
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-3 mt-2">
             {!isEnrolled ? (
               <Button
                 onClick={handleEnroll}
                 disabled={enrolling}
-                className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
+                className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
               >
-                {enrolling ? 'Enrolling...' : 'Enroll Now'}
+                {enrolling ? (
+                  'Enrolling...'
+                ) : (
+                  <>
+                    <MdLibraryBooks size={18} />
+                    Enroll Now
+                  </>
+                )}
               </Button>
             ) : (
-              <div className="flex items-center gap-4">
-                <span className="px-4 py-2 bg-green-100 text-green-800 rounded-lg font-medium">
-                  ✓ Enrolled
-                </span>
+              <>
                 {!hasCompletedEntranceTest ? (
                   <Button
                     onClick={() => {
                       const entranceTestRoute = STUDENT_WEB_ROUTES.COURSE_ENTRANCE_TEST.replace(':courseId', id);
                       navigate(entranceTestRoute);
                     }}
-                    className="px-8 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg"
+                    className="inline-flex items-center gap-2 px-6 py-2.5 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg"
                   >
+                    <MdEdit size={18} />
                     Take Entrance Test
                   </Button>
                 ) : progressStatus?.isCompletedTotalCourseSection && !progressStatus?.isCompletedFinalCourseTest ? (
@@ -213,9 +309,10 @@ export function ResourceCoursePage() {
                       const finalExamRoute = STUDENT_WEB_ROUTES.COURSE_FINAL_EXAM.replace(':courseId', id);
                       navigate(finalExamRoute);
                     }}
-                    className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg flex items-center gap-2"
+                    className="inline-flex items-center gap-2 px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg"
                   >
-                    🎯 Take Final Exam
+                    <MdEmojiEvents size={18} />
+                    Take Final Exam
                   </Button>
                 ) : progressStatus?.isCompletedCourse ? (
                   <Button
@@ -223,42 +320,44 @@ export function ResourceCoursePage() {
                       const finalExamRoute = STUDENT_WEB_ROUTES.COURSE_FINAL_EXAM.replace(':courseId', id);
                       navigate(finalExamRoute);
                     }}
-                    className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg flex items-center gap-2"
+                    className="inline-flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg"
                   >
-                    🎓 View Certificate
+                    <MdSchool size={18} />
+                    View Certificate
                   </Button>
                 ) : (
                   <Button
                     onClick={() => {
                       // Navigate to first incomplete lecture
                       const firstIncompleteLecture = lectures?.find(l => !l.isCompletedCourseSection);
-                      if (firstIncompleteLecture) {
+                      if (firstIncompleteLecture && firstIncompleteLecture.courseSectionId) {
                         const lectureRoute = STUDENT_WEB_ROUTES.COURSE_LECTURE
                           .replace(':courseId', id)
                           .replace(':lectureId', firstIncompleteLecture.courseSectionId);
                         navigate(lectureRoute);
                       }
                     }}
-                    className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
+                    className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
                   >
+                    <MdPlayArrow size={18} />
                     Continue Learning
                   </Button>
                 )}
-              </div>
+              </>
             )}
           </div>
 
           {/* Entrance Test Requirement Notice */}
           {isEnrolled && !hasCompletedEntranceTest && (
-            <div className="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded-lg">
-              <div className="flex items-center gap-2">
-                <span className="text-yellow-700 text-xl">⚠️</span>
-                <div>
+            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="flex items-start gap-2">
+                <MdWarning className="text-yellow-600 flex-shrink-0 mt-0.5" size={20} />
+                <div className="flex-1">
                   <h3 className="text-sm font-semibold text-yellow-800">
                     Entrance Test Required
                   </h3>
-                  <p className="text-sm text-yellow-700 mt-1">
-                    You must complete the entrance test before accessing the course lectures.
+                  <p className="text-xs text-yellow-700 mt-0.5">
+                    Complete the entrance test to access course content.
                   </p>
                 </div>
               </div>
@@ -267,55 +366,96 @@ export function ResourceCoursePage() {
         </div>
       </div>
 
-      {/* Course Lectures */}
+      {/* Course Description/Content - Full Width Below */}
+      {(descriptionContent.isRichText || descriptionContent.text) && (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-2xl font-bold mb-4">About This Course</h2>
+          
+          {descriptionContent.isRichText && descriptionContent.richTextContent && (
+            <div className="text-gray-700 leading-relaxed prose max-w-none">
+              <RichTextContent value={stringToRichText(descriptionContent.richTextContent.content)} />
+            </div>
+          )}
+
+          {!descriptionContent.isRichText && descriptionContent.text && (
+            <div className="text-gray-700 leading-relaxed">
+              {descriptionContent.text}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Course Lectures - Full Width */}
       {isEnrolled && hasCompletedEntranceTest && (
-        <div className="flex flex-col gap-4 mt-8">
-          <h2 className="text-2xl font-bold">Course Content</h2>
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold">Course Content</h2>
+            {lectures && lectures.length > 0 && (
+              <span className="text-sm text-gray-600">
+                {lectures.filter(l => l.isCompletedCourseSection).length} / {lectures.length} completed
+              </span>
+            )}
+          </div>
 
           {lecturesLoading ? (
-            <div className="text-gray-600">Loading lectures...</div>
+            <div className="text-center py-8 text-gray-600">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+              Loading lectures...
+            </div>
           ) : lectures && lectures.length > 0 ? (
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2">
               {lectures.map((lecture, index) => (
                 <div
                   key={lecture.id}
                   onClick={() => {
-                    const lectureRoute = STUDENT_WEB_ROUTES.COURSE_LECTURE
-                      .replace(':courseId', id)
-                      .replace(':lectureId', lecture.courseSectionId);
-                    navigate(lectureRoute);
+                    if (lecture.courseSectionId) {
+                      const lectureRoute = STUDENT_WEB_ROUTES.COURSE_LECTURE
+                        .replace(':courseId', id)
+                        .replace(':lectureId', lecture.courseSectionId);
+                      navigate(lectureRoute);
+                    }
                   }}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors hover:border-blue-500"
+                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition-all group"
                 >
-                  <div className="flex items-center gap-4">
-                    <span className="text-gray-500 font-medium">
-                      {index + 1}.
-                    </span>
-                    <div className="flex flex-col">
-                      <h3 className="font-medium">{lecture.title}</h3>
-                      {lecture.videoDuration && (
-                        <span className="text-sm text-gray-500">
-                          {Math.floor(lecture.videoDuration / 60)} minutes
-                        </span>
-                      )}
+                  <div className="flex items-center gap-4 flex-1">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-600 font-semibold text-sm group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
+                      {index + 1}
+                    </div>
+                    <div className="flex flex-col flex-1">
+                      <h3 className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+                        {lecture.title}
+                      </h3>
+                      <div className="flex items-center gap-3 mt-1">
+                        {lecture.videoDuration && (
+                          <span className="text-xs text-gray-500 flex items-center gap-1">
+                            <MdVideocam size={14} /> {Math.floor(lecture.videoDuration / 60)} min
+                          </span>
+                        )}
+                        {lecture.totalCredits && (
+                          <span className="text-xs text-gray-500 flex items-center gap-1">
+                            <MdStar size={14} /> {lecture.totalCredits} credits
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    {lecture.isCompletedCourseSection && (
-                      <span className="text-green-600 font-medium">✓</span>
-                    )}
-                    {lecture.totalCredits && (
-                      <span className="text-sm text-gray-500">
-                        {lecture.totalCredits} credits
+                    {lecture.isCompletedCourseSection ? (
+                      <span className="flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600">
+                        <MdCheckCircle size={16} />
                       </span>
+                    ) : (
+                      <span className="flex items-center justify-center w-6 h-6 rounded-full border-2 border-gray-300 group-hover:border-blue-400"></span>
                     )}
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="text-gray-600">No lectures available yet</div>
+            <div className="text-center py-8 text-gray-500">
+              No lectures available yet
+            </div>
           )}
         </div>
       )}

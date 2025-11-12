@@ -81,6 +81,7 @@ public class UserCourseServiceImpl implements UserCourseService {
                     UserProgressCourseDto dto = userRegistrationCourseMapper.toUserProgressCourseDto(urc);
                     dto.setCourseId(urc.getCourse().getId());
                     dto.setCourseTitle(urc.getCourse().getTitle());
+                    // thumbnailUrl is now automatically set by the mapper
                     return dto;
                 })
                 .toList();

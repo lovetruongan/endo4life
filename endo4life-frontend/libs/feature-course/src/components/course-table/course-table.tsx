@@ -8,6 +8,7 @@ import { RefObject, useState } from 'react';
 import { CourseState } from '@endo4life/data-access';
 import { AgGridReact } from 'ag-grid-react';
 import { arrayUtils, booleanUtils } from '@endo4life/util-common';
+import CourseStateDialog from '../course-state-dialog/course-state-dialog';
 
 interface Props {
   gridRef: RefObject<AgGridReact>;
@@ -67,6 +68,13 @@ export function CourseTable({
         onSortChanged={onSortChange}
         onSelectionChanged={handleSelectionChanged}
       />
+      {openStateDialog && selectCourse && (
+        <CourseStateDialog
+          courseId={selectCourse}
+          state={stateCourse}
+          onClose={() => openStateDialogAction.setLeft()}
+        />
+      )}
     </div>
   );
 }

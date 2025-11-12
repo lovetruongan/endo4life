@@ -4,6 +4,7 @@ import { useEntranceTest, useTestSubmission } from '@endo4life/feature-resources
 import { StudentTestContainer } from '@endo4life/feature-resources';
 import { STUDENT_WEB_ROUTES } from '@endo4life/feature-config';
 import { toast } from 'react-toastify';
+import { MdWarning } from 'react-icons/md';
 
 export function EntranceTestPage() {
   const { courseId = '' } = useParams<{ courseId: string }>();
@@ -74,7 +75,7 @@ export function EntranceTestPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center max-w-md">
-          <div className="text-red-600 text-6xl mb-4">⚠️</div>
+          <MdWarning className="text-red-600 mx-auto mb-4" size={72} />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Failed to Load Test
           </h2>

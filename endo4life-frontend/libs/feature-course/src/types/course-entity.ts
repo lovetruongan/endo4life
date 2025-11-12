@@ -14,6 +14,7 @@ export interface ICourseEntity extends BaseEntity<CourseResponseDto> {
   title: string;
   description?: IRichText;
   author?: string;
+  status?: string;
   tags?: string[];
   detailTags?: string[];
   thumbnail?: IImageUploadableEntity;

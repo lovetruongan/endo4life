@@ -77,17 +77,24 @@ export class CourseMapper implements ICourseMapper {
       thumbnail = undefined;
     }
 
+    const updateDto: any = {
+      thumbnail,
+      title: data.title,
+      description: data.description?.content,
+      lecturer: data.author,
+      tags: data.tags,
+      tagsDetail: data.detailTags,
+    };
+
+    // Always include state if it's provided (even if it's an empty string, let backend handle it)
+    // But check if it's explicitly set (not undefined/null)
+    if (data.state !== undefined && data.state !== null) {
+      updateDto.state = data.state as CourseState;
+    }
+
     return {
       id: data.id,
-      updateCourseRequestDto: {
-        thumbnail,
-        state: data.state as CourseState,
-        title: data.title,
-        description: data.description?.content,
-        lecturer: data.author,
-        tags: data.tags,
-        tagsDetail: data.detailTags,
-      },
+      updateCourseRequestDto: updateDto,
     };
   }
 

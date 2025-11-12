@@ -13,6 +13,7 @@ import {
   PiArrowDownBold
 } from 'react-icons/pi';
 import { BiBot } from 'react-icons/bi';
+import { MdWarning } from 'react-icons/md';
 import { useAuthContext } from '@endo4life/feature-auth';
 import { Link } from 'react-router-dom';
 import { STUDENT_WEB_ROUTES } from '@endo4life/feature-config';
@@ -565,7 +566,10 @@ export function RagChat({
 
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-            <p className="font-semibold mb-1">⚠️ Error:</p>
+            <p className="font-semibold mb-1 flex items-center gap-1">
+              <MdWarning size={16} />
+              Error:
+            </p>
             <p className="text-sm">{error}</p>
           </div>
         )}
