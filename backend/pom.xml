@@ -259,7 +259,7 @@
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
                 <configuration>
-                    <url>jdbc:postgresql://3.107.208.12:5432/elearning</url>
+                    <url>jdbc:postgresql://52.65.109.56:5432/elearning</url>
                     <user>postgres</user>
                     <password>postgres123</password>
                 </configuration>
