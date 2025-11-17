@@ -35,11 +35,17 @@ export function DoctorUserConversationBox({
   // Generate resource link based on type and resourceId
   const getResourceLink = () => {
     if (!conversation.resourceId) return null;
-    
+
     if (conversation.type === 'VIDEO') {
-      return STUDENT_WEB_ROUTES.RESOURCE_VIDEO.replace(':id', conversation.resourceId);
+      return STUDENT_WEB_ROUTES.RESOURCE_VIDEO.replace(
+        ':id',
+        conversation.resourceId,
+      );
     } else if (conversation.type === 'IMAGE') {
-      return STUDENT_WEB_ROUTES.RESOURCE_IMAGE.replace(':id', conversation.resourceId);
+      return STUDENT_WEB_ROUTES.RESOURCE_IMAGE.replace(
+        ':id',
+        conversation.resourceId,
+      );
     }
     return null;
   };
@@ -80,7 +86,7 @@ export function DoctorUserConversationBox({
             )}
           </div>
           <span>{conversation.content}</span>
-          
+
           {/* Resource link - only show for parent conversations */}
           {!conversation.parentId && resourceLink && (
             <Link
@@ -89,7 +95,8 @@ export function DoctorUserConversationBox({
             >
               <TbExternalLink size={14} />
               <span>
-                View {conversation.type === 'VIDEO' ? 'video' : 'image'} resource
+                View {conversation.type === 'VIDEO' ? 'video' : 'image'}{' '}
+                resource
               </span>
             </Link>
           )}

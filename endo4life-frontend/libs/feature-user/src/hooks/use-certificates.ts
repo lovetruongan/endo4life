@@ -40,3 +40,30 @@ export const useCertificates = (userId?: string) => {
   };
 };
 
+export const useCourseCertificate = (courseId?: string, userId?: string) => {
+  const { data, error, isFetching } = useQuery<CertificateResponseDto>(
+    [REACT_QUERY_KEYS.COURSE_CERTIFICATE, courseId, userId],
+    async () => {
+      const helper = new CertificateApiHelper();
+      const api = await helper.getCertificateApi();
+      const response = await api.getCourseCertificate({
+        courseId: courseId!,
+        userId: userId!,
+      });
+      return response.data;
+    },
+    {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      enabled: !!courseId && !!userId, // Only run query if both are provided
+    }
+  );
+
+  return {
+    data,
+    error,
+    isLoading: isFetching,
+  };
+};
+

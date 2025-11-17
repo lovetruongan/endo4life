@@ -28,8 +28,13 @@ export function LectureReviewPage() {
 
   const { mutation: submitMutation } = useTestSubmission();
 
-  // Check if video is completed (80%+ watched)
+  // Check if video is completed (80%+ watched for normal videos, 50%+ for short videos)
   const isVideoComplete = currentLecture?.isCompletedVideoCourseSection ?? false;
+  
+  // Determine threshold based on video duration (< 10 seconds = short video)
+  const videoDuration = currentLecture?.videoDuration || 0;
+  const isShortVideo = videoDuration < 10;
+  const requiredPercentage = isShortVideo ? 50 : 80;
 
   // If video not complete, redirect back to lecture player
   if (!loading && !isVideoComplete) {
@@ -41,7 +46,7 @@ export function LectureReviewPage() {
             Video Not Complete
           </h2>
           <p className="text-gray-600 mb-6">
-            You must watch at least 80% of the lecture video before taking the review questions.
+            You must watch at least {requiredPercentage}% of the lecture video before taking the review questions.
           </p>
           <button
             onClick={() => {

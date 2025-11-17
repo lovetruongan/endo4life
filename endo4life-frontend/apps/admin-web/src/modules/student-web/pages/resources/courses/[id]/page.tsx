@@ -213,9 +213,9 @@ export function ResourceCoursePage() {
   }
 
   return (
-    <div className="flex flex-col w-full max-w-7xl mx-auto gap-8 p-6">
+    <div className="flex flex-col w-full max-w-7xl mx-auto gap-6 p-4 sm:p-6 lg:p-8">
       {/* Course Header - Thumbnail and Basic Info Side by Side */}
-      <div className="flex flex-col lg:flex-row gap-6 bg-white rounded-lg shadow-sm p-6">
+      <div className="flex flex-col lg:flex-row gap-6 bg-white rounded-xl shadow-md p-6 lg:p-8">
         {/* Thumbnail - Left Side */}
         {thumbnailUrl && (
           <div className="flex-shrink-0">
@@ -368,8 +368,8 @@ export function ResourceCoursePage() {
 
       {/* Course Description/Content - Full Width Below */}
       {(descriptionContent.isRichText || descriptionContent.text) && (
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-2xl font-bold mb-4">About This Course</h2>
+        <div className="bg-white rounded-xl shadow-md p-6 lg:p-8">
+          <h2 className="text-2xl font-bold mb-6 text-gray-900">About This Course</h2>
           
           {descriptionContent.isRichText && descriptionContent.richTextContent && (
             <div className="text-gray-700 leading-relaxed prose max-w-none">
@@ -387,9 +387,9 @@ export function ResourceCoursePage() {
 
       {/* Course Lectures - Full Width */}
       {isEnrolled && hasCompletedEntranceTest && (
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold">Course Content</h2>
+        <div className="bg-white rounded-xl shadow-md p-6 lg:p-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Course Content</h2>
             {lectures && lectures.length > 0 && (
               <span className="text-sm text-gray-600">
                 {lectures.filter(l => l.isCompletedCourseSection).length} / {lectures.length} completed
@@ -398,12 +398,12 @@ export function ResourceCoursePage() {
           </div>
 
           {lecturesLoading ? (
-            <div className="text-center py-8 text-gray-600">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-              Loading lectures...
+            <div className="text-center py-12 text-gray-600">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-3"></div>
+              <p className="text-sm">Loading lectures...</p>
             </div>
           ) : lectures && lectures.length > 0 ? (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               {lectures.map((lecture, index) => (
                 <div
                   key={lecture.id}
@@ -415,14 +415,14 @@ export function ResourceCoursePage() {
                       navigate(lectureRoute);
                     }
                   }}
-                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition-all group"
+                  className="flex items-center justify-between p-5 border-2 border-gray-200 rounded-xl hover:bg-blue-50 hover:border-blue-400 hover:shadow-md cursor-pointer transition-all duration-200 group"
                 >
                   <div className="flex items-center gap-4 flex-1">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-600 font-semibold text-sm group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 text-gray-600 font-semibold text-sm group-hover:bg-blue-600 group-hover:text-white transition-all duration-200">
                       {index + 1}
                     </div>
                     <div className="flex flex-col flex-1">
-                      <h3 className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+                      <h3 className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
                         {lecture.title}
                       </h3>
                       <div className="flex items-center gap-3 mt-1">
@@ -442,19 +442,20 @@ export function ResourceCoursePage() {
 
                   <div className="flex items-center gap-3">
                     {lecture.isCompletedCourseSection ? (
-                      <span className="flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600">
-                        <MdCheckCircle size={16} />
+                      <span className="flex items-center justify-center w-7 h-7 rounded-full bg-green-100 text-green-600">
+                        <MdCheckCircle size={18} />
                       </span>
                     ) : (
-                      <span className="flex items-center justify-center w-6 h-6 rounded-full border-2 border-gray-300 group-hover:border-blue-400"></span>
+                      <span className="flex items-center justify-center w-7 h-7 rounded-full border-2 border-gray-300 group-hover:border-blue-500 transition-colors"></span>
                     )}
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-500">
-              No lectures available yet
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-base">No lectures available yet</p>
+              <p className="text-gray-400 text-sm mt-2">Check back later for course content</p>
             </div>
           )}
         </div>

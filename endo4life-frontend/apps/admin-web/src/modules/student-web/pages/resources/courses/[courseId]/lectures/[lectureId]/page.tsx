@@ -1,20 +1,37 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '@endo4life/feature-auth';
-import { useCourseLectures, useLectureProgressRecord } from '@endo4life/feature-resources';
+import {
+  useCourseLectures,
+  useLectureProgressRecord,
+} from '@endo4life/feature-resources';
 import { STUDENT_WEB_ROUTES } from '@endo4life/feature-config';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
-import { MdArrowBack, MdArrowForward, MdCheckCircle, MdWarning, MdCheck } from 'react-icons/md';
+import {
+  MdArrowBack,
+  MdArrowForward,
+  MdCheckCircle,
+  MdWarning,
+  MdCheck,
+} from 'react-icons/md';
 import { RichTextContent } from '@endo4life/feature-richtext-editor';
 import { stringToRichText } from '@endo4life/util-common';
 
 export function LecturePlayerPage() {
-  const { courseId = '', lectureId = '' } = useParams<{ courseId: string; lectureId: string }>();
+  const { courseId = '', lectureId = '' } = useParams<{
+    courseId: string;
+    lectureId: string;
+  }>();
   const { userProfile } = useAuthContext();
   const userInfoId = userProfile?.id || '';
   const navigate = useNavigate();
 
-  const { data: lectures, loading, error, refetch } = useCourseLectures(courseId, userInfoId, true);
+  const {
+    data: lectures,
+    loading,
+    error,
+    refetch,
+  } = useCourseLectures(courseId, userInfoId, true);
   const { mutation: progressMutation } = useLectureProgressRecord();
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -24,17 +41,34 @@ export function LecturePlayerPage() {
   const saveInFlightRef = useRef(false);
 
   const currentLecture = lectures?.find((l) => l.courseSectionId === lectureId);
-  const currentIndex = lectures?.findIndex((l) => l.courseSectionId === lectureId) || 0;
-  const nextLecture = lectures && currentIndex < lectures.length - 1 ? lectures[currentIndex + 1] : null;
-  const prevLecture = lectures && currentIndex > 0 ? lectures[currentIndex - 1] : null;
+  const currentIndex =
+    lectures?.findIndex((l) => l.courseSectionId === lectureId) || 0;
+  const nextLecture =
+    lectures && currentIndex < lectures.length - 1
+      ? lectures[currentIndex + 1]
+      : null;
+  const prevLecture =
+    lectures && currentIndex > 0 ? lectures[currentIndex - 1] : null;
 
-  const isVideoComplete = currentLecture?.isCompletedVideoCourseSection ?? false;
-  const hasReviewQuestions = (currentLecture?.totalQuestionLectureReviewTest ?? 0) > 0;
-  const hasCompletedReview = currentLecture?.isCompletedLectureReviewQuestion ?? false;
+  const isVideoComplete =
+    currentLecture?.isCompletedVideoCourseSection ?? false;
+  const hasReviewQuestions =
+    (currentLecture?.totalQuestionLectureReviewTest ?? 0) > 0;
+  const hasCompletedReview =
+    currentLecture?.isCompletedLectureReviewQuestion ?? false;
 
-  // Calculate if video is 80%+ complete
+  // Calculate completion threshold based on video duration
+  // For short videos (< 10 seconds), use 50% threshold; otherwise use 80%
+  const videoDuration = currentLecture?.videoDuration || 0;
+  const isShortVideo = videoDuration < 10;
+  const completionThreshold = isShortVideo ? 50 : 80;
+
+  // Calculate if video meets completion threshold (for real-time feedback)
   const progressPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
-  const isVideoWatchedEnough = progressPercentage >= 80;
+  const isVideoWatchedEnough = progressPercentage >= completionThreshold;
+
+  // Check if review questions should be unlocked (either from backend saved state or current watch progress)
+  const canAccessReviewQuestions = isVideoComplete || isVideoWatchedEnough;
 
   // Record progress every 10 seconds
   useEffect(() => {
@@ -60,7 +94,7 @@ export function LecturePlayerPage() {
           saveInFlightRef.current = false;
           console.error('Failed to record progress:', error);
         },
-      }
+      },
     );
   }, [currentTime, lastRecordedTime, currentLecture?.id]);
 
@@ -95,36 +129,42 @@ export function LecturePlayerPage() {
         onError: () => {
           saveInFlightRef.current = false;
         },
-      }
+      },
     );
   };
 
   const handleBackToCourse = () => {
-    const courseRoute = STUDENT_WEB_ROUTES.RESOURCE_COURSE.replace(':id', courseId);
+    const courseRoute = STUDENT_WEB_ROUTES.RESOURCE_COURSE.replace(
+      ':id',
+      courseId,
+    );
     navigate(courseRoute);
   };
 
   const handleGoToReview = () => {
-    const reviewRoute = STUDENT_WEB_ROUTES.COURSE_LECTURE_REVIEW
-      .replace(':courseId', courseId)
-      .replace(':lectureId', lectureId);
+    const reviewRoute = STUDENT_WEB_ROUTES.COURSE_LECTURE_REVIEW.replace(
+      ':courseId',
+      courseId,
+    ).replace(':lectureId', lectureId);
     navigate(reviewRoute);
   };
 
   const handleNextLecture = () => {
     if (nextLecture) {
-      const nextRoute = STUDENT_WEB_ROUTES.COURSE_LECTURE
-        .replace(':courseId', courseId)
-        .replace(':lectureId', nextLecture.courseSectionId);
+      const nextRoute = STUDENT_WEB_ROUTES.COURSE_LECTURE.replace(
+        ':courseId',
+        courseId,
+      ).replace(':lectureId', nextLecture.courseSectionId);
       navigate(nextRoute);
     }
   };
 
   const handlePrevLecture = () => {
     if (prevLecture) {
-      const prevRoute = STUDENT_WEB_ROUTES.COURSE_LECTURE
-        .replace(':courseId', courseId)
-        .replace(':lectureId', prevLecture.courseSectionId);
+      const prevRoute = STUDENT_WEB_ROUTES.COURSE_LECTURE.replace(
+        ':courseId',
+        courseId,
+      ).replace(':lectureId', prevLecture.courseSectionId);
       navigate(prevRoute);
     }
   };
@@ -145,9 +185,12 @@ export function LecturePlayerPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center max-w-md">
           <MdWarning className="text-red-600 mx-auto mb-4" size={72} />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Lecture Not Found</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Lecture Not Found
+          </h2>
           <p className="text-gray-600 mb-6">
-            The lecture you're looking for could not be found or you don't have access to it.
+            The lecture you're looking for could not be found or you don't have
+            access to it.
           </p>
           <button
             onClick={handleBackToCourse}
@@ -163,12 +206,12 @@ export function LecturePlayerPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             <button
               onClick={handleBackToCourse}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 font-medium"
+              className="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-medium transition-colors"
             >
               <MdArrowBack size={20} />
               Back to Course
@@ -192,11 +235,11 @@ export function LecturePlayerPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Video Player Section */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="bg-white rounded-xl shadow-md overflow-hidden">
               {/* Video */}
               <div className="relative bg-black aspect-video">
                 {currentLecture.attachmentUrl ? (
@@ -220,26 +263,6 @@ export function LecturePlayerPage() {
                 )}
               </div>
 
-              {/* Progress Bar */}
-              <div className="p-4 border-b border-gray-200">
-                <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
-                  <span>Watch Progress</span>
-                  <span>{Math.round(progressPercentage)}%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full transition-all"
-                    style={{ width: `${progressPercentage}%` }}
-                  />
-                </div>
-                {!isVideoComplete && isVideoWatchedEnough && (
-                  <p className="text-sm text-green-600 mt-2 flex items-center gap-1">
-                    <MdCheck size={16} />
-                    You've watched enough to proceed!
-                  </p>
-                )}
-              </div>
-
               {/* Lecture Info */}
               <div className="p-6">
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">
@@ -250,9 +273,13 @@ export function LecturePlayerPage() {
                     {(() => {
                       try {
                         const raw = (currentLecture as any).attribute;
-                        const obj = typeof raw === 'string' ? JSON.parse(raw) : raw;
+                        const obj =
+                          typeof raw === 'string' ? JSON.parse(raw) : raw;
                         const meta = obj?.metadata ?? obj;
-                        const main = meta?.mainContent ?? meta?.content ?? meta?.description;
+                        const main =
+                          meta?.mainContent ??
+                          meta?.content ??
+                          meta?.description;
                         const target = meta?.target ?? meta?.objective;
                         return (
                           <>
@@ -261,8 +288,12 @@ export function LecturePlayerPage() {
                             )}
                             {target && (
                               <div>
-                                <h3 className="text-base font-semibold text-gray-900 mb-1">Objectives</h3>
-                                <RichTextContent value={stringToRichText(target)} />
+                                <h3 className="text-base font-semibold text-gray-900 mb-1">
+                                  Objectives
+                                </h3>
+                                <RichTextContent
+                                  value={stringToRichText(target)}
+                                />
                               </div>
                             )}
                           </>
@@ -275,7 +306,10 @@ export function LecturePlayerPage() {
                 )}
                 <div className="flex items-center gap-4 mt-4 text-sm text-gray-600">
                   {currentLecture.videoDuration && (
-                    <span>Duration: {Math.floor(currentLecture.videoDuration / 60)} min</span>
+                    <span>
+                      Duration: {Math.floor(currentLecture.videoDuration / 60)}{' '}
+                      min
+                    </span>
                   )}
                   {currentLecture.totalCredits && (
                     <span>Credits: {currentLecture.totalCredits}</span>
@@ -286,12 +320,14 @@ export function LecturePlayerPage() {
 
             {/* Action Buttons */}
             <div className="mt-6 flex flex-col gap-4">
-              {hasReviewQuestions && isVideoWatchedEnough && (
+              {hasReviewQuestions && canAccessReviewQuestions && (
                 <button
                   onClick={handleGoToReview}
                   className="w-full px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg flex items-center justify-center gap-2"
                 >
-                  {hasCompletedReview ? 'Review Questions Again' : 'Take Review Questions'}
+                  {hasCompletedReview
+                    ? 'Review Questions Again'
+                    : 'Take Review Questions'}
                   <MdArrowForward size={20} />
                 </button>
               )}
@@ -306,10 +342,11 @@ export function LecturePlayerPage() {
                 </button>
               )}
 
-              {hasReviewQuestions && !isVideoWatchedEnough && (
+              {hasReviewQuestions && !canAccessReviewQuestions && (
                 <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
                   <p className="text-sm text-gray-600">
-                    Watch at least 80% of the video to unlock the review questions.
+                    Watch at least 80% of the video to unlock the review
+                    questions.
                   </p>
                 </div>
               )}
@@ -318,24 +355,27 @@ export function LecturePlayerPage() {
 
           {/* Sidebar - Lecture List */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-24">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Course Content</h2>
+            <div className="bg-white rounded-xl shadow-md p-6 sticky top-24">
+              <h2 className="text-lg font-bold text-gray-900 mb-4">
+                Course Content
+              </h2>
               <div className="space-y-2 max-h-[600px] overflow-y-auto">
                 {lectures?.map((lecture, index) => (
                   <div
                     key={lecture.id}
                     onClick={() => {
                       if (lecture.courseSectionId !== lectureId) {
-                        const route = STUDENT_WEB_ROUTES.COURSE_LECTURE
-                          .replace(':courseId', courseId)
-                          .replace(':lectureId', lecture.courseSectionId);
+                        const route = STUDENT_WEB_ROUTES.COURSE_LECTURE.replace(
+                          ':courseId',
+                          courseId,
+                        ).replace(':lectureId', lecture.courseSectionId);
                         navigate(route);
                       }
                     }}
-                    className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                    className={`p-3 rounded-xl cursor-pointer transition-all duration-200 ${
                       lecture.courseSectionId === lectureId
-                        ? 'bg-blue-50 border-2 border-blue-500'
-                        : 'hover:bg-gray-50 border border-gray-200'
+                        ? 'bg-blue-50 border-2 border-blue-500 shadow-sm'
+                        : 'hover:bg-blue-50 border-2 border-gray-200 hover:border-blue-400 hover:shadow-sm'
                     }`}
                   >
                     <div className="flex items-start gap-3">
@@ -353,7 +393,10 @@ export function LecturePlayerPage() {
                         )}
                       </div>
                       {lecture.isCompletedCourseSection && (
-                        <MdCheckCircle className="flex-shrink-0 text-green-600" size={20} />
+                        <MdCheckCircle
+                          className="flex-shrink-0 text-green-600"
+                          size={20}
+                        />
                       )}
                     </div>
                   </div>
@@ -388,4 +431,3 @@ export function LecturePlayerPage() {
 }
 
 export default LecturePlayerPage;
-

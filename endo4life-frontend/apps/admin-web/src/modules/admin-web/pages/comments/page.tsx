@@ -400,14 +400,14 @@ export default function CommentsPage() {
         }
       />
 
-      <div className="flex-1 px-4 pb-4">
-        <div className="h-full ag-theme-alpine">
+      <div className="flex flex-col flex-auto w-full h-1 px-5 overflow-y-auto">
+        <div className="ag-theme-alpine" style={{ width: '100%' }}>
           <AgGridReact
             ref={gridRef}
             rowData={commentsData?.data || []}
             columnDefs={columnDefs}
             loading={loadingComments}
-            domLayout="normal"
+            domLayout="autoHeight"
             rowHeight={60}
             headerHeight={48}
             pagination={false}
@@ -417,13 +417,6 @@ export default function CommentsPage() {
               resizable: true,
             }}
           />
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between px-4 py-3 border-t">
-        <div className="text-sm text-gray-700">
-          Hiển thị {formatNumber(commentsData?.data?.length || 0)} /{' '}
-          {formatNumber(commentsData?.total || 0)} bình luận
         </div>
         <Pagination
           pagination={{

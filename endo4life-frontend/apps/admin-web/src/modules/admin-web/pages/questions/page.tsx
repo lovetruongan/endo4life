@@ -318,14 +318,14 @@ export default function QuestionsPage() {
         }
       />
 
-      <div className="flex-1 px-4 pb-4">
-        <div className="h-full ag-theme-alpine">
+      <div className="flex flex-col flex-auto w-full h-1 px-5 overflow-y-auto">
+        <div className="ag-theme-alpine" style={{ width: '100%' }}>
           <AgGridReact
             ref={gridRef}
             rowData={conversationsData?.data || []}
             columnDefs={columnDefs}
             loading={loadingConversations}
-            domLayout="normal"
+            domLayout="autoHeight"
             rowHeight={60}
             headerHeight={48}
             pagination={false}
@@ -335,13 +335,6 @@ export default function QuestionsPage() {
               resizable: true,
             }}
           />
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between px-4 py-3 border-t">
-        <div className="text-sm text-gray-700">
-          Hiển thị {formatNumber(conversationsData?.data?.length || 0)} /{' '}
-          {formatNumber(conversationsData?.total || 0)} câu hỏi
         </div>
         <Pagination
           pagination={{

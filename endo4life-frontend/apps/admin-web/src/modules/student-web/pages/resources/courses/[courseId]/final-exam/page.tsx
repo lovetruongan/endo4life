@@ -10,6 +10,7 @@ import { STUDENT_WEB_ROUTES } from '@endo4life/feature-config';
 import { toast } from 'react-toastify';
 import { MdEmojiEvents, MdDownload, MdWarning, MdSchool, MdGpsFixed, MdCheck } from 'react-icons/md';
 import { useState } from 'react';
+import { useCourseCertificate } from '@endo4life/feature-user';
 
 export function FinalExamPage() {
   const { courseId = '' } = useParams<{ courseId: string }>();
@@ -31,6 +32,12 @@ export function FinalExamPage() {
   // Check if all lectures are completed
   const allLecturesCompleted = progressStatus?.isCompletedTotalCourseSection ?? false;
   const hasCompletedFinalExam = progressStatus?.isCompletedFinalCourseTest ?? false;
+
+  // Fetch certificate only if course is completed
+  const { data: certificate, isLoading: certificateLoading } = useCourseCertificate(
+    courseId,
+    userInfoId
+  );
 
   // If not all lectures completed, redirect
   if (!loading && !allLecturesCompleted) {
@@ -100,11 +107,24 @@ export function FinalExamPage() {
   };
 
   const handleDownloadCertificate = () => {
-    // TODO: Implement certificate download
-    toast.info('Certificate download will be available soon!', {
+    if (certificate?.fileUrl) {
+      // Open certificate in new tab to download
+      window.open(certificate.fileUrl, '_blank');
+      toast.success('Certificate download started!', {
+        position: 'top-right',
+        autoClose: 3000,
+      });
+    } else if (certificateLoading) {
+      toast.info('Loading certificate...', {
+        position: 'top-right',
+        autoClose: 2000,
+      });
+    } else {
+      toast.error('Certificate not available yet. Please contact support.', {
       position: 'top-right',
       autoClose: 3000,
     });
+    }
   };
 
   if (loading) {
@@ -183,11 +203,24 @@ export function FinalExamPage() {
 
               {/* Certificate Badge */}
               <div className="bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl p-6 mb-6 border-2 border-blue-300">
+                {certificate?.previewImageUrl ? (
+                  <img
+                    src={certificate.previewImageUrl}
+                    alt="Certificate Preview"
+                    className="w-full h-auto rounded-lg shadow-lg mb-4"
+                  />
+                ) : (
                 <MdSchool className="mx-auto mb-2 text-blue-700" size={40} />
+                )}
                 <p className="font-semibold text-gray-900">Certificate of Completion</p>
                 <p className="text-sm text-gray-600 mt-2">
                   Awarded to {userProfile?.firstName} {userProfile?.lastName}
                 </p>
+                {certificate?.issuedAt && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Issued: {new Date(certificate.issuedAt).toLocaleDateString()}
+                  </p>
+                )}
               </div>
 
               {/* Actions */}

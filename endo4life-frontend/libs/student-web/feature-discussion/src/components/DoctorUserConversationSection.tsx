@@ -69,11 +69,7 @@ export function DoctorUserConversationSection({
   );
 
   return (
-    <div
-      className={clsx({
-        'flex flex-col gap-4': true,
-      })}
-    >
+    <div className="flex flex-col gap-4">
       <ResourceCreateContext.Provider value={resourceCreateContextValue}>
         {discussAcceptable && (
           <DoctorUserConversationFormInput onSubmit={createConversation} />
@@ -81,12 +77,19 @@ export function DoctorUserConversationSection({
 
         {!loading ? (
           !data.length || !data ? (
-            <div className="flex flex-col items-center gap-4 p-4 text-slate-500">
-              <RiCheckboxMultipleBlankLine className="text-4xl " />
-              <span>Chưa có dữ liệu</span>
+            <div className="flex flex-col items-center justify-center gap-4 py-12 text-gray-500">
+              <RiCheckboxMultipleBlankLine className="text-5xl text-gray-400" />
+              <div className="text-center">
+                <p className="text-lg font-medium text-gray-700">
+                  No questions yet
+                </p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Your questions will appear here
+                </p>
+              </div>
             </div>
           ) : (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               {data.map((conversation) => {
                 const childrenConversations: IDoctorUserConversationEntity[] =
                   conversation.replies || [];

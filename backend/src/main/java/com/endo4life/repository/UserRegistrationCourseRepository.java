@@ -18,5 +18,7 @@ public interface UserRegistrationCourseRepository
 
     List<UserRegistrationCourse> findByUserId(UUID userInfoId);
 
+    List<UserRegistrationCourse> findByCourseId(UUID courseId);
+
     Optional<UserRegistrationCourse> findByCourseAndUser(Course course, UserInfo userInfo);
 }

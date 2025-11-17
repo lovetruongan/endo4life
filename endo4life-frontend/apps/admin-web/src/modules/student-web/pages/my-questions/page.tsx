@@ -10,7 +10,6 @@ import {
   ResourceDetailContext,
   ResourceCreateContext,
 } from '@endo4life/feature-resources';
-import { Container, Typography, Box } from '@mui/material';
 import { TbMessage2Question } from 'react-icons/tb';
 
 export default function MyQuestionsPage() {
@@ -18,12 +17,12 @@ export default function MyQuestionsPage() {
   const { userProfile } = useAuthContext();
 
   const { filter, updateFilter } = useDoctorUserConversationFilters(false);
-  
+
   // Determine if user is a specialist/doctor or a customer/student
   const userRole = userProfile?.roles?.[0];
   const isSpecialist = userRole === 'SPECIALIST';
   const filterField = isSpecialist ? 'assigneeId' : 'questionerId';
-  
+
   // Set filter based on current user role
   // SPECIALIST: see questions assigned to them (assigneeId)
   // CUSTOMER/STUDENT: see questions they created (questionerId)
@@ -62,33 +61,36 @@ export default function MyQuestionsPage() {
   return (
     <ResourceDetailContext.Provider value={resourceDetailContextValue}>
       <ResourceCreateContext.Provider value={resourceCreateContextValue}>
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-          <Box sx={{ mb: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-              <TbMessage2Question size={32} />
-              <Typography variant="h4" component="h1">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Header Section */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-3">
+              <TbMessage2Question size={32} className="text-blue-600" />
+              <h1 className="text-3xl font-bold text-gray-900">
                 {userRole === 'SPECIALIST'
                   ? 'Assigned Questions'
                   : t('navigation.txtMenuItemQ&A')}
-              </Typography>
-            </Box>
-            <Typography variant="body1" color="text.secondary">
+              </h1>
+            </div>
+            <p className="text-base text-gray-600 ml-11">
               {userRole === 'SPECIALIST'
                 ? 'View questions assigned to you. Go to the course resource to reply.'
                 : 'Track your questions and get answers from assigned doctors'}
-            </Typography>
-          </Box>
+            </p>
+          </div>
 
-          <DoctorUserConversationSection
-            discussAcceptable={false} // Questions must be asked from course resources, not standalone
-            replyAcceptable={!isSpecialist} // Specialists must go to course to reply, students can reply here
-            data={data}
-            loading={loading}
-            onRefresh={handleRefresh}
-          />
-        </Container>
+          {/* Questions Section */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <DoctorUserConversationSection
+              discussAcceptable={false}
+              replyAcceptable={!isSpecialist}
+              data={data}
+              loading={loading}
+              onRefresh={handleRefresh}
+            />
+          </div>
+        </div>
       </ResourceCreateContext.Provider>
     </ResourceDetailContext.Provider>
   );
 }
-

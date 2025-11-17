@@ -6,6 +6,7 @@ import com.endo4life.domain.document.Test;
 import com.endo4life.domain.document.UserProgressCourseSection;
 import com.endo4life.domain.document.UserRegistrationCourse;
 import com.endo4life.mapper.CourseSectionMapper;
+import com.endo4life.repository.CourseSectionRepository;
 import com.endo4life.repository.UserProgressCourseSectionRepository;
 import com.endo4life.repository.UserRegistrationCourseRepository;
 import com.endo4life.utils.StringUtil;
@@ -20,9 +21,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -32,6 +35,7 @@ public class UserProgressCourseSectionServiceImpl implements UserProgressCourseS
     private final CourseSectionMapper courseSectionMapper;
     private final UserRegistrationCourseRepository userRegistrationCourseRepository;
     private final UserProgressCourseSectionRepository userProgressCourseSectionRepository;
+    private final CourseSectionRepository courseSectionRepository;
 
     @Override
     public UUID recordUserLectureData(UUID userProgressCourseSectionId,
@@ -71,9 +75,42 @@ public class UserProgressCourseSectionServiceImpl implements UserProgressCourseS
         }
 
         UserRegistrationCourse userRegistrationCourseEntity = userRegistrationCourseEntityOpt.get();
-        List<UserProgressCourseSection> userProgressCourseSections = userRegistrationCourseEntity
-                .getUserProgressCourseSections();
-        return processLectureAndTestDto(userProgressCourseSections);
+
+        // Get ALL course sections for this course (including newly added ones)
+        List<CourseSection> allCourseSections = courseSectionRepository.findByCourseId(courseId);
+
+        // Get existing user progress records mapped by course section ID
+        Map<UUID, UserProgressCourseSection> progressMap = userRegistrationCourseEntity
+                .getUserProgressCourseSections()
+                .stream()
+                .collect(Collectors.toMap(
+                        progress -> progress.getCourseSection().getId(),
+                        progress -> progress));
+
+        // For each course section, get or create progress record
+        List<UserProgressCourseSection> syncedProgressList = allCourseSections.stream()
+                .map(courseSection -> {
+                    UserProgressCourseSection progress = progressMap.get(courseSection.getId());
+                    if (progress == null) {
+                        // Auto-create progress record for new course sections
+                        log.info("Creating new UserProgressCourseSection for courseSection: {} and user: {}",
+                                courseSection.getId(), userInfoId);
+                        progress = new UserProgressCourseSection();
+                        progress.setUserRegistrationCourse(userRegistrationCourseEntity);
+                        progress.setCourseSection(courseSection);
+                        progress.setTotalSecondLectureVideo(courseSection.getVideoDuration());
+                        progress.setTotalSecondWatchedLectureVideo(0);
+                        progress.setPercentageVideoWatched(0f);
+                        progress.setIsCompletedVideoCourseSection(false);
+                        progress.setIsCompletedLectureReviewQuestion(false);
+                        progress.setIsCompletedCourseSection(false);
+                        progress = userProgressCourseSectionRepository.save(progress);
+                    }
+                    return progress;
+                })
+                .toList();
+
+        return processLectureAndTestDto(syncedProgressList);
     }
 
     private List<LectureAndTestDto> processLectureAndTestDto(
@@ -155,7 +192,15 @@ public class UserProgressCourseSectionServiceImpl implements UserProgressCourseS
         if (Objects.nonNull(totalVideoDuration) && totalVideoDuration > 0 && Objects.nonNull(watched)) {
             float percentageWatched = (watched * Constants.ONE_HUNDRED) / totalVideoDuration;
             userProgressCourseSection.setPercentageVideoWatched(percentageWatched);
-            if (percentageWatched > Constants.COMPLETION_THRESHOLD) {
+
+            // Use different completion threshold based on video duration
+            // For very short videos (< 10 seconds), use 50% threshold to avoid timing
+            // precision issues
+            float completionThreshold = totalVideoDuration < Constants.SHORT_VIDEO_DURATION_THRESHOLD
+                    ? Constants.SHORT_VIDEO_COMPLETION_THRESHOLD
+                    : Constants.COMPLETION_THRESHOLD;
+
+            if (percentageWatched >= completionThreshold) {
                 userProgressCourseSection.setIsCompletedVideoCourseSection(true);
             }
         }
