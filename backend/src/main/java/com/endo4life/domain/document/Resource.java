@@ -81,6 +81,16 @@ public class Resource extends AbstractEntity {
 
     private String extension;
 
+    // Book-specific fields
+    private String author;
+
+    private String publisher;
+
+    private Integer publishYear;
+
+    @Column(length = 50)
+    private String isbn;
+
     @Column(nullable = false)
     private Integer commentCount = 0;
 
@@ -190,6 +200,7 @@ public class Resource extends AbstractEntity {
         VIDEO("VIDEO"),
         AVATAR("AVATAR"),
         THUMBNAIL("THUMBNAIL"),
+        BOOK("BOOK"),
         OTHER("OTHER"),
         PROCESS("PROCESS");
 

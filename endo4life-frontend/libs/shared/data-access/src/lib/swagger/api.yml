@@ -2068,6 +2068,18 @@ components:
         attachment:
           type: string
           format: uuid
+        author:
+          type: string
+          description: 'Author of the book (for BOOK type resources)'
+        publisher:
+          type: string
+          description: 'Publisher of the book (for BOOK type resources)'
+        publishYear:
+          type: integer
+          description: 'Publication year (for BOOK type resources)'
+        isbn:
+          type: string
+          description: 'ISBN number (for BOOK type resources)'
 
     ResourceCriteria:
       type: object

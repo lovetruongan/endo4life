@@ -1886,6 +1886,18 @@ components:
               type: array
               items:
                 type: string
+            author:
+              type: string
+              description: 'Author of the book (for BOOK type resources)'
+            publisher:
+              type: string
+              description: 'Publisher of the book (for BOOK type resources)'
+            publishYear:
+              type: integer
+              description: 'Publication year (for BOOK type resources)'
+            isbn:
+              type: string
+              description: 'ISBN number (for BOOK type resources)'
 
     UserResourceResponsePaginatedDto:
       type: object
@@ -1966,6 +1978,18 @@ components:
           type: string
         createdByInfo:
           $ref: '#/components/schemas/UserInfoDto'
+        author:
+          type: string
+          description: 'Author of the book (for BOOK type resources)'
+        publisher:
+          type: string
+          description: 'Publisher of the book (for BOOK type resources)'
+        publishYear:
+          type: integer
+          description: 'Publication year (for BOOK type resources)'
+        isbn:
+          type: string
+          description: 'ISBN number (for BOOK type resources)'
 
     CreateResourceRequest:
       type: object
@@ -1984,6 +2008,7 @@ components:
       enum:
         - VIDEO
         - IMAGE
+        - BOOK
         - COMPRESSED
         - OTHER
 
@@ -2028,6 +2053,18 @@ components:
           type: array
           items:
             type: string
+        author:
+          type: string
+          description: 'Author of the book (for BOOK type resources)'
+        publisher:
+          type: string
+          description: 'Publisher of the book (for BOOK type resources)'
+        publishYear:
+          type: integer
+          description: 'Publication year (for BOOK type resources)'
+        isbn:
+          type: string
+          description: 'ISBN number (for BOOK type resources)'
 
     UpdateResourceRequestDto:
       type: object
@@ -2068,6 +2105,18 @@ components:
         attachment:
           type: string
           format: uuid
+        author:
+          type: string
+          description: 'Author of the book (for BOOK type resources)'
+        publisher:
+          type: string
+          description: 'Publisher of the book (for BOOK type resources)'
+        publishYear:
+          type: integer
+          description: 'Publication year (for BOOK type resources)'
+        isbn:
+          type: string
+          description: 'ISBN number (for BOOK type resources)'
 
     ResourceCriteria:
       type: object
@@ -2137,6 +2186,7 @@ components:
         - VIDEO
         - AVATAR
         - THUMBNAIL
+        - BOOK
         - OTHER
         - PROCESS
 

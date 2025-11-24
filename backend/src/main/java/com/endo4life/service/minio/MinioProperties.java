@@ -20,6 +20,7 @@ public class MinioProperties {
     private String bucketImage;
     private String bucketAvatar;
     private String bucketThumbnail;
+    private String bucketBook;
     private String bucketOther;
     private String bucketProcess;
 }

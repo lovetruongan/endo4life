@@ -27,7 +27,24 @@ public class ResourceSpecifications {
         if (Objects.isNull(resourceType)) {
             return null;
         }
-        return (root, query, builder) -> builder.equal(root.get(Resource_.type), resourceType);
+        // Convert web model ResourceType to domain ResourceType enum
+        Resource.ResourceType domainType = convertToDomainResourceType(resourceType);
+        return (root, query, builder) -> builder.equal(root.get(Resource_.type), domainType);
+    }
+
+    private Resource.ResourceType convertToDomainResourceType(ResourceType webType) {
+        if (webType == null) {
+            return null;
+        }
+        return switch (webType) {
+            case IMAGE -> Resource.ResourceType.IMAGE;
+            case VIDEO -> Resource.ResourceType.VIDEO;
+            case AVATAR -> Resource.ResourceType.AVATAR;
+            case THUMBNAIL -> Resource.ResourceType.THUMBNAIL;
+            case BOOK -> Resource.ResourceType.BOOK;
+            case OTHER -> Resource.ResourceType.OTHER;
+            case PROCESS -> Resource.ResourceType.PROCESS;
+        };
     }
 
     private Specification<Resource> hasState(final ResourceState state) {

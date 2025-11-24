@@ -442,6 +442,7 @@ public class ResourceServiceImpl implements ResourceService {
             case IMAGE -> com.endo4life.web.rest.model.ResourceType.IMAGE;
             case AVATAR -> com.endo4life.web.rest.model.ResourceType.AVATAR;
             case THUMBNAIL -> com.endo4life.web.rest.model.ResourceType.THUMBNAIL;
+            case BOOK -> com.endo4life.web.rest.model.ResourceType.BOOK;
             case OTHER -> com.endo4life.web.rest.model.ResourceType.OTHER;
             case PROCESS -> com.endo4life.web.rest.model.ResourceType.PROCESS;
         };
@@ -465,6 +466,9 @@ public class ResourceServiceImpl implements ResourceService {
         }
         if (StringUtils.equalsIgnoreCase(uploadType.getValue(), Constants.IMAGE_RESOURCE_TYPE)) {
             return ResourceType.IMAGE;
+        }
+        if (StringUtils.equalsIgnoreCase(uploadType.getValue(), "BOOK")) {
+            return ResourceType.BOOK;
         }
         if (StringUtils.equalsIgnoreCase(uploadType.getValue(), Constants.OTHER_RESOURCE_TYPE)) {
             return ResourceType.OTHER;

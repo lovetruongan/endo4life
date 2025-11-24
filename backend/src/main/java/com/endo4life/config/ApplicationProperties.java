@@ -40,6 +40,7 @@ public record ApplicationProperties(
                         String bucketImage,
                         String bucketAvatar,
                         String bucketThumbnail,
+                        String bucketBook,
                         String bucketOther,
                         String bucketProcess) {
         }

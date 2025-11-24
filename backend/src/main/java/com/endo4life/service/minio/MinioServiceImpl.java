@@ -275,6 +275,9 @@ public class MinioServiceImpl implements MinioService {
         if (StringUtils.equalsIgnoreCase(resourceType, "AVATAR")) {
             return properties.getBucketAvatar();
         }
+        if (StringUtils.equalsIgnoreCase(resourceType, "BOOK")) {
+            return properties.getBucketBook();
+        }
         if (StringUtils.equalsIgnoreCase(resourceType, "PROCESS")) {
             return properties.getBucketProcess();
         }

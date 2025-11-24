@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { IoBookOutline } from 'react-icons/io5';
-import { BsDownload } from 'react-icons/bs';
 import { AiOutlineEye } from 'react-icons/ai';
 
 export interface Book {
@@ -15,7 +14,6 @@ export interface Book {
   language?: string;
   fileUrl?: string;
   views?: number;
-  downloads?: number;
 }
 
 interface BookCardProps {
@@ -99,12 +97,6 @@ export function BookCard({ book }: BookCardProps) {
             <div className="flex items-center gap-1">
               <AiOutlineEye size={16} />
               <span>{book.views}</span>
-            </div>
-          )}
-          {book.downloads !== undefined && (
-            <div className="flex items-center gap-1">
-              <BsDownload size={14} />
-              <span>{book.downloads}</span>
             </div>
           )}
         </div>

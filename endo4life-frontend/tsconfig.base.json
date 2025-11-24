@@ -15,40 +15,31 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@endo4life/data-access": [
-        "libs/shared/data-access/src/index.ts"
-      ],
+      "@endo4life/data-access": ["libs/shared/data-access/src/index.ts"],
       "@endo4life/feature-assessments": [
         "libs/feature-assessments/src/index.ts"
       ],
       "@endo4life/feature-auth": ["libs/feature-auth/src/index.ts"],
-      "@endo4life/feature-config": [
-        "libs/feature-config/src/index.ts"
+      "@endo4life/feature-book": [
+        "libs/feature-book/feature-book/src/index.ts"
       ],
-      "@endo4life/feature-course": [
-        "libs/feature-course/src/index.ts"
-      ],
+      "@endo4life/feature-config": ["libs/feature-config/src/index.ts"],
+      "@endo4life/feature-course": ["libs/feature-course/src/index.ts"],
       "@endo4life/feature-course-section": [
         "libs/feature-course-section/src/index.ts"
-      ],
-      "@endo4life/feature-i18n": ["libs/feature-i18n/src/index.ts"],
-      "@endo4life/feature-image": [
-        "libs/feature-image/src/index.ts"
-      ],
-      "@endo4life/feature-image-viewer": [
-        "libs/feature-image-viewer/src/index.ts"
-      ],
-      "@endo4life/feature-library": [
-        "libs/feature-library/src/index.ts"
-      ],
-      "@endo4life/feature-resources": [
-        "libs/student-web/feature-resources/src/index.ts"
       ],
       "@endo4life/feature-discussion": [
         "libs/student-web/feature-discussion/src/index.ts"
       ],
-      "@endo4life/feature-rag": [
-        "libs/student-web/feature-rag/src/index.ts"
+      "@endo4life/feature-i18n": ["libs/feature-i18n/src/index.ts"],
+      "@endo4life/feature-image": ["libs/feature-image/src/index.ts"],
+      "@endo4life/feature-image-viewer": [
+        "libs/feature-image-viewer/src/index.ts"
+      ],
+      "@endo4life/feature-library": ["libs/feature-library/src/index.ts"],
+      "@endo4life/feature-rag": ["libs/student-web/feature-rag/src/index.ts"],
+      "@endo4life/feature-resources": [
+        "libs/student-web/feature-resources/src/index.ts"
       ],
       "@endo4life/feature-richtext-editor": [
         "libs/feature-richtext-editor/src/index.ts"
@@ -56,16 +47,10 @@
       "@endo4life/feature-tag": ["libs/feature-tag/src/index.ts"],
       "@endo4life/feature-test": ["libs/feature-test/src/index.ts"],
       "@endo4life/feature-user": ["libs/feature-user/src/index.ts"],
-      "@endo4life/feature-videos": [
-        "libs/feature-videos/src/index.ts"
-      ],
+      "@endo4life/feature-videos": ["libs/feature-videos/src/index.ts"],
       "@endo4life/types": ["libs/shared/types/src/index.ts"],
-      "@endo4life/ui-common": [
-        "libs/shared/ui-common/src/index.ts"
-      ],
-      "@endo4life/util-common": [
-        "libs/shared/util-common/src/index.ts"
-      ]
+      "@endo4life/ui-common": ["libs/shared/ui-common/src/index.ts"],
+      "@endo4life/util-common": ["libs/shared/util-common/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

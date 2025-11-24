@@ -87,7 +87,7 @@ export default function Footer() {
             <h3 className="text-title1 font-semibold mb-4">Tài Nguyên & Hỗ Trợ</h3>
             <ul className="space-y-3">
               {resourceLinks.map((link) => (
-                <li key={link.path}>
+                <li key={link.id}>
                   <Link
                     to={link.path}
                     className="text-body1 text-gray-300 hover:text-primary-300 transition-colors duration-200 inline-flex items-center gap-2 group"
@@ -158,7 +158,7 @@ export default function Footer() {
             
             <div className="flex flex-wrap justify-center gap-6">
               {legalLinks.map((link, index) => (
-                <span key={link.path} className="flex items-center gap-6">
+                <div key={link.path} className="flex items-center gap-6">
                   <Link
                     to={link.path}
                     className="text-body1 text-gray-300 hover:text-primary-300 transition-colors duration-200"
@@ -168,7 +168,7 @@ export default function Footer() {
                   {index < legalLinks.length - 1 && (
                     <span className="text-gray-300">•</span>
                   )}
-                </span>
+                </div>
               ))}
             </div>
           </div>
@@ -195,11 +195,11 @@ const quickLinks = [
 ];
 
 const resourceLinks = [
-  { label: 'Khóa Học', path: STUDENT_WEB_ROUTES.RESOURCES },
-  { label: 'Video Học Tập', path: STUDENT_WEB_ROUTES.RESOURCES },
-  { label: 'Tài Liệu', path: STUDENT_WEB_ROUTES.RESOURCES },
-  { label: 'Câu Hỏi Thường Gặp', path: STUDENT_WEB_ROUTES.ABOUT_US },
-  { label: 'Hỗ Trợ', path: STUDENT_WEB_ROUTES.ABOUT_US },
+  { id: 'resource-1', label: 'Khóa Học', path: STUDENT_WEB_ROUTES.RESOURCES },
+  { id: 'resource-2', label: 'Video Học Tập', path: STUDENT_WEB_ROUTES.RESOURCES },
+  { id: 'resource-3', label: 'Tài Liệu', path: STUDENT_WEB_ROUTES.RESOURCES },
+  { id: 'resource-4', label: 'Câu Hỏi Thường Gặp', path: STUDENT_WEB_ROUTES.ABOUT_US },
+  { id: 'resource-5', label: 'Hỗ Trợ', path: STUDENT_WEB_ROUTES.ABOUT_US },
 ];
 
 const legalLinks = [

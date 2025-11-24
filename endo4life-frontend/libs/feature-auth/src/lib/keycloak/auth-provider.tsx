@@ -69,7 +69,7 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [keycloak, setKeycloak] = useState<Keycloak>();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(true);
   const [userProfile, setUserProfile] = useState<KeycloakUserProfile>();
   const [useDirectLogin] = useState(true); // Set to true for direct login, false for redirect
 

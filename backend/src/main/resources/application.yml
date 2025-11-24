@@ -90,6 +90,7 @@ spring:
       bucket-image: images
       bucket-avatar: avatars
       bucket-thumbnail: thumbnails
+      bucket-book: books
       bucket-other: others
       bucket-process: process
     job:
