@@ -40,8 +40,9 @@ import {
 import { FiCamera, FiCrop, FiDownload } from 'react-icons/fi';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { useToggle } from 'ahooks';
-import { useAllTagOptions } from '@endo4life/feature-tag';
+import { useAllTagOptions, useTagOptionsByType } from '@endo4life/feature-tag';
 import { EnvConfig } from '@endo4life/feature-config';
+import { TagType } from '@endo4life/data-access';
 
 interface Props {
   loading?: boolean;
@@ -55,6 +56,10 @@ export function ImageDetailForm({ loading, formData, onSubmit }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
   const { loading: tagLoading, tagOptions } = useAllTagOptions();
+  const anatomyLocationOptions = useTagOptionsByType(TagType.AnatomyLocationTag);
+  const hpOptions = useTagOptionsByType(TagType.HpTag);
+  const lightOptions = useTagOptionsByType(TagType.LightTag);
+  const upperGastroOptions = useTagOptionsByType(TagType.UpperGastroAnatomyTag);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -65,7 +70,7 @@ export function ImageDetailForm({ loading, formData, onSubmit }: Props) {
   );
   const [remoteSize, setRemoteSize] = useState<string | undefined>(undefined);
 
-  const { control, handleSubmit, formState, watch } =
+  const { control, handleSubmit, formState, watch, reset } =
     useForm<IImageUpdateFormData>({
       resolver: yupResolver(useImageDetailFormSchema()),
       mode: 'onChange',
@@ -75,6 +80,16 @@ export function ImageDetailForm({ loading, formData, onSubmit }: Props) {
       },
     });
   const { options: imageStateOptions } = useImageStateOptions();
+
+  // Reset form when formData changes
+  useEffect(() => {
+    if (formData) {
+      reset({
+        ...formData,
+        file: {} as File,
+      });
+    }
+  }, [formData, reset]);
 
   const selectedFile = watch('file');
 
@@ -409,6 +424,74 @@ export function ImageDetailForm({ loading, formData, onSubmit }: Props) {
                     disabled={!selectedTag}
                     value={value}
                     options={detailTagOptions}
+                    onSubmit={onChange}
+                  />
+                )}
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Controller
+                name="metadata.anatomyLocationTag"
+                control={control}
+                render={({ field: { onChange, value, name } }) => (
+                  <FormInputMultiSelect
+                    key={name}
+                    className="flex flex-col w-full"
+                    label="Anatomy Location"
+                    isIgnoredValidating={true}
+                    value={value}
+                    options={anatomyLocationOptions.options}
+                    onSubmit={onChange}
+                  />
+                )}
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Controller
+                name="metadata.hpTag"
+                control={control}
+                render={({ field: { onChange, value, name } }) => (
+                  <FormInputMultiSelect
+                    key={name}
+                    className="flex flex-col w-full"
+                    label="HP Classification"
+                    isIgnoredValidating={true}
+                    value={value}
+                    options={hpOptions.options}
+                    onSubmit={onChange}
+                  />
+                )}
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Controller
+                name="metadata.lightTag"
+                control={control}
+                render={({ field: { onChange, value, name } }) => (
+                  <FormInputMultiSelect
+                    key={name}
+                    className="flex flex-col w-full"
+                    label="Light Type"
+                    isIgnoredValidating={true}
+                    value={value}
+                    options={lightOptions.options}
+                    onSubmit={onChange}
+                  />
+                )}
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Controller
+                name="metadata.upperGastroAnatomyTag"
+                control={control}
+                render={({ field: { onChange, value, name } }) => (
+                  <FormInputMultiSelect
+                    key={name}
+                    className="flex flex-col w-full"
+                    label="Upper GI Anatomy"
+                    isIgnoredValidating={true}
+                    value={value}
+                    options={upperGastroOptions.options}
                     onSubmit={onChange}
                   />
                 )}

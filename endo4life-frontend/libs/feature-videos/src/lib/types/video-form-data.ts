@@ -10,6 +10,10 @@ export interface IVideoFormMetadataData {
   state?: ResourceState;
   tag?: string[];
   detailTag?: string[];
+  anatomyLocationTag?: string[];
+  hpTag?: string[];
+  lightTag?: string[];
+  upperGastroAnatomyTag?: string[];
 }
 
 export interface IVideoCreateFormData {
@@ -27,6 +31,10 @@ export interface IVideoUploadFormData {
     state?: ResourceState;
     tag?: string[];
     detailTag?: string[];
+    anatomyLocationTag?: string[];
+    hpTag?: string[];
+    lightTag?: string[];
+    upperGastroAnatomyTag?: string[];
   }[];
   compressedFile?: File;
 }

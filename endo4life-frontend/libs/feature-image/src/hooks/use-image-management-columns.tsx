@@ -114,27 +114,33 @@ function useImageManagementColumns({
         field: 'tag',
         headerName: t('basicInfo.tag'),
         hide: false,
-        initialFlex: 0.75,
+        initialFlex: 0.5,
         minWidth: 100,
-        cellRenderer: (params: ICellRendererParams<IImageEntity>) => (
-          <div className="flex items-center justify-start h-full">
-            <ImageTagsCell tags={params?.data?.tag || []} />
-          </div>
-        ),
+        cellRenderer: (params: ICellRendererParams<IImageEntity>) => {
+          const firstTag = params?.data?.tag?.[0];
+          return (
+            <div className="flex items-center justify-start h-full">
+              {firstTag && <ImageTagsCell tags={[firstTag]} />}
+            </div>
+          );
+        },
       },
       {
         id: 5,
         colId: 'detailTag',
         field: 'detailTag',
         hide: false,
-        initialFlex: 0.75,
+        initialFlex: 0.5,
         minWidth: 100,
         headerName: t('basicInfo.detailTag'),
-        cellRenderer: (params: ICellRendererParams<IImageEntity>) => (
-          <div className="flex items-center justify-start h-full">
-            <ImageTagsCell tags={params?.data?.detailTag || []} />
-          </div>
-        ),
+        cellRenderer: (params: ICellRendererParams<IImageEntity>) => {
+          const firstDetailTag = params?.data?.detailTag?.[0];
+          return (
+            <div className="flex items-center justify-start h-full">
+              {firstDetailTag && <ImageTagsCell tags={[firstDetailTag]} />}
+            </div>
+          );
+        },
       },
       {
         id: 6,

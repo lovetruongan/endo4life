@@ -7,6 +7,7 @@ import {
   TbMessage2Question,
   TbFolder,
   TbStar,
+  TbTags,
 } from 'react-icons/tb';
 import { VscAccount } from 'react-icons/vsc';
 import { ADMIN_WEB_ROUTES } from '@endo4life/feature-config';
@@ -65,6 +66,11 @@ export function useNavItems() {
             label: t('navigation.txtMenuItemComment'),
             link: ADMIN_WEB_ROUTES.COMMENTS,
             icon: TbStar,
+          },
+          {
+            label: 'Tags',
+            link: ADMIN_WEB_ROUTES.TAGS,
+            icon: TbTags,
           },
         ],
       },

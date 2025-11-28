@@ -14,6 +14,8 @@ import java.util.UUID;
 public interface TagRepository extends JpaRepository<Tag, UUID>, JpaSpecificationExecutor<Tag> {
     Optional<Tag> findByContent(String content);
 
+    List<Tag> findAllByContent(String content);
+
     @Query("SELECT t.id from Tag t where t.parentId IN :parentIds")
     List<UUID> findAllIdsByParentIdIn(List<UUID> parentIds);
 }

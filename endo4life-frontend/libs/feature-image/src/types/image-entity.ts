@@ -21,4 +21,8 @@ export interface IImageEntity extends BaseEntity<ResourceResponseDto> {
   updatedAt?: string;
   tag?: string[];
   detailTag?: string[];
+  anatomyLocationTag?: string[];
+  hpTag?: string[];
+  lightTag?: string[];
+  upperGastroAnatomyTag?: string[];
 }

@@ -10,6 +10,10 @@ export interface IImageFormMetadataData {
   state?: ResourceState;
   tag?: string[];
   detailTag?: string[];
+  anatomyLocationTag?: string[];
+  hpTag?: string[];
+  lightTag?: string[];
+  upperGastroAnatomyTag?: string[];
 }
 
 export interface IImageCreateFormData {
@@ -27,6 +31,10 @@ export interface IImageUploadFormData {
     state?: ResourceState;
     tag?: string[];
     detailTag?: string[];
+    anatomyLocationTag?: string[];
+    hpTag?: string[];
+    lightTag?: string[];
+    upperGastroAnatomyTag?: string[];
   }[];
   compressedFile?: File;
 }

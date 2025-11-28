@@ -44,6 +44,10 @@ export class VideoMapper implements IVideoMapper {
       createdAt: dto.createdAt,
       tag: dto.tag || [],
       detailTag: dto.detailTag || [],
+      anatomyLocationTag: dto.anatomyLocationTag || [],
+      hpTag: dto.hpTag || [],
+      lightTag: dto.lightTag || [],
+      upperGastroAnatomyTag: dto.upperGastroAnatomyTag || [],
       metadata: dto,
     };
   }
@@ -63,6 +67,10 @@ export class VideoMapper implements IVideoMapper {
       createdAt: dto.createdAt,
       tag: dto.tag,
       detailTag: dto.detailTag,
+      anatomyLocationTag: dto.anatomyLocationTag,
+      hpTag: dto.hpTag,
+      lightTag: dto.lightTag,
+      upperGastroAnatomyTag: dto.upperGastroAnatomyTag,
       metadata: dto,
     };
   }
@@ -78,6 +86,10 @@ export class VideoMapper implements IVideoMapper {
           state: entity.state,
           tag: entity.tag,
           detailTag: entity.detailTag,
+          anatomyLocationTag: entity.anatomyLocationTag,
+          hpTag: entity.hpTag,
+          lightTag: entity.lightTag,
+          upperGastroAnatomyTag: entity.upperGastroAnatomyTag,
         },
       ],
       compressedFile: {} as File,
@@ -94,6 +106,10 @@ export class VideoMapper implements IVideoMapper {
         description: entity.description || '',
         tag: entity.tag,
         detailTag: entity.detailTag,
+        anatomyLocationTag: entity.anatomyLocationTag,
+        hpTag: entity.hpTag,
+        lightTag: entity.lightTag,
+        upperGastroAnatomyTag: entity.upperGastroAnatomyTag,
         state: entity.state,
       },
       entity: entity,
@@ -105,19 +121,16 @@ export class VideoMapper implements IVideoMapper {
     tagOptions?: IOption[]
   ): IVideoCreateFormData {
     if (tagOptions && tagOptions.length) {
+      const convertIdsToNames = (ids?: string[]) => 
+        ids?.map((id) => tagOptions.find((t) => t.value === id)?.label || 'Nhãn dán không hợp lệ');
+
       form.metadata?.forEach((item) => {
-        const parentTagIds = item.tag;
-        const detailTagIds = item.detailTag;
-        item.tag = parentTagIds?.map(
-          (id) =>
-            tagOptions.find((t) => t.value === id)?.label ||
-            'Nhãn dán không hợp lệ'
-        );
-        item.detailTag = detailTagIds?.map(
-          (id) =>
-            tagOptions.find((t) => t.value === id)?.label ||
-            'Nhãn dán không hợp lệ'
-        );
+        item.tag = convertIdsToNames(item.tag);
+        item.detailTag = convertIdsToNames(item.detailTag);
+        item.anatomyLocationTag = convertIdsToNames(item.anatomyLocationTag);
+        item.hpTag = convertIdsToNames(item.hpTag);
+        item.lightTag = convertIdsToNames(item.lightTag);
+        item.upperGastroAnatomyTag = convertIdsToNames(item.upperGastroAnatomyTag);
       });
     }
     return {
@@ -134,18 +147,15 @@ export class VideoMapper implements IVideoMapper {
   ): IVideoUpdateFormData {
     if (!data.id) throw new Error('Invalid id');
     if (tagOptions && tagOptions.length) {
-      const parentTagIds = data.metadata.tag;
-      const detailTagIds = data.metadata.detailTag;
-      data.metadata.tag = parentTagIds?.map(
-        (id) =>
-          tagOptions.find((t) => t.value === id)?.label ||
-          'Nhãn dán không hợp lệ'
-      );
-      data.metadata.detailTag = detailTagIds?.map(
-        (id) =>
-          tagOptions.find((t) => t.value === id)?.label ||
-          'Nhãn dán không hợp lệ'
-      );
+      const convertIdsToNames = (ids?: string[]) => 
+        ids?.map((id) => tagOptions.find((t) => t.value === id)?.label || 'Nhãn dán không hợp lệ');
+
+      data.metadata.tag = convertIdsToNames(data.metadata.tag);
+      data.metadata.detailTag = convertIdsToNames(data.metadata.detailTag);
+      data.metadata.anatomyLocationTag = convertIdsToNames(data.metadata.anatomyLocationTag);
+      data.metadata.hpTag = convertIdsToNames(data.metadata.hpTag);
+      data.metadata.lightTag = convertIdsToNames(data.metadata.lightTag);
+      data.metadata.upperGastroAnatomyTag = convertIdsToNames(data.metadata.upperGastroAnatomyTag);
     }
     return {
       id: data.id,
@@ -167,6 +177,10 @@ export class VideoMapper implements IVideoMapper {
           state: data?.metadata[0]?.state,
           tag: data?.metadata[0]?.tag,
           detailTag: data?.metadata[0]?.detailTag,
+          anatomyLocationTag: data?.metadata[0]?.anatomyLocationTag,
+          hpTag: data?.metadata[0]?.hpTag,
+          lightTag: data?.metadata[0]?.lightTag,
+          upperGastroAnatomyTag: data?.metadata[0]?.upperGastroAnatomyTag,
         },
       ],
       compressedFile: data.compressedFile,
@@ -189,6 +203,10 @@ export class VideoMapper implements IVideoMapper {
           state: data?.metadata[index]?.state || ResourceState.Unlisted,
           tag: data?.metadata[index]?.tag || [],
           detailTag: data?.metadata[index]?.detailTag || [],
+          anatomyLocationTag: data?.metadata[index]?.anatomyLocationTag || [],
+          hpTag: data?.metadata[index]?.hpTag || [],
+          lightTag: data?.metadata[index]?.lightTag || [],
+          upperGastroAnatomyTag: data?.metadata[index]?.upperGastroAnatomyTag || [],
         })) || [],
     };
   }
@@ -202,6 +220,10 @@ export class VideoMapper implements IVideoMapper {
       state: data.metadata.state,
       tag: data.metadata.tag,
       detailTag: data.metadata.detailTag,
+      anatomyLocationTag: data.metadata.anatomyLocationTag,
+      hpTag: data.metadata.hpTag,
+      lightTag: data.metadata.lightTag,
+      upperGastroAnatomyTag: data.metadata.upperGastroAnatomyTag,
     };
 
     // If a new file was uploaded, include the attachment field (objectKey)

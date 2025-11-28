@@ -11,10 +11,10 @@ export interface IResourceEntity extends BaseEntity {
   thumbnailUrl?: string;
   tag?: string[];
   detailTag?: string[];
-  endoscopyTag?: string[];
+  anatomyLocationTag?: string[];
   lightTag?: string[];
   hpTag?: string[];
-  locationUpperTag?: string[];
+  upperGastroAnatomyTag?: string[];
   size?: string;
   extension?: string;
   dimension?: string;
