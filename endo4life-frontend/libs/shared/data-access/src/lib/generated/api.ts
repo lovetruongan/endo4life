@@ -587,6 +587,12 @@ export interface CreateCertificateRequestDto {
      */
     'filePath': string;
     /**
+     * MIME type of the uploaded file (e.g., application/pdf, image/jpeg, image/png)
+     * @type {string}
+     * @memberof CreateCertificateRequestDto
+     */
+    'fileType'?: string;
+    /**
      * 
      * @type {string}
      * @memberof CreateCertificateRequestDto
@@ -1950,6 +1956,30 @@ export interface ResourceDetailResponseDto {
     'detailTag'?: Array<string>;
     /**
      * 
+     * @type {Array<string>}
+     * @memberof ResourceDetailResponseDto
+     */
+    'anatomyLocationTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ResourceDetailResponseDto
+     */
+    'hpTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ResourceDetailResponseDto
+     */
+    'lightTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ResourceDetailResponseDto
+     */
+    'upperGastroAnatomyTag'?: Array<string>;
+    /**
+     * 
      * @type {string}
      * @memberof ResourceDetailResponseDto
      */
@@ -2071,6 +2101,30 @@ export interface ResourceResponseDto {
      * @memberof ResourceResponseDto
      */
     'detailTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ResourceResponseDto
+     */
+    'anatomyLocationTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ResourceResponseDto
+     */
+    'hpTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ResourceResponseDto
+     */
+    'lightTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ResourceResponseDto
+     */
+    'upperGastroAnatomyTag'?: Array<string>;
     /**
      * 
      * @type {string}
@@ -3339,6 +3393,30 @@ export interface UserResourceDetailResponseDto {
     'detailTag'?: Array<string>;
     /**
      * 
+     * @type {Array<string>}
+     * @memberof UserResourceDetailResponseDto
+     */
+    'anatomyLocationTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UserResourceDetailResponseDto
+     */
+    'hpTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UserResourceDetailResponseDto
+     */
+    'lightTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UserResourceDetailResponseDto
+     */
+    'upperGastroAnatomyTag'?: Array<string>;
+    /**
+     * 
      * @type {number}
      * @memberof UserResourceDetailResponseDto
      */
@@ -3451,6 +3529,30 @@ export interface UserResourceResponseDto {
      * @memberof UserResourceResponseDto
      */
     'detailTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UserResourceResponseDto
+     */
+    'anatomyLocationTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UserResourceResponseDto
+     */
+    'hpTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UserResourceResponseDto
+     */
+    'lightTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UserResourceResponseDto
+     */
+    'upperGastroAnatomyTag'?: Array<string>;
     /**
      * 
      * @type {number}

@@ -43,7 +43,7 @@ management:
           ]
 
 application:
-  app-version: @project.version@
+  app-version: 1.0.0
 
 spring:
   task:
@@ -85,7 +85,7 @@ spring:
       endpoint: https://minio-api.mydevopsproject2023.id.vn
       username: ${MINIO_USERNAME:endo4life}
       password: ${MINIO_PASSWORD:U6ZeyWQKjLMA6t31lh4xdebjkhkCs6x9}
-      webhook-identifier: _
+      webhook-identifier: primary
       bucket-video: videos
       bucket-image: images
       bucket-avatar: avatars

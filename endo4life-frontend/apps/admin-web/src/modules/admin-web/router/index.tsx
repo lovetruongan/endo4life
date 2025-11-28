@@ -95,6 +95,9 @@ import DashboardPage from '../pages/dashboard/page';
 import KeycloakDebugPage from '../pages/debug/keycloak-debug';
 import VideoImportPageError from '../pages/videos/import/error';
 import VideoImportPageLoading from '../pages/videos/import/loading';
+import TagsPageError from '../pages/tags/error';
+import TagsPageLoading from '../pages/tags/loading';
+import TagsPage from '../pages/tags/page';
 import { ADMIN_WEB_ROUTES } from '@endo4life/feature-config';
 
 const HomePage = lazy(() => import('../pages/home/page'));
@@ -495,6 +498,29 @@ export const adminWebRouter = createBrowserRouter([
             element: (
               <Suspense fallback={<DocumentsPageLoading />}>
                 <DocumentsPage />
+              </Suspense>
+            ),
+          },
+        ],
+      },
+      // TAGS
+      {
+        path: ADMIN_WEB_ROUTES.TAGS,
+
+        element: (
+          <ProtectedRoute roles={[]}>
+            <Outlet />
+          </ProtectedRoute>
+        ),
+
+        children: [
+          {
+            path: ADMIN_WEB_ROUTES.TAGS,
+            index: true,
+            errorElement: <TagsPageError />,
+            element: (
+              <Suspense fallback={<TagsPageLoading />}>
+                <TagsPage />
               </Suspense>
             ),
           },

@@ -38,7 +38,8 @@ import {
 } from '@endo4life/util-common';
 import { useToggle } from 'ahooks';
 import { EnvConfig } from '@endo4life/feature-config';
-import { useAllTagOptions } from '@endo4life/feature-tag';
+import { useAllTagOptions, useTagOptionsByType } from '@endo4life/feature-tag';
+import { TagType } from '@endo4life/data-access';
 
 interface IImageCreateFormProps {
   loading?: boolean;
@@ -50,6 +51,10 @@ export function ImageCreateForm({ loading, onSubmit }: IImageCreateFormProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { tagOptions } = useAllTagOptions();
+  const anatomyLocationOptions = useTagOptionsByType(TagType.AnatomyLocationTag);
+  const hpOptions = useTagOptionsByType(TagType.HpTag);
+  const lightOptions = useTagOptionsByType(TagType.LightTag);
+  const upperGastroOptions = useTagOptionsByType(TagType.UpperGastroAnatomyTag);
   const formRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isCropping, croppingToggle] = useToggle<boolean>(false);
@@ -69,6 +74,10 @@ export function ImageCreateForm({ loading, onSubmit }: IImageCreateFormProps) {
             state: ResourceState.Unlisted,
             tag: [],
             detailTag: [],
+            anatomyLocationTag: [],
+            hpTag: [],
+            lightTag: [],
+            upperGastroAnatomyTag: [],
           },
         ],
       },
@@ -387,6 +396,70 @@ export function ImageCreateForm({ loading, onSubmit }: IImageCreateFormProps) {
                     key={name}
                     label={t('image:basicInfo.detailTag')}
                     disabled={!selectedTag}
+                    value={value}
+                    onSubmit={onChange}
+                  />
+                )}
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Controller
+                name="metadata.0.anatomyLocationTag"
+                control={control}
+                render={({ field: { onChange, value, name } }) => (
+                  <FormInputMultiSelect
+                    className="flex flex-col w-full text-xs"
+                    options={anatomyLocationOptions.options}
+                    key={name}
+                    label="Anatomy Location"
+                    value={value}
+                    onSubmit={onChange}
+                  />
+                )}
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Controller
+                name="metadata.0.hpTag"
+                control={control}
+                render={({ field: { onChange, value, name } }) => (
+                  <FormInputMultiSelect
+                    className="flex flex-col w-full text-xs"
+                    options={hpOptions.options}
+                    key={name}
+                    label="HP Classification"
+                    value={value}
+                    onSubmit={onChange}
+                  />
+                )}
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Controller
+                name="metadata.0.lightTag"
+                control={control}
+                render={({ field: { onChange, value, name } }) => (
+                  <FormInputMultiSelect
+                    className="flex flex-col w-full text-xs"
+                    options={lightOptions.options}
+                    key={name}
+                    label="Light Type"
+                    value={value}
+                    onSubmit={onChange}
+                  />
+                )}
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Controller
+                name="metadata.0.upperGastroAnatomyTag"
+                control={control}
+                render={({ field: { onChange, value, name } }) => (
+                  <FormInputMultiSelect
+                    className="flex flex-col w-full text-xs"
+                    options={upperGastroOptions.options}
+                    key={name}
+                    label="Upper GI Anatomy"
                     value={value}
                     onSubmit={onChange}
                   />

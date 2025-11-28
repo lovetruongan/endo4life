@@ -37,7 +37,8 @@ export const ADMIN_WEB_ROUTES = {
     COURSE_DETAIL_LECTURES_RECAP_QUESTION:
       '/courses/:id/lectures/:lectureId/recap-question', // trang xem các câu hỏi ôn tập của 1 bài giảng của 1 khoá học
   
-    QUESTIONS: '/questions',
-    DOCUMENTS: '/documents',
-  };
+  QUESTIONS: '/questions',
+  DOCUMENTS: '/documents',
+  TAGS: '/tags',
+};
   

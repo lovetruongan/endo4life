@@ -1857,6 +1857,22 @@ components:
           type: array
           items:
             type: string
+        anatomyLocationTag:
+          type: array
+          items:
+            type: string
+        hpTag:
+          type: array
+          items:
+            type: string
+        lightTag:
+          type: array
+          items:
+            type: string
+        upperGastroAnatomyTag:
+          type: array
+          items:
+            type: string
         createdAt:
           type: string
           format: date-time
@@ -1883,6 +1899,22 @@ components:
               items:
                 type: string
             detailTag:
+              type: array
+              items:
+                type: string
+            anatomyLocationTag:
+              type: array
+              items:
+                type: string
+            hpTag:
+              type: array
+              items:
+                type: string
+            lightTag:
+              type: array
+              items:
+                type: string
+            upperGastroAnatomyTag:
               type: array
               items:
                 type: string
@@ -1928,6 +1960,22 @@ components:
           type: array
           items:
             type: string
+        anatomyLocationTag:
+          type: array
+          items:
+            type: string
+        hpTag:
+          type: array
+          items:
+            type: string
+        lightTag:
+          type: array
+          items:
+            type: string
+        upperGastroAnatomyTag:
+          type: array
+          items:
+            type: string
         time:
           type: integer
 
@@ -1952,6 +2000,22 @@ components:
           items:
             type: string
         detailTag:
+          type: array
+          items:
+            type: string
+        anatomyLocationTag:
+          type: array
+          items:
+            type: string
+        hpTag:
+          type: array
+          items:
+            type: string
+        lightTag:
+          type: array
+          items:
+            type: string
+        upperGastroAnatomyTag:
           type: array
           items:
             type: string

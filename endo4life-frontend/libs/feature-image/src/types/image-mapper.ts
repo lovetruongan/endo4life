@@ -16,11 +16,12 @@ import {
 import { IOption } from '@endo4life/types';
 import { isFileValid } from '@endo4life/util-common';
 import { isEqual } from 'lodash';
+import { convertTagNamesToIds } from '@endo4life/feature-tag';
 
 export interface IImageMapper {
   fromDto(dto: ResourceResponseDto): IImageEntity;
   toCreateFormData(entity: IImageEntity): IImageCreateFormData;
-  toUpdateFormData(entity: IImageEntity): IImageUpdateFormData;
+  toUpdateFormData(entity: IImageEntity, allTagOptions?: IOption[]): IImageUpdateFormData;
   toCreateImageRequest(
     data: IImageCreateFormData,
     tagOptions?: IOption[]
@@ -58,6 +59,10 @@ export class ImageMapper implements IImageMapper {
       createdAt: dto.createdAt,
       tag: dto.tag || [],
       detailTag: dto.detailTag || [],
+      anatomyLocationTag: dto.anatomyLocationTag || [],
+      hpTag: dto.hpTag || [],
+      lightTag: dto.lightTag || [],
+      upperGastroAnatomyTag: dto.upperGastroAnatomyTag || [],
       metadata: dto,
     };
   }
@@ -77,6 +82,10 @@ export class ImageMapper implements IImageMapper {
       createdAt: dto.createdAt,
       tag: dto.tag,
       detailTag: dto.detailTag,
+      anatomyLocationTag: dto.anatomyLocationTag,
+      hpTag: dto.hpTag,
+      lightTag: dto.lightTag,
+      upperGastroAnatomyTag: dto.upperGastroAnatomyTag,
       metadata: dto,
     };
   }
@@ -92,13 +101,24 @@ export class ImageMapper implements IImageMapper {
           state: entity.state,
           tag: entity.tag,
           detailTag: entity.detailTag,
+          anatomyLocationTag: entity.anatomyLocationTag,
+          hpTag: entity.hpTag,
+          lightTag: entity.lightTag,
+          upperGastroAnatomyTag: entity.upperGastroAnatomyTag,
         },
       ],
       compressedFile: {} as File,
     };
   }
 
-  toUpdateFormData(entity: IImageEntity): IImageUpdateFormData {
+  toUpdateFormData(entity: IImageEntity, allTagOptions?: IOption[]): IImageUpdateFormData {
+    // Backend returns tag NAMES, but form needs tag UUIDs
+    // Convert names to UUIDs using tag options
+    const convertToIds = (names: string[] | undefined): string[] => {
+      if (!names || !allTagOptions) return names || [];
+      return convertTagNamesToIds(names, allTagOptions);
+    };
+
     return {
       id: entity.id,
       resourceUrl: entity.resourceUrl,
@@ -106,8 +126,12 @@ export class ImageMapper implements IImageMapper {
       metadata: {
         title: entity.title || '',
         description: entity.description || '',
-        tag: entity.tag,
-        detailTag: entity.detailTag,
+        tag: convertToIds(entity.tag),
+        detailTag: convertToIds(entity.detailTag),
+        anatomyLocationTag: convertToIds(entity.anatomyLocationTag),
+        hpTag: convertToIds(entity.hpTag),
+        lightTag: convertToIds(entity.lightTag),
+        upperGastroAnatomyTag: convertToIds(entity.upperGastroAnatomyTag),
         state: entity.state,
       },
       entity: entity,
@@ -133,6 +157,14 @@ export class ImageMapper implements IImageMapper {
       partialFormData['metadata']['tag'] = form.metadata.tag;
     if (!isEqual(form.metadata.detailTag, rawData.detailTag))
       partialFormData['metadata']['detailTag'] = form.metadata.detailTag;
+    if (!isEqual(form.metadata.anatomyLocationTag, rawData.anatomyLocationTag))
+      partialFormData['metadata']['anatomyLocationTag'] = form.metadata.anatomyLocationTag;
+    if (!isEqual(form.metadata.hpTag, rawData.hpTag))
+      partialFormData['metadata']['hpTag'] = form.metadata.hpTag;
+    if (!isEqual(form.metadata.lightTag, rawData.lightTag))
+      partialFormData['metadata']['lightTag'] = form.metadata.lightTag;
+    if (!isEqual(form.metadata.upperGastroAnatomyTag, rawData.upperGastroAnatomyTag))
+      partialFormData['metadata']['upperGastroAnatomyTag'] = form.metadata.upperGastroAnatomyTag;
 
     return partialFormData;
   }
@@ -204,6 +236,10 @@ export class ImageMapper implements IImageMapper {
           state: data?.metadata[0]?.state,
           tag: data?.metadata[0]?.tag,
           detailTag: data?.metadata[0]?.detailTag,
+          anatomyLocationTag: data?.metadata[0]?.anatomyLocationTag,
+          hpTag: data?.metadata[0]?.hpTag,
+          lightTag: data?.metadata[0]?.lightTag,
+          upperGastroAnatomyTag: data?.metadata[0]?.upperGastroAnatomyTag,
         },
       ],
       compressedFile: data.compressedFile,
@@ -226,6 +262,10 @@ export class ImageMapper implements IImageMapper {
           state: data?.metadata[index]?.state || ResourceState.Unlisted,
           tag: data?.metadata[index]?.tag || [],
           detailTag: data?.metadata[index]?.detailTag || [],
+          anatomyLocationTag: data?.metadata[index]?.anatomyLocationTag || [],
+          hpTag: data?.metadata[index]?.hpTag || [],
+          lightTag: data?.metadata[index]?.lightTag || [],
+          upperGastroAnatomyTag: data?.metadata[index]?.upperGastroAnatomyTag || [],
         })) || [],
     };
   }
@@ -239,6 +279,10 @@ export class ImageMapper implements IImageMapper {
       state: data.metadata.state,
       tag: data.metadata.tag,
       detailTag: data.metadata.detailTag,
+      anatomyLocationTag: data.metadata.anatomyLocationTag,
+      hpTag: data.metadata.hpTag,
+      lightTag: data.metadata.lightTag,
+      upperGastroAnatomyTag: data.metadata.upperGastroAnatomyTag,
     };
 
     // If a new file was uploaded, include the attachment field (objectKey)

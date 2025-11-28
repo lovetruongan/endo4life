@@ -4,6 +4,8 @@ import {
   useVideoStateOptions,
   useVideoTagOptions,
 } from '@endo4life/feature-videos';
+import { useTagOptionsByType } from '@endo4life/feature-tag';
+import { TagType } from '@endo4life/data-access';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -72,6 +74,10 @@ export function VideoCreateForm({ loading, onSubmit }: IVideoCreateFormProps) {
           state: yup.string().default(ResourceState.Unlisted),
           tag: yup.array().of(yup.string()),
           detailTag: yup.array().of(yup.string()),
+          anatomyLocationTag: yup.array().of(yup.string()),
+          hpTag: yup.array().of(yup.string()),
+          lightTag: yup.array().of(yup.string()),
+          upperGastroAnatomyTag: yup.array().of(yup.string()),
         }),
       ),
       compressedFile: yup.object(),
@@ -92,6 +98,10 @@ export function VideoCreateForm({ loading, onSubmit }: IVideoCreateFormProps) {
             state: ResourceState.Unlisted,
             tag: [],
             detailTag: [],
+            anatomyLocationTag: [],
+            hpTag: [],
+            lightTag: [],
+            upperGastroAnatomyTag: [],
           },
         ],
       },
@@ -103,6 +113,14 @@ export function VideoCreateForm({ loading, onSubmit }: IVideoCreateFormProps) {
   const { options: detailTagOptions } = useVideoTagOptions({
     parentTags: selectedParentTags,
   });
+  const { options: anatomyLocationTagOptions } = useTagOptionsByType(
+    TagType.AnatomyLocationTag,
+  );
+  const { options: hpTagOptions } = useTagOptionsByType(TagType.HpTag);
+  const { options: lightTagOptions } = useTagOptionsByType(TagType.LightTag);
+  const { options: upperGastroAnatomyTagOptions } = useTagOptionsByType(
+    TagType.UpperGastroAnatomyTag,
+  );
   const totalTags = useMemo(
     () => [...tagOptions, ...detailTagOptions],
     [tagOptions, detailTagOptions],
@@ -399,6 +417,70 @@ export function VideoCreateForm({ loading, onSubmit }: IVideoCreateFormProps) {
                     key={name}
                     label={t('video:basicInfo.detailTag')}
                     disabled={!selectedParentTags?.length}
+                    value={value}
+                    onSubmit={onChange}
+                  />
+                )}
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Controller
+                name="metadata.0.anatomyLocationTag"
+                control={control}
+                render={({ field: { onChange, value, name } }) => (
+                  <FormInputMultiSelect
+                    className="flex flex-col w-full"
+                    options={anatomyLocationTagOptions}
+                    key={name}
+                    label="Anatomy Location"
+                    value={value}
+                    onSubmit={onChange}
+                  />
+                )}
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Controller
+                name="metadata.0.hpTag"
+                control={control}
+                render={({ field: { onChange, value, name } }) => (
+                  <FormInputMultiSelect
+                    className="flex flex-col w-full"
+                    options={hpTagOptions}
+                    key={name}
+                    label="HP Classification"
+                    value={value}
+                    onSubmit={onChange}
+                  />
+                )}
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Controller
+                name="metadata.0.lightTag"
+                control={control}
+                render={({ field: { onChange, value, name } }) => (
+                  <FormInputMultiSelect
+                    className="flex flex-col w-full"
+                    options={lightTagOptions}
+                    key={name}
+                    label="Light Type"
+                    value={value}
+                    onSubmit={onChange}
+                  />
+                )}
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Controller
+                name="metadata.0.upperGastroAnatomyTag"
+                control={control}
+                render={({ field: { onChange, value, name } }) => (
+                  <FormInputMultiSelect
+                    className="flex flex-col w-full"
+                    options={upperGastroAnatomyTagOptions}
+                    key={name}
+                    label="Upper GI Anatomy"
                     value={value}
                     onSubmit={onChange}
                   />

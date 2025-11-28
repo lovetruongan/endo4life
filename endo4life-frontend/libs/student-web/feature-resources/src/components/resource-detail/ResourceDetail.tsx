@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import styles from './ResourceDetail.module.css';
-import moment from "moment";
+import moment from 'moment';
 import { Avatar } from '@mui/material';
 import { arrayUtils, stringUtils } from '@endo4life/util-common';
 import { useCallback, useMemo } from 'react';
@@ -12,7 +12,7 @@ import { ResourceMediaViewSkeleton } from '../resource-skeleton/ResourceMediaVie
 import ResourceDetailSimilar from '../resource-detail-similar/ResourceDetailSimilar';
 import { ResourceType } from '@endo4life/data-access';
 import { useNavigate } from 'react-router-dom';
-import { DiscussionWrapper } from "@endo4life/feature-discussion";
+import { DiscussionWrapper } from '@endo4life/feature-discussion';
 import { STUDENT_WEB_ROUTES } from '@endo4life/feature-config';
 import { useResourceDetailContext } from '../../hooks';
 
@@ -20,15 +20,27 @@ interface IResourceDetailProps {
   loading: boolean;
 }
 
-export function ResourceDetail({
-  loading,
-}: IResourceDetailProps) {
+export function ResourceDetail({ loading }: IResourceDetailProps) {
   const navigate = useNavigate();
   const { resource } = useResourceDetailContext();
 
   const allTags = useMemo(() => {
-    return [...arrayUtils.defaultArray(resource.tag), ...arrayUtils.defaultArray(resource.detailTag)];
-  }, [resource.tag, resource.detailTag])
+    return [
+      ...arrayUtils.defaultArray(resource.tag),
+      ...arrayUtils.defaultArray(resource.detailTag),
+      ...arrayUtils.defaultArray(resource.anatomyLocationTag),
+      ...arrayUtils.defaultArray(resource.hpTag),
+      ...arrayUtils.defaultArray(resource.lightTag),
+      ...arrayUtils.defaultArray(resource.upperGastroAnatomyTag),
+    ];
+  }, [
+    resource.tag,
+    resource.detailTag,
+    resource.anatomyLocationTag,
+    resource.hpTag,
+    resource.lightTag,
+    resource.upperGastroAnatomyTag,
+  ]);
 
   const renderMedia = useCallback(() => {
     return resource.type === ResourceType.Image ? (
@@ -46,7 +58,17 @@ export function ResourceDetail({
 
   const onTagClick = (type: string, tagValue: string) => {
     const urlParams = new URLSearchParams();
-    urlParams.set(type, tagValue);
+    // Map entity field names to filter field names for ResourceCriteria
+    // Entity uses anatomyLocationTag/upperGastroAnatomyTag
+    // Filter uses endoscopyTag/locationUpperTag
+    const filterFieldMap: Record<string, string> = {
+      anatomyLocationTag: 'endoscopyTag',
+      upperGastroAnatomyTag: 'locationUpperTag',
+      hpTag: 'hpTag',
+      lightTag: 'lightTag',
+    };
+    const filterField = filterFieldMap[type] || type;
+    urlParams.set(filterField, tagValue);
     navigate({
       pathname: STUDENT_WEB_ROUTES.RESOURCES,
       search: `?${urlParams.toString()}`,
@@ -61,34 +83,35 @@ export function ResourceDetail({
     >
       {/* resource view section */}
       <div className="flex justify-center border rounded-lg bg-stone-900 lg:w-full h-170">
-        {loading ? (
-          <ResourceMediaViewSkeleton />
-        ): (
-          renderMedia()
-        )}
+        {loading ? <ResourceMediaViewSkeleton /> : renderMedia()}
       </div>
       {/* Info view section */}
       <div className="flex flex-col gap-4">
         {loading ? (
-          <ResourceTextSkeleton isFullWidth={false}/>
+          <ResourceTextSkeleton isFullWidth={false} />
         ) : (
           <h1 className="text-4xl font-bold">{resource?.title}</h1>
         )}
         {/* info of user that created the resource */}
         <div>
           {loading ? (
-            <ResourceTextSkeleton isFullWidth={false}/>
-          ): (
+            <ResourceTextSkeleton isFullWidth={false} />
+          ) : (
             <div className="flex items-center gap-2">
               <Avatar
                 src="https://img.tripi.vn/cdn-cgi/image/width=700,height=700/https://gcs.tripi.vn/public-tripi/tripi-feed/img/474488XVB/meme-cho-rang-trang-cuoi_044958043.jpg"
                 sx={{ width: 28, height: 28 }}
               />
               <span className="text-sm">
-                {stringUtils.defaultStringWithValue(resource?.createdBy, "Không xác định")}
+                {stringUtils.defaultStringWithValue(
+                  resource?.createdBy,
+                  'Không xác định',
+                )}
               </span>
               <span>•</span>
-              <span className="text-sm">{moment(resource.createdAt).fromNow()}</span>
+              <span className="text-sm">
+                {moment(resource.createdAt).fromNow()}
+              </span>
             </div>
           )}
         </div>
@@ -102,6 +125,10 @@ export function ResourceDetail({
               <ResourceTagList
                 tags={resource.tag}
                 detailTags={resource.detailTag}
+                anatomyLocationTags={resource.anatomyLocationTag}
+                hpTags={resource.hpTag}
+                lightTags={resource.lightTag}
+                upperGastroAnatomyTags={resource.upperGastroAnatomyTag}
                 maxDisplay={allTags.length}
                 textColorHex="000000"
                 onTagClick={onTagClick}
@@ -110,8 +137,8 @@ export function ResourceDetail({
           </div>
           {/* description of resource */}
           {loading ? (
-            <ResourceMultiTextSkeleton numOfLines={5}/>
-          ): (
+            <ResourceMultiTextSkeleton numOfLines={5} />
+          ) : (
             <ReadMoreText>
               <span>{resource.description}</span>
             </ReadMoreText>
@@ -119,17 +146,11 @@ export function ResourceDetail({
         </div>
       </div>
       {/* similar resources section */}
-      <div className='block lg:hidden'>
-        {resource && (
-          <ResourceDetailSimilar />
-        )}
+      <div className="block lg:hidden">
+        {resource && <ResourceDetailSimilar />}
       </div>
       {/* comment/ask expert section */}
-      <div>
-        {resource.id && (
-          <DiscussionWrapper />
-        )}
-      </div>
+      <div>{resource.id && <DiscussionWrapper />}</div>
     </div>
   );
 }

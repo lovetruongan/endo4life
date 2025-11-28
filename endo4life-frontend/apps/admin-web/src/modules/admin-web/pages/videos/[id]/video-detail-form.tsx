@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -18,8 +18,13 @@ import { IconButton, Tooltip } from '@mui/material';
 import { VscArrowLeft } from 'react-icons/vsc';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ADMIN_WEB_ROUTES } from '@endo4life/feature-config';
-import { ResourceState } from '@endo4life/data-access';
-import { useAllTagOptions } from '@endo4life/feature-tag';
+import { ResourceState, TagType } from '@endo4life/data-access';
+import {
+  useAllTagOptions,
+  useTagOptionsByType,
+  convertTagNamesToIds,
+  convertTagIdsToNames,
+} from '@endo4life/feature-tag';
 import {
   IVideoEntity,
   IVideoUpdateFormData,
@@ -85,12 +90,16 @@ export function VideoDetailForm({
         state: yup.string().default(ResourceState.Unlisted),
         tag: yup.array().of(yup.string()),
         detailTag: yup.array().of(yup.string()),
+        anatomyLocationTag: yup.array().of(yup.string()),
+        hpTag: yup.array().of(yup.string()),
+        lightTag: yup.array().of(yup.string()),
+        upperGastroAnatomyTag: yup.array().of(yup.string()),
       }),
       compressedFile: yup.object(),
     });
   }, [t]);
 
-  const { control, handleSubmit, formState, watch } =
+  const { control, handleSubmit, formState, watch, reset } =
     useForm<IVideoUpdateFormData>({
       resolver: yupResolver(schema),
       mode: 'onChange',
@@ -101,6 +110,14 @@ export function VideoDetailForm({
     });
 
   const { options: videoStateOptions } = useVideoStateOptions();
+  const { options: anatomyLocationTagOptions } = useTagOptionsByType(
+    TagType.AnatomyLocationTag,
+  );
+  const { options: hpTagOptions } = useTagOptionsByType(TagType.HpTag);
+  const { options: lightTagOptions } = useTagOptionsByType(TagType.LightTag);
+  const { options: upperGastroAnatomyTagOptions } = useTagOptionsByType(
+    TagType.UpperGastroAnatomyTag,
+  );
 
   const selectedFile = watch('file');
 
@@ -117,6 +134,61 @@ export function VideoDetailForm({
     }
     return results;
   }, [selectedTag, tagOptions]);
+
+  // Convert tag names from API to tag IDs for form dropdowns
+  useEffect(() => {
+    if (
+      formData &&
+      tagOptions.length > 0 &&
+      anatomyLocationTagOptions.length > 0 &&
+      hpTagOptions.length > 0 &&
+      lightTagOptions.length > 0 &&
+      upperGastroAnatomyTagOptions.length > 0
+    ) {
+      const allTagOptions = [
+        ...tagOptions,
+        ...tagOptions.flatMap((tag) => tag.children || []),
+        ...anatomyLocationTagOptions,
+        ...hpTagOptions,
+        ...lightTagOptions,
+        ...upperGastroAnatomyTagOptions,
+      ];
+
+      const convertedData = {
+        ...formData,
+        metadata: {
+          ...formData.metadata,
+          tag: convertTagNamesToIds(formData.metadata.tag, allTagOptions),
+          detailTag: convertTagNamesToIds(
+            formData.metadata.detailTag,
+            allTagOptions,
+          ),
+          anatomyLocationTag: convertTagNamesToIds(
+            formData.metadata.anatomyLocationTag,
+            allTagOptions,
+          ),
+          hpTag: convertTagNamesToIds(formData.metadata.hpTag, allTagOptions),
+          lightTag: convertTagNamesToIds(
+            formData.metadata.lightTag,
+            allTagOptions,
+          ),
+          upperGastroAnatomyTag: convertTagNamesToIds(
+            formData.metadata.upperGastroAnatomyTag,
+            allTagOptions,
+          ),
+        },
+      };
+      reset(convertedData);
+    }
+  }, [
+    formData,
+    tagOptions,
+    anatomyLocationTagOptions,
+    hpTagOptions,
+    lightTagOptions,
+    upperGastroAnatomyTagOptions,
+    reset,
+  ]);
 
   const onDownloadVideoClick = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -146,6 +218,39 @@ export function VideoDetailForm({
     event.preventDefault();
     event.stopPropagation();
     croppingVideoToggle.toggle();
+  };
+
+  // Convert tag IDs to names before submitting
+  const handleFormSubmit = (data: IVideoUpdateFormData) => {
+    const allTagOptions = [
+      ...tagOptions,
+      ...tagOptions.flatMap((tag) => tag.children || []),
+      ...anatomyLocationTagOptions,
+      ...hpTagOptions,
+      ...lightTagOptions,
+      ...upperGastroAnatomyTagOptions,
+    ];
+
+    const convertedData = {
+      ...data,
+      metadata: {
+        ...data.metadata,
+        tag: convertTagIdsToNames(data.metadata.tag, allTagOptions),
+        detailTag: convertTagIdsToNames(data.metadata.detailTag, allTagOptions),
+        anatomyLocationTag: convertTagIdsToNames(
+          data.metadata.anatomyLocationTag,
+          allTagOptions,
+        ),
+        hpTag: convertTagIdsToNames(data.metadata.hpTag, allTagOptions),
+        lightTag: convertTagIdsToNames(data.metadata.lightTag, allTagOptions),
+        upperGastroAnatomyTag: convertTagIdsToNames(
+          data.metadata.upperGastroAnatomyTag,
+          allTagOptions,
+        ),
+      },
+    };
+
+    onSubmit(convertedData);
   };
 
   return (
@@ -196,7 +301,7 @@ export function VideoDetailForm({
       <form
         id="video-detail-form"
         ref={formRef}
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(handleFormSubmit)}
         className={clsx({
           'pointer-events-none cursor-default opacity-60':
             loading || tagLoading,
@@ -435,6 +540,74 @@ export function VideoDetailForm({
                     label={t('video:basicInfo.detailTag')}
                     isIgnoredValidating={true}
                     disabled={!selectedTag}
+                    value={value}
+                    onSubmit={onChange}
+                  />
+                )}
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Controller
+                name="metadata.anatomyLocationTag"
+                control={control}
+                render={({ field: { onChange, value, name } }) => (
+                  <FormInputMultiSelect
+                    className="flex flex-col w-full"
+                    options={anatomyLocationTagOptions}
+                    key={name}
+                    label="Anatomy Location"
+                    isIgnoredValidating={true}
+                    value={value}
+                    onSubmit={onChange}
+                  />
+                )}
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Controller
+                name="metadata.hpTag"
+                control={control}
+                render={({ field: { onChange, value, name } }) => (
+                  <FormInputMultiSelect
+                    className="flex flex-col w-full"
+                    options={hpTagOptions}
+                    key={name}
+                    label="HP Classification"
+                    isIgnoredValidating={true}
+                    value={value}
+                    onSubmit={onChange}
+                  />
+                )}
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Controller
+                name="metadata.lightTag"
+                control={control}
+                render={({ field: { onChange, value, name } }) => (
+                  <FormInputMultiSelect
+                    className="flex flex-col w-full"
+                    options={lightTagOptions}
+                    key={name}
+                    label="Light Type"
+                    isIgnoredValidating={true}
+                    value={value}
+                    onSubmit={onChange}
+                  />
+                )}
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Controller
+                name="metadata.upperGastroAnatomyTag"
+                control={control}
+                render={({ field: { onChange, value, name } }) => (
+                  <FormInputMultiSelect
+                    className="flex flex-col w-full"
+                    options={upperGastroAnatomyTagOptions}
+                    key={name}
+                    label="Upper GI Anatomy"
+                    isIgnoredValidating={true}
                     value={value}
                     onSubmit={onChange}
                   />
