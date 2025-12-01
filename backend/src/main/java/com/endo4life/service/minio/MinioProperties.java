@@ -22,4 +22,5 @@ public class MinioProperties {
     private String bucketThumbnail;
     private String bucketOther;
     private String bucketProcess;
+    private String bucketBook;
 }

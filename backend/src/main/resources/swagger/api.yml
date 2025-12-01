@@ -2203,6 +2203,7 @@ components:
         - THUMBNAIL
         - OTHER
         - PROCESS
+        - BOOK
 
     ResourceState:
       type: string

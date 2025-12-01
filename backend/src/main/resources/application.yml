@@ -92,6 +92,7 @@ spring:
       bucket-thumbnail: thumbnails
       bucket-other: others
       bucket-process: process
+      bucket-book: books
     job:
       delete-user:
         enabled: true

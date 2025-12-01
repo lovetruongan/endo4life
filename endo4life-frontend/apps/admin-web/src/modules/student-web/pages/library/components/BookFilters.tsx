@@ -1,6 +1,5 @@
-import { useState } from 'react';
-import { IoSearchOutline } from 'react-icons/io5';
-import { HiOutlineFilter } from 'react-icons/hi';
+import { useState, useEffect } from 'react';
+import { IoSearchOutline, IoCloseOutline } from 'react-icons/io5';
 
 export interface BookFilterOptions {
   search: string;
@@ -12,27 +11,10 @@ interface BookFiltersProps {
   onFilterChange: (filters: BookFilterOptions) => void;
 }
 
-// Danh sách các danh mục sách
-const BOOK_CATEGORIES = [
-  { value: '', label: 'Tất cả danh mục' },
-  { value: 'anatomy', label: 'Giải phẫu học' },
-  { value: 'physiology', label: 'Sinh lý học' },
-  { value: 'pathology', label: 'Bệnh lý học' },
-  { value: 'pharmacology', label: 'Dược lý học' },
-  { value: 'surgery', label: 'Phẫu thuật' },
-  { value: 'internal-medicine', label: 'Nội khoa' },
-  { value: 'pediatrics', label: 'Nhi khoa' },
-  { value: 'gynecology', label: 'Sản phụ khoa' },
-  { value: 'cardiology', label: 'Tim mạch' },
-  { value: 'neurology', label: 'Thần kinh' },
-  { value: 'endoscopy', label: 'Nội soi' },
-  { value: 'others', label: 'Khác' },
-];
-
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Mới nhất' },
   { value: 'popular', label: 'Phổ biến nhất' },
-  { value: 'title', label: 'Theo tên A-Z' },
+  { value: 'title', label: 'Tên A-Z' },
 ];
 
 export function BookFilters({ onFilterChange }: BookFiltersProps) {
@@ -42,135 +24,71 @@ export function BookFilters({ onFilterChange }: BookFiltersProps) {
     sortBy: 'newest',
   });
 
-  const [showFilters, setShowFilters] = useState(false);
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onFilterChange(filters);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [filters.search]);
 
-  const handleSearchChange = (value: string) => {
-    const newFilters = { ...filters, search: value };
-    setFilters(newFilters);
-    onFilterChange(newFilters);
-  };
-
-  const handleCategoryChange = (value: string) => {
-    const newFilters = { ...filters, category: value };
-    setFilters(newFilters);
-    onFilterChange(newFilters);
-  };
-
-  const handleSortChange = (value: 'newest' | 'popular' | 'title') => {
-    const newFilters = { ...filters, sortBy: value };
+  // Immediate update for other filters
+  const handleFilterUpdate = (newFilters: BookFilterOptions) => {
     setFilters(newFilters);
     onFilterChange(newFilters);
   };
 
   return (
-    <div className="space-y-4 mb-8">
-      {/* Search and Filter Toggle */}
-      <div className="flex gap-4 items-center">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-8">
+      <div className="flex flex-col md:flex-row gap-4">
         {/* Search Bar */}
-        <div className="flex-1 relative">
+        <div className="flex-1 relative group">
           <IoSearchOutline
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors"
             size={20}
           />
           <input
             type="text"
-            placeholder="Tìm kiếm sách theo tên, tác giả..."
+            placeholder="Tìm kiếm sách..."
             value={filters.search}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+            className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border-transparent focus:bg-white border focus:border-blue-500 rounded-lg outline-none transition-all text-sm"
           />
-        </div>
-
-        {/* Filter Toggle Button */}
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className={`flex items-center gap-2 px-6 py-3 border rounded-lg font-medium transition-colors ${
-            showFilters
-              ? 'bg-primary-600 text-white border-primary-600'
-              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-          }`}
-        >
-          <HiOutlineFilter size={20} />
-          <span>Bộ lọc</span>
-        </button>
-      </div>
-
-      {/* Filter Options - Expandable */}
-      {showFilters && (
-        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Category Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Danh mục
-              </label>
-              <select
-                value={filters.category}
-                onChange={(e) => handleCategoryChange(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              >
-                {BOOK_CATEGORIES.map((cat) => (
-                  <option key={cat.value} value={cat.value}>
-                    {cat.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Sort By */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Sắp xếp theo
-              </label>
-              <select
-                value={filters.sortBy}
-                onChange={(e) =>
-                  handleSortChange(e.target.value as 'newest' | 'popular' | 'title')
-                }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              >
-                {SORT_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Active Filters Summary */}
-          {(filters.category || filters.search) && (
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm text-gray-600">Bộ lọc đang áp dụng:</span>
-                {filters.category && (
-                  <span className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
-                    {BOOK_CATEGORIES.find((c) => c.value === filters.category)?.label}
-                  </span>
-                )}
-                {filters.search && (
-                  <span className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
-                    "{filters.search}"
-                  </span>
-                )}
-                <button
-                  onClick={() => {
-                    const resetFilters = { search: '', category: '', sortBy: 'newest' as const };
-                    setFilters(resetFilters);
-                    onFilterChange(resetFilters);
-                  }}
-                  className="ml-auto text-sm text-red-600 hover:text-red-700 font-medium"
-                >
-                  Xóa bộ lọc
-                </button>
-              </div>
-            </div>
+          {filters.search && (
+            <button
+              onClick={() => setFilters({ ...filters, search: '' })}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              <IoCloseOutline size={18} />
+            </button>
           )}
         </div>
-      )}
+
+        {/* Filters Group */}
+        <div className="flex gap-3">
+          {/* Sort Select */}
+          <div className="relative min-w-[160px]">
+            <select
+              value={filters.sortBy}
+              onChange={(e) => handleFilterUpdate({ ...filters, sortBy: e.target.value as any })}
+              className="w-full appearance-none pl-4 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none cursor-pointer hover:border-gray-300 transition-colors"
+            >
+              {SORT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
 export default BookFilters;
-

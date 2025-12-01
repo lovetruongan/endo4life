@@ -32,7 +32,7 @@ export function useHeaderItems() {
           },
           {
             id: 'common4',
-            label: t('navigation.txtMyLibrary'),
+            label: 'Thư viện',
             name: 'MY_LIBRARY',
             link: STUDENT_WEB_ROUTES.MY_LIBRARY,
             isAuthRequired: true,

@@ -42,6 +42,8 @@ public class MinioConfiguration {
     private String bucketOther;
     @Value("${spring.application.minio-configuration.bucket-process}")
     private String bucketProcess;
+    @Value("${spring.application.minio-configuration.bucket-book}")
+    private String bucketBook;
 
     @PostConstruct
     private void init() {
@@ -52,6 +54,7 @@ public class MinioConfiguration {
         MinIOUtil.setBucketResourceMap(ResourceType.THUMBNAIL, bucketThumbnail);
         MinIOUtil.setBucketResourceMap(ResourceType.OTHER, bucketOther);
         MinIOUtil.setBucketResourceMap(ResourceType.PROCESS, bucketProcess);
+        MinIOUtil.setBucketResourceMap(ResourceType.BOOK, bucketBook);
     }
 
     @Bean
@@ -78,6 +81,7 @@ public class MinioConfiguration {
             createBucketIfNotExist(client, minioProperties.getBucketThumbnail());
             createBucketIfNotExist(client, minioProperties.getBucketOther());
             createBucketIfNotExist(client, minioProperties.getBucketProcess());
+            createBucketIfNotExist(client, minioProperties.getBucketBook());
 
             // Assign Policy to public buckets
             var objectOps = Constants.MinioObjectOperations;
@@ -93,6 +97,8 @@ public class MinioConfiguration {
                     MinioUtil.generatePolicyPublic(minioProperties.getBucketAvatar(), actionsForPublicBucket));
             setBucketPolicy(client, minioProperties.getBucketOther(),
                     MinioUtil.generatePolicyPublic(minioProperties.getBucketOther(), actionsForPublicBucket));
+            setBucketPolicy(client, minioProperties.getBucketBook(),
+                    MinioUtil.generatePolicyPublic(minioProperties.getBucketBook(), actionsForPublicBucket));
 
             // TODO: Setup webhook notifications for automatic thumbnail generation
             // First configure webhook in MinIO server, then uncomment this:
