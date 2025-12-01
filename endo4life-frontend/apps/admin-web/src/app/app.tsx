@@ -13,7 +13,7 @@ import {
   WEB_CLIENT_STUDENT,
 } from '@endo4life/feature-config';
 import '@endo4life/feature-i18n';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const queryClient = new QueryClient();
 
@@ -41,6 +41,14 @@ function useRouter() {
     }
     return WEB_CLIENT_STUDENT;
   });
+
+  useEffect(() => {
+    if (webClientId === WEB_CLIENT_STUDENT) {
+      document.body.classList.add('theme-blue');
+    } else {
+      document.body.classList.remove('theme-blue');
+    }
+  }, [webClientId]);
 
   return {
     router:
