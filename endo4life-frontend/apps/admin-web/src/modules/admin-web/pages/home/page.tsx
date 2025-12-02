@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 export default function HomePage() {
   const navigate = useNavigate();
   useMount(() => {
-    navigate(ADMIN_WEB_ROUTES.IMAGES);
+    navigate(ADMIN_WEB_ROUTES.DASHBOARD);
   });
   return <div className="p-4"></div>;
 }

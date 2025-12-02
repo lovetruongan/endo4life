@@ -1,6 +1,7 @@
 export const ADMIN_WEB_ROUTES = {
     ROOT: '/',
     HOME: '/',
+    DASHBOARD: '/dashboard',
     USERS: '/users',
     USER_CREATE: '/users/create',
     USER_DETAIL: '/users/:id',
