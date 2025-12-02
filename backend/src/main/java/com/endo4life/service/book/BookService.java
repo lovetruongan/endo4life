@@ -1,19 +1,20 @@
 package com.endo4life.service.book;
 
-import com.endo4life.service.dto.BookDto;
+import com.endo4life.web.rest.model.BookResponseDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface BookService {
-    BookDto createBook(String title, String author, String description, MultipartFile file, MultipartFile cover);
+    BookResponseDto createBook(String title, String author, String description, MultipartFile file,
+            MultipartFile cover);
 
-    List<BookDto> getBooks();
+    List<BookResponseDto> getBooks();
 
-    BookDto getBook(UUID id);
+    BookResponseDto getBook(UUID id);
 
-    BookDto updateBook(UUID id, String title, String author, String description, MultipartFile file,
+    BookResponseDto updateBook(UUID id, String title, String author, String description, MultipartFile file,
             MultipartFile cover);
 
     void deleteBook(UUID id);

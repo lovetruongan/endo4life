@@ -1,5 +1,6 @@
 package com.endo4life.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -25,4 +26,10 @@ public interface UserInfoRepository extends JpaRepository<UserInfo, UUID>, JpaSp
 
     @Query("SELECT u FROM UserInfo u WHERE u.email IN :emails")
     List<UserInfo> findAllByEmails(@Param("emails") Set<String> emails);
+
+    @Query(value = "SELECT DATE(created_at) as date, COUNT(*) as count FROM user_info WHERE created_at >= :startDate GROUP BY DATE(created_at) ORDER BY date", nativeQuery = true)
+    List<Object[]> countUsersByDate(@Param("startDate") LocalDateTime startDate);
+
+    @Query("SELECT COUNT(u) FROM UserInfo u WHERE u.createdAt < :startDate")
+    long countUsersCreatedBefore(@Param("startDate") LocalDateTime startDate);
 }
