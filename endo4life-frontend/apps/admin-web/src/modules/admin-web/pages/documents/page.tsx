@@ -1,115 +1,162 @@
-import { useState, useEffect } from 'react';
-import { IoAdd } from 'react-icons/io5';
-import { bookApi, BookDto } from '../../../student-web/pages/library/api/book-api';
-import { DocumentList } from './components/DocumentList';
-import { DocumentForm } from './components/DocumentForm';
+import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
+import { AgGridReact } from 'ag-grid-react';
+import { useToggle } from 'ahooks';
+import { IconButton, Tooltip } from '@mui/material';
+import { VscAdd, VscRefresh } from 'react-icons/vsc';
+import { Button, PageHeader, Pagination } from '@endo4life/ui-common';
+import { formatNumber } from '@endo4life/util-common';
+import { useBooks, useBookCreate, useBookUpdate, useBookDelete } from './hooks';
+import { BookTable, BookFormDialog, BookDeleteDialog } from './components';
+import { IBookEntity } from './types';
+import { REACT_QUERY_KEYS } from './constants';
 
 export default function DocumentsPage() {
-  const [documents, setDocuments] = useState<BookDto[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingDoc, setEditingDoc] = useState<BookDto | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useTranslation(['common']);
+  const gridRef = useRef<AgGridReact>(null);
+  const client = useQueryClient();
+  const { data, loading, pagination, refetch } = useBooks();
+  const { mutation: createMutation } = useBookCreate();
+  const { mutation: updateMutation } = useBookUpdate();
+  const { mutation: deleteMutation } = useBookDelete();
 
-  const fetchDocuments = async () => {
-    try {
-      setIsLoading(true);
-      const data = await bookApi.getBooks();
-      setDocuments(data);
-    } catch (error) {
-      console.error('Failed to fetch documents:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchDocuments();
-  }, []);
+  const [isFormOpen, formToggle] = useToggle(false);
+  const [isDeleteOpen, deleteToggle] = useToggle(false);
+  const [editingBook, setEditingBook] = useState<IBookEntity | null>(null);
+  const [deletingBook, setDeletingBook] = useState<IBookEntity | null>(null);
 
   const handleAdd = () => {
-    setEditingDoc(null);
-    setIsFormOpen(true);
+    setEditingBook(null);
+    formToggle.setRight();
   };
 
-  const handleEdit = (doc: BookDto) => {
-    setEditingDoc(doc);
-    setIsFormOpen(true);
+  const handleEdit = (book: IBookEntity) => {
+    setEditingBook(book);
+    formToggle.setRight();
   };
 
-  const handleDelete = async (doc: BookDto) => {
-    if (!window.confirm(`Bạn có chắc chắn muốn xóa tài liệu "${doc.title}" không?`)) {
-      return;
-    }
+  const handleDelete = (book: IBookEntity) => {
+    setDeletingBook(book);
+    deleteToggle.setRight();
+  };
 
-    try {
-      await bookApi.deleteBook(doc.id);
-      await fetchDocuments();
-    } catch (error) {
-      console.error('Failed to delete document:', error);
-      alert('Có lỗi xảy ra khi xóa tài liệu');
+  const handleFormSubmit = async (
+    data: { title: string; author: string; description: string },
+    file?: File,
+    cover?: File,
+  ) => {
+    if (editingBook) {
+      await updateMutation.mutateAsync({
+        id: editingBook.id,
+        title: data.title,
+        author: data.author,
+        description: data.description,
+        file,
+        cover,
+      });
+    } else {
+      await createMutation.mutateAsync({
+        title: data.title,
+        author: data.author,
+        description: data.description,
+        file,
+        cover,
+      });
+    }
+    formToggle.setLeft();
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deletingBook) {
+      await deleteMutation.mutateAsync(deletingBook.id);
+      deleteToggle.setLeft();
+      setDeletingBook(null);
     }
   };
 
-  const handleSubmit = async (formData: FormData) => {
-    try {
-      setIsSubmitting(true);
-      const title = formData.get('title') as string;
-      const author = formData.get('author') as string;
-      const description = formData.get('description') as string;
-      const file = formData.get('file') as File;
-      const cover = formData.get('cover') as File;
+  const handlePageChange = (page: number) => {
+    // For now, no server-side pagination
+  };
 
-      if (editingDoc) {
-        await bookApi.updateBook(editingDoc.id, title, author, description, file, cover);
-      } else {
-        await bookApi.createBook(title, author, description, file, cover);
-      }
-
-      await fetchDocuments();
-      setIsFormOpen(false);
-    } catch (error) {
-      console.error('Failed to save document:', error);
-      alert('Có lỗi xảy ra khi lưu tài liệu');
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handlePageSizeChange = (size: number) => {
+    // For now, no server-side pagination
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Quản lý tài liệu</h1>
-          <p className="text-gray-500 mt-1">Quản lý sách và tài liệu đóng góp</p>
-        </div>
-        <button
-          onClick={handleAdd}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-        >
-          <IoAdd size={20} />
-          <span>Thêm tài liệu</span>
-        </button>
-      </div>
-
-      {/* List */}
-      <DocumentList
-        documents={documents}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        isLoading={isLoading}
+    <div className="flex flex-col h-full">
+      <PageHeader
+        title="Document Management"
+        titleAction={
+          <Tooltip title={t('common:txtRefresh')} arrow>
+            <span>
+              <IconButton
+                size="small"
+                disabled={loading}
+                onClick={(evt) => {
+                  evt.preventDefault();
+                  evt.stopPropagation();
+                  client.invalidateQueries([REACT_QUERY_KEYS.BOOKS]);
+                }}
+              >
+                <VscRefresh size={18} />
+              </IconButton>
+            </span>
+          </Tooltip>
+        }
+        description={
+          pagination && (
+            <span>
+              <strong className="pr-1">{formatNumber(pagination.totalCount)}</strong>
+              <span>documents</span>
+            </span>
+          )
+        }
+        leading={
+          <div className="flex items-center gap-4">
+            <Button
+              text="Add Document"
+              textClassName="hidden md:block"
+              onClick={handleAdd}
+            >
+              <VscAdd size={16} />
+            </Button>
+          </div>
+        }
       />
 
-      {/* Form Modal */}
-      {isFormOpen && (
-        <DocumentForm
-          initialData={editingDoc}
-          onSubmit={handleSubmit}
-          onCancel={() => setIsFormOpen(false)}
-          isLoading={isSubmitting}
+      <div className="flex flex-col flex-auto w-full h-1 px-5 overflow-y-auto">
+        <BookTable
+          gridRef={gridRef}
+          loading={loading}
+          data={data ?? []}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
         />
-      )}
+        {pagination && (
+          <Pagination
+            pagination={pagination}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+          />
+        )}
+      </div>
+
+      <BookFormDialog
+        open={isFormOpen}
+        book={editingBook}
+        isLoading={createMutation.isLoading || updateMutation.isLoading}
+        onClose={() => formToggle.setLeft()}
+        onSubmit={handleFormSubmit}
+      />
+
+      <BookDeleteDialog
+        open={isDeleteOpen}
+        book={deletingBook}
+        isLoading={deleteMutation.isLoading}
+        onClose={() => deleteToggle.setLeft()}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 }
