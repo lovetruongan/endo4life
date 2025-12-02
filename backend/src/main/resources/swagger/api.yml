@@ -1211,6 +1211,164 @@ paths:
         204:
           description: Tags deleted successfully
 
+  # Dashboard Statistics APIs
+  /api/v1/stats/user-growth:
+    get:
+      description: Get user registration statistics by date
+      operationId: getUserGrowthStats
+      tags:
+        - 'stats-v1'
+      parameters:
+        - name: days
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 30
+          description: Number of days to fetch (default 30)
+      responses:
+        200:
+          description: User growth statistics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserGrowthStatDto'
+
+  /api/v1/stats/resource-views:
+    get:
+      description: Get top viewed resources
+      operationId: getResourceViewsStats
+      tags:
+        - 'stats-v1'
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Number of top resources to fetch (default 10)
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [IMAGE, VIDEO]
+          description: Filter by resource type
+      responses:
+        200:
+          description: Resource views statistics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceViewStatDto'
+
+  # Book Management APIs
+  /api/v1/books:
+    get:
+      description: Get all books
+      operationId: getBooks
+      tags:
+        - 'book-v1'
+      responses:
+        200:
+          description: Books retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookResponseDto'
+    post:
+      description: Create a new book
+      operationId: createBook
+      tags:
+        - 'book-v1'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateBookRequestDto'
+      responses:
+        201:
+          description: Book created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookResponseDto'
+
+  /api/v1/books/{id}:
+    get:
+      description: Get book by ID
+      operationId: getBookById
+      tags:
+        - 'book-v1'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Book found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookResponseDto'
+        404:
+          description: Book not found
+    put:
+      description: Update a book
+      operationId: updateBook
+      tags:
+        - 'book-v1'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateBookRequestDto'
+      responses:
+        200:
+          description: Book updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookResponseDto'
+        404:
+          description: Book not found
+    delete:
+      description: Delete a book
+      operationId: deleteBook
+      tags:
+        - 'book-v1'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: Book deleted successfully
+        404:
+          description: Book not found
+
   # Course Section APIs
   /api/v1/course-sections:
     get:
@@ -2203,6 +2361,7 @@ components:
         - THUMBNAIL
         - OTHER
         - PROCESS
+        - BOOK
 
     ResourceState:
       type: string
@@ -3477,3 +3636,87 @@ components:
         createdAt:
           type: string
           format: date-time
+
+    # Dashboard Statistics schemas
+    UserGrowthStatDto:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        count:
+          type: integer
+        cumulativeCount:
+          type: integer
+
+    ResourceViewStatDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        type:
+          type: string
+        viewCount:
+          type: integer
+        thumbnailUrl:
+          type: string
+
+    # Book schemas
+    BookResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        author:
+          type: string
+        description:
+          type: string
+        fileUrl:
+          type: string
+        coverUrl:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    CreateBookRequestDto:
+      type: object
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+        description:
+          type: string
+        file:
+          type: string
+          format: binary
+        cover:
+          type: string
+          format: binary
+      required:
+        - title
+
+    UpdateBookRequestDto:
+      type: object
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+        description:
+          type: string
+        file:
+          type: string
+          format: binary
+        cover:
+          type: string
+          format: binary
+      required:
+        - title

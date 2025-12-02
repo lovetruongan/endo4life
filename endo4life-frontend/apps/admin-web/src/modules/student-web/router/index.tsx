@@ -49,6 +49,7 @@ const FinalExamPage = lazy(
 );
 
 const LibraryPage = lazy(() => import('../pages/library/page'));
+const BookDetailPage = lazy(() => import('../pages/library/books/[id]/page'));
 const MyLearningPage = lazy(() => import('../pages/my-learning/page'));
 const WatchHistoryPage = lazy(() => import('../pages/watch-history/page'));
 const MyQuestionsPage = lazy(() => import('../pages/my-questions/page'));
@@ -241,12 +242,19 @@ export const studentWebRouter = createBrowserRouter([
 
         children: [
           {
-            path: STUDENT_WEB_ROUTES.MY_LIBRARY,
             index: true,
             errorElement: <LibraryPageError />,
             element: (
               <Suspense fallback={<LibraryPageLoading />}>
                 <LibraryPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: 'books/:id',
+            element: (
+              <Suspense fallback={<LibraryPageLoading />}>
+                <BookDetailPage />
               </Suspense>
             ),
           },

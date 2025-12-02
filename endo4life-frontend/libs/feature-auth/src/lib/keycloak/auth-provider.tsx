@@ -69,54 +69,54 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [keycloak, setKeycloak] = useState<Keycloak>();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(true);
   const [userProfile, setUserProfile] = useState<KeycloakUserProfile>();
   const [useDirectLogin] = useState(true); // Set to true for direct login, false for redirect
 
-    // Helper functions for token management
-    const saveTokensToStorage = (token: string, refreshToken: string, expiresIn?: number) => {
-      localStorage.setItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN, token);
-      localStorage.setItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
-      
-      if (expiresIn) {
-        const expiryTime = Date.now() + expiresIn * 1000; // Convert to milliseconds
-        localStorage.setItem(AUTH_STORAGE_KEYS.TOKEN_EXPIRY, expiryTime.toString());
-      }
-    };
-  
-    const getTokensFromStorage = () => {
-      const token = localStorage.getItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN);
-      const refreshToken = localStorage.getItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN);
-      const expiry = localStorage.getItem(AUTH_STORAGE_KEYS.TOKEN_EXPIRY);
-      
-      return { token, refreshToken, expiry };
-    };
-  
-    const clearTokensFromStorage = () => {
-      localStorage.removeItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN);
-      localStorage.removeItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN);
-      localStorage.removeItem(AUTH_STORAGE_KEYS.TOKEN_EXPIRY);
-      localStorage.removeItem(AUTH_STORAGE_KEYS.USER_PROFILE);
-    };
-  
-    const isTokenExpired = (expiry: string | null) => {
-      if (!expiry) return true;
-      return Date.now() > parseInt(expiry);
-    };
-  
-    const saveUserProfileToStorage = (profile: KeycloakUserProfile) => {
-      localStorage.setItem(AUTH_STORAGE_KEYS.USER_PROFILE, JSON.stringify(profile));
-    };
-  
-    const getUserProfileFromStorage = (): KeycloakUserProfile | null => {
-      const profileStr = localStorage.getItem(AUTH_STORAGE_KEYS.USER_PROFILE);
-      if (!profileStr) return null;
-      try {
-        return JSON.parse(profileStr);
-      } catch {
-        return null;
-      }
-    };
+  // Helper functions for token management
+  const saveTokensToStorage = (token: string, refreshToken: string, expiresIn?: number) => {
+    localStorage.setItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN, token);
+    localStorage.setItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+
+    if (expiresIn) {
+      const expiryTime = Date.now() + expiresIn * 1000; // Convert to milliseconds
+      localStorage.setItem(AUTH_STORAGE_KEYS.TOKEN_EXPIRY, expiryTime.toString());
+    }
+  };
+
+  const getTokensFromStorage = () => {
+    const token = localStorage.getItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN);
+    const refreshToken = localStorage.getItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN);
+    const expiry = localStorage.getItem(AUTH_STORAGE_KEYS.TOKEN_EXPIRY);
+
+    return { token, refreshToken, expiry };
+  };
+
+  const clearTokensFromStorage = () => {
+    localStorage.removeItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN);
+    localStorage.removeItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN);
+    localStorage.removeItem(AUTH_STORAGE_KEYS.TOKEN_EXPIRY);
+    localStorage.removeItem(AUTH_STORAGE_KEYS.USER_PROFILE);
+  };
+
+  const isTokenExpired = (expiry: string | null) => {
+    if (!expiry) return true;
+    return Date.now() > parseInt(expiry);
+  };
+
+  const saveUserProfileToStorage = (profile: KeycloakUserProfile) => {
+    localStorage.setItem(AUTH_STORAGE_KEYS.USER_PROFILE, JSON.stringify(profile));
+  };
+
+  const getUserProfileFromStorage = (): KeycloakUserProfile | null => {
+    const profileStr = localStorage.getItem(AUTH_STORAGE_KEYS.USER_PROFILE);
+    if (!profileStr) return null;
+    try {
+      return JSON.parse(profileStr);
+    } catch {
+      return null;
+    }
+  };
 
   const loadUserProfile = async (keycloakInstance: Keycloak) => {
     const keycloakProfile = await keycloakInstance.loadUserProfile();
@@ -244,12 +244,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
         // Try to restore session from localStorage
         console.log('Checking for existing session...');
         const { token, refreshToken, expiry } = getTokensFromStorage();
-        
+
         if (token && refreshToken) {
           // Check if token is still valid
           if (!isTokenExpired(expiry)) {
             console.log('Found valid session, restoring...');
-            
+
             // Restore user profile from storage
             const savedProfile = getUserProfileFromStorage();
             if (savedProfile) {
@@ -259,7 +259,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             // Create Keycloak instance
             const tokenParts = token.split('.');
             const tokenPayload = JSON.parse(atob(tokenParts[1]));
-            
+
             const keycloakInstance = {
               token,
               refreshToken,
@@ -281,7 +281,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         } else {
           console.log('No existing session found.');
         }
-        
+
         setIsAuthenticating(false);
         return;
       }
@@ -316,15 +316,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const handleStorageChange = () => {
       console.log('Storage changed, checking for new session...');
       const { token, refreshToken, expiry } = getTokensFromStorage();
-      
+
       if (token && refreshToken && !isTokenExpired(expiry)) {
         const savedProfile = getUserProfileFromStorage();
         if (savedProfile && !isAuthenticated) {
           console.log('New session detected, restoring...');
-          
+
           const tokenParts = token.split('.');
           const tokenPayload = JSON.parse(atob(tokenParts[1]));
-          
+
           const keycloakInstance = {
             token,
             refreshToken,
@@ -347,7 +347,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, [isAuthenticated]);
-  
+
   const updateUserInfo = (profile: UserResponseDto) => {
     setUserProfile({
       ...userProfile,
@@ -363,24 +363,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = useCallback(() => {
     // Clear tokens from storage
     clearTokensFromStorage();
-    
+
     // Clear keycloak instance
     keycloakUtils.dispose();
-    
+
     // Check if we're in admin context and redirect to student home
     const currentWebClientId = localStorage.getItem(LOCALE_STORAGE_KEYS.WEB_CLIENT_ID);
     const isAdmin = currentWebClientId === WEB_CLIENT_ADMIN;
-    
+
     // If logging out from admin, set web client to student
     if (isAdmin) {
       localStorage.setItem(LOCALE_STORAGE_KEYS.WEB_CLIENT_ID, WEB_CLIENT_STUDENT);
     }
-    
+
     // Determine redirect URI - if admin, redirect to student home
-    const redirectUri = isAdmin 
+    const redirectUri = isAdmin
       ? `${window.location.origin}${STUDENT_WEB_ROUTES.ROOT}`
       : window.location.origin;
-    
+
     if (useDirectLogin && keycloak?.logout) {
       // For direct login, redirect to student home if admin, otherwise use default
       if (isAdmin) {

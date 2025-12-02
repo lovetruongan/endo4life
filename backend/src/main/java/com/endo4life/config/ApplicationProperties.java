@@ -41,7 +41,8 @@ public record ApplicationProperties(
                         String bucketAvatar,
                         String bucketThumbnail,
                         String bucketOther,
-                        String bucketProcess) {
+                        String bucketProcess,
+                        String bucketBook) {
         }
 
         public record Job(
