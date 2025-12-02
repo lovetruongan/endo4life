@@ -86,7 +86,7 @@ export function LoginPage() {
         // Fetch user info from backend to get the database user_info.id
         try {
           const userInfoResponse = await fetch(
-            `${import.meta.env.VITE_APP_USER_SERVICE_URL || 'http://localhost:8080/api/v1/users'}/info`,
+            `${import.meta.env.VITE_ENDO4LIFE_USER_SERVICE_URL || 'http://localhost:8080/api/v1/users'}/info`,
             {
               headers: {
                 Authorization: `Bearer ${response.data.access_token}`,

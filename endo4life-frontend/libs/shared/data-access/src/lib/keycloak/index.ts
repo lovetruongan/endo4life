@@ -1,5 +1,12 @@
 import Keycloak from "keycloak-js";
-import { EnvConfig } from "@endo4life/feature-config";
+
+// Inline env config to avoid cross-library dependency
+const getEnvConfig = () => ({
+  Endo4LifeUrl: (import.meta as any).env?.VITE_ENDO4LIFE_APP_URL || '',
+  Endo4LifeRealm: (import.meta as any).env?.VITE_ENDO4LIFE_APP_REALM || 'endo4life',
+  Endo4LifeClient: (import.meta as any).env?.VITE_ENDO4LIFE_APP_CLIENT || 'endo4life_app',
+  Endo4LifeClientSecret: (import.meta as any).env?.VITE_ENDO4LIFE_CLIENT_SECRET || '',
+});
 
 const TOKEN_EXPIRED_MIN_VALIDITY = 1 * 60; // 1 min
 const TOKEN_EXPIRED_UPDATE_DURATION = 1 * 60 * 60; // 1 hour
@@ -68,12 +75,13 @@ async function refreshToken() {
 
   // Try refresh
   if (rToken) {
-    const url = `${EnvConfig.Endo4LifeUrl}/realms/${EnvConfig.Endo4LifeRealm}/protocol/openid-connect/token`;
+    const envConfig = getEnvConfig();
+    const url = `${envConfig.Endo4LifeUrl}/realms/${envConfig.Endo4LifeRealm}/protocol/openid-connect/token`;
     const body = new URLSearchParams();
     body.append('grant_type', 'refresh_token');
-    body.append('client_id', EnvConfig.Endo4LifeClient);
-    if (EnvConfig.Endo4LifeClientSecret) {
-      body.append('client_secret', EnvConfig.Endo4LifeClientSecret);
+    body.append('client_id', envConfig.Endo4LifeClient);
+    if (envConfig.Endo4LifeClientSecret) {
+      body.append('client_secret', envConfig.Endo4LifeClientSecret);
     }
     body.append('refresh_token', rToken);
 
@@ -113,11 +121,11 @@ function isTokenExpired(minValidity: number = 0) {
   if (!_keycloak || !_keycloak.tokenParsed) {
     return true;
   }
-  
-  const expiresIn = _keycloak.tokenParsed['exp'] 
-    ? _keycloak.tokenParsed['exp'] - Math.ceil(new Date().getTime() / 1000) 
+
+  const expiresIn = _keycloak.tokenParsed['exp']
+    ? _keycloak.tokenParsed['exp'] - Math.ceil(new Date().getTime() / 1000)
     : 0;
-  
+
   return expiresIn < minValidity;
 }
 

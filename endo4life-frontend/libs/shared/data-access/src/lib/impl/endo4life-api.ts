@@ -1,8 +1,7 @@
-import { EnvConfig } from '@endo4life/feature-config';
 import BaseApi from './base-api';
-import { 
-  UserV1Api, 
-  CourseV1Api, 
+import {
+  UserV1Api,
+  CourseV1Api,
   ResourceV1Api,
   UserResponseDto,
   CourseResponseDto,
@@ -15,9 +14,12 @@ import {
   ResourceCriteria
 } from '../generated';
 
+// Inline env config to avoid cross-library dependency
+const getServiceUrl = () => (import.meta as any).env?.VITE_ENDO4LIFE_SERVICE_URL || 'http://localhost:8080';
+
 export class Endo4LifeApiImpl extends BaseApi {
   constructor() {
-    super(EnvConfig.Endo4LifeServiceUrl || 'http://localhost:8080');
+    super(getServiceUrl());
   }
 
   // User APIs
@@ -33,10 +35,10 @@ export class Endo4LifeApiImpl extends BaseApi {
     return userApi.getCurrentUserInfo();
   }
 
-  async createUser(data: CreateUserRequestDto, avatar?: File, certificates?: File[]) {
+  async createUser(data: CreateUserRequestDto) {
     const config = await this.getApiConfiguration();
     const userApi = new UserV1Api(config);
-    return userApi.createUser({ user: data, avatar, certificate: certificates });
+    return userApi.createUser({ createUserRequestDto: data });
   }
 
   async getUserById(id: string) {
@@ -80,7 +82,7 @@ export class Endo4LifeApiImpl extends BaseApi {
   async createResource(data: CreateResourceRequestDto) {
     const config = await this.getApiConfiguration();
     const resourceApi = new ResourceV1Api(config);
-    return resourceApi.createResource({ createResourceRequestDto: data });
+    return resourceApi.createResource({ createResourceRequest: data as any });
   }
 
   async getResourceById(id: string) {

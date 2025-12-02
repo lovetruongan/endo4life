@@ -10,7 +10,7 @@ COPY package.json yarn.lock ./
 RUN yarn && mkdir /admin-web && mv ./node_modules ./admin-web
 WORKDIR /admin-web
 COPY . .
-RUN export NODE_OPTIONS="--max-old-space-size=8192" && yarn run build:admin:${APP_ENV}
+RUN rm -rf .nx/cache && export NODE_OPTIONS="--max-old-space-size=8192" && yarn run build:admin:${APP_ENV}
 
 FROM nginx:1.16.0-alpine as runner
 COPY --from=builder /admin-web/dist/apps/admin-web /usr/share/nginx/html

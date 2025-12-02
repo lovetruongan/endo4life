@@ -1,16 +1,15 @@
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "jsx":"react-jsx",
-    "module": "commonjs",
+    "jsx": "react-jsx",
+    "module": "esnext",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "esModuleInterop": true,
-    "rootDir": "."
+    "esModuleInterop": true
   },
   "files": [],
   "include": [],
@@ -23,4 +22,3 @@
     }
   ]
 }
-

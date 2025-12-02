@@ -24,11 +24,12 @@ export function useResourcesAccessed({
     [QUERY_KEY, userId],
     async () => {
       return new ResourceApiImpl().getResourcesAccessedByUserInfoIdAndType(
-        userId || '',
+        userId,
         resourceType as UserResourceType,
       );
     },
     {
+      enabled: !!userId, // Only fetch when userId is available
       refetchOnWindowFocus: false,
       refetchOnMount: false,
       keepPreviousData: true,
