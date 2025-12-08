@@ -1,5 +1,6 @@
 package com.endo4life.web.rest;
 
+import com.endo4life.security.RoleAccess;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.endo4life.service.comment.CommentService;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@RoleAccess.Authenticated // All users can interact with comments
 public class CommentV1ApiDelegateImpl implements CommentV1ApiDelegate {
     private final CommentService commentService;
 

@@ -1,5 +1,6 @@
 package com.endo4life.web.rest;
 
+import com.endo4life.security.RoleAccess;
 import com.endo4life.service.userregistrationcourse.UserRegistrationCourseService;
 import com.endo4life.web.rest.model.IdWrapperDto;
 import com.endo4life.web.rest.model.UserInfoEnrollCourseDto;
@@ -18,6 +19,7 @@ public class EnrollCourseV1ApiDelegateImpl implements com.endo4life.web.rest.api
     private final UserRegistrationCourseService userRegistrationCourseService;
 
     @Override
+    @RoleAccess.Authenticated // Any logged-in user can enroll
     public ResponseEntity<IdWrapperDto> enrollUserInCourse(UUID id, UserInfoEnrollCourseDto userInfoEnrollCourseDto) {
         UUID enrollID = userRegistrationCourseService.enrollUserIntoCourse(id, userInfoEnrollCourseDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(new IdWrapperDto().id(enrollID));

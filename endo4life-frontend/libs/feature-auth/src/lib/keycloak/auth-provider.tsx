@@ -74,13 +74,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [useDirectLogin] = useState(true); // Set to true for direct login, false for redirect
 
   // Helper functions for token management
-  const saveTokensToStorage = (token: string, refreshToken: string, expiresIn?: number) => {
+  const saveTokensToStorage = (
+    token: string,
+    refreshToken: string,
+    expiresIn?: number,
+  ) => {
     localStorage.setItem(AUTH_STORAGE_KEYS.ACCESS_TOKEN, token);
     localStorage.setItem(AUTH_STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
 
     if (expiresIn) {
       const expiryTime = Date.now() + expiresIn * 1000; // Convert to milliseconds
-      localStorage.setItem(AUTH_STORAGE_KEYS.TOKEN_EXPIRY, expiryTime.toString());
+      localStorage.setItem(
+        AUTH_STORAGE_KEYS.TOKEN_EXPIRY,
+        expiryTime.toString(),
+      );
     }
   };
 
@@ -105,7 +112,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const saveUserProfileToStorage = (profile: KeycloakUserProfile) => {
-    localStorage.setItem(AUTH_STORAGE_KEYS.USER_PROFILE, JSON.stringify(profile));
+    localStorage.setItem(
+      AUTH_STORAGE_KEYS.USER_PROFILE,
+      JSON.stringify(profile),
+    );
   };
 
   const getUserProfileFromStorage = (): KeycloakUserProfile | null => {
@@ -160,7 +170,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setUserProfile(newUserProfile);
   };
 
-  const handleDirectLogin = async (token: string, refreshToken: string, expiresIn?: number) => {
+  const handleDirectLogin = async (
+    token: string,
+    refreshToken: string,
+    expiresIn?: number,
+  ) => {
     try {
       console.log('Starting direct login with token...');
       setIsAuthenticating(true);
@@ -193,7 +207,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         authenticated: true,
         tokenParsed: tokenPayload,
         logout: () => {
-          window.location.href = `${EnvConfig.Endo4LifeUrl}/realms/${EnvConfig.Endo4LifeRealm}/protocol/openid-connect/logout?redirect_uri=${window.location.origin}`;
+          window.location.href = `${EnvConfig.Endo4LifeUrl}/realms/${EnvConfig.Endo4LifeRealm}/protocol/openid-connect/logout?post_logout_redirect_uri=${encodeURIComponent(window.location.origin)}&client_id=${EnvConfig.Endo4LifeClient}`;
         },
       } as any;
 
@@ -368,34 +382,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
     keycloakUtils.dispose();
 
     // Check if we're in admin context and redirect to student home
-    const currentWebClientId = localStorage.getItem(LOCALE_STORAGE_KEYS.WEB_CLIENT_ID);
+    const currentWebClientId = localStorage.getItem(
+      LOCALE_STORAGE_KEYS.WEB_CLIENT_ID,
+    );
     const isAdmin = currentWebClientId === WEB_CLIENT_ADMIN;
 
     // If logging out from admin, set web client to student
     if (isAdmin) {
-      localStorage.setItem(LOCALE_STORAGE_KEYS.WEB_CLIENT_ID, WEB_CLIENT_STUDENT);
+      localStorage.setItem(
+        LOCALE_STORAGE_KEYS.WEB_CLIENT_ID,
+        WEB_CLIENT_STUDENT,
+      );
     }
 
-    // Determine redirect URI - if admin, redirect to student home
-    const redirectUri = isAdmin
-      ? `${window.location.origin}${STUDENT_WEB_ROUTES.ROOT}`
-      : window.location.origin;
+    // Determine redirect URI
+    const redirectUri = window.location.origin;
 
-    if (useDirectLogin && keycloak?.logout) {
-      // For direct login, redirect to student home if admin, otherwise use default
-      if (isAdmin) {
-        window.location.href = STUDENT_WEB_ROUTES.ROOT;
-      } else {
-        keycloak.logout();
-      }
-    } else if (keycloak?.logout) {
-      // For redirect login, use Keycloak's logout with redirect URI
-      keycloak.logout({ redirectUri });
-    } else {
-      // Fallback: redirect directly
-      window.location.href = isAdmin ? STUDENT_WEB_ROUTES.ROOT : '/';
-    }
-  }, [keycloak, useDirectLogin]);
+    // Build Keycloak logout URL with correct OIDC parameters
+    const logoutUrl = `${EnvConfig.Endo4LifeUrl}/realms/${EnvConfig.Endo4LifeRealm}/protocol/openid-connect/logout?post_logout_redirect_uri=${encodeURIComponent(redirectUri)}&client_id=${EnvConfig.Endo4LifeClient}`;
+
+    // Always use the direct logout URL for consistent behavior
+    window.location.href = logoutUrl;
+  }, []);
 
   const changeWebClientId = useCallback((webClientId: string) => {
     localStorage.setItem(LOCALE_STORAGE_KEYS.WEB_CLIENT_ID, webClientId);

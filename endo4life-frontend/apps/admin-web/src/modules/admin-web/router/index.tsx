@@ -13,7 +13,12 @@ import CommentsPage from '../pages/comments/page';
 import CommentDetailPageError from '../pages/comments/[id]/error';
 import CommentDetailPageLoading from '../pages/comments/[id]/loading';
 import CommentDetailPage from '../pages/comments/[id]/page';
-import { ProtectedRoute } from './protected-route';
+import {
+  ProtectedRoute,
+  STAFF_ROLES,
+  CONTENT_MANAGER_ROLES,
+  USER_MANAGER_ROLES,
+} from './protected-route';
 import Layout from '../components/layout';
 import Navbar from '../components/navbar';
 import Header from '../components/header';
@@ -99,20 +104,28 @@ import TagsPageError from '../pages/tags/error';
 import TagsPageLoading from '../pages/tags/loading';
 import TagsPage from '../pages/tags/page';
 import { ADMIN_WEB_ROUTES } from '@endo4life/feature-config';
+import UnauthorizedPage from '../pages/unauthorized/page';
 
 const HomePage = lazy(() => import('../pages/home/page'));
 
 export const adminWebRouter = createBrowserRouter([
+  // Unauthorized page - accessible without layout
+  {
+    path: '/unauthorized',
+    element: <UnauthorizedPage />,
+  },
   {
     path: ADMIN_WEB_ROUTES.ROOT,
     errorElement: <div> Loading</div>,
     element: (
-      <Layout header={<Header />} navbar={<Navbar />}>
-        <Outlet />
-      </Layout>
+      <ProtectedRoute roles={STAFF_ROLES}>
+        <Layout header={<Header />} navbar={<Navbar />}>
+          <Outlet />
+        </Layout>
+      </ProtectedRoute>
     ),
     children: [
-      // HOME
+      // HOME - Dashboard for staff
       {
         path: ADMIN_WEB_ROUTES.HOME,
         index: true,
@@ -123,12 +136,12 @@ export const adminWebRouter = createBrowserRouter([
           </Suspense>
         ),
       },
-      // USER
+      // USER - Only ADMIN and COORDINATOR can manage users
       {
         path: ADMIN_WEB_ROUTES.USERS,
 
         element: (
-          <ProtectedRoute roles={[]}>
+          <ProtectedRoute roles={USER_MANAGER_ROLES}>
             <Outlet />
           </ProtectedRoute>
         ),
@@ -164,12 +177,12 @@ export const adminWebRouter = createBrowserRouter([
           },
         ],
       },
-      // COMMENT (not yet implemented)
+      // COMMENT - Staff can view comments
       {
         path: ADMIN_WEB_ROUTES.COMMENTS,
 
         element: (
-          <ProtectedRoute roles={[]}>
+          <ProtectedRoute roles={STAFF_ROLES}>
             <Outlet />
           </ProtectedRoute>
         ),
@@ -196,12 +209,12 @@ export const adminWebRouter = createBrowserRouter([
           },
         ],
       },
-      // IMAGE
+      // IMAGE - Content managers only
       {
         path: ADMIN_WEB_ROUTES.IMAGES,
 
         element: (
-          <ProtectedRoute roles={[]}>
+          <ProtectedRoute roles={CONTENT_MANAGER_ROLES}>
             <Outlet />
           </ProtectedRoute>
         ),
@@ -246,12 +259,12 @@ export const adminWebRouter = createBrowserRouter([
           },
         ],
       },
-      // VIDEO
+      // VIDEO - Content managers only
       {
         path: ADMIN_WEB_ROUTES.VIDEOS,
 
         element: (
-          <ProtectedRoute roles={[]}>
+          <ProtectedRoute roles={CONTENT_MANAGER_ROLES}>
             <Outlet />
           </ProtectedRoute>
         ),
@@ -296,12 +309,12 @@ export const adminWebRouter = createBrowserRouter([
           },
         ],
       },
-      // COURSE
+      // COURSE - Content managers only
       {
         path: ADMIN_WEB_ROUTES.COURSES,
         errorElement: <CoursesPageError />,
         element: (
-          <ProtectedRoute roles={[]}>
+          <ProtectedRoute roles={CONTENT_MANAGER_ROLES}>
             <Outlet />
           </ProtectedRoute>
         ),
@@ -326,7 +339,7 @@ export const adminWebRouter = createBrowserRouter([
                   subNavbar={<CourseSubNavbar />}
                   header={<CourseHeader />}
                 >
-                  <ProtectedRoute roles={[]}>
+                  <ProtectedRoute roles={CONTENT_MANAGER_ROLES}>
                     <Outlet />
                   </ProtectedRoute>
                 </CoursesPageLayout>
@@ -457,12 +470,12 @@ export const adminWebRouter = createBrowserRouter([
           },
         ],
       },
-      // QUESTION (not yet implemented)
+      // QUESTION - Content managers only
       {
         path: ADMIN_WEB_ROUTES.QUESTIONS,
 
         element: (
-          <ProtectedRoute roles={[]}>
+          <ProtectedRoute roles={CONTENT_MANAGER_ROLES}>
             <Outlet />
           </ProtectedRoute>
         ),
@@ -480,12 +493,12 @@ export const adminWebRouter = createBrowserRouter([
           },
         ],
       },
-      // DOCUMENT (not yet implemented)
+      // DOCUMENT - Content managers only
       {
         path: ADMIN_WEB_ROUTES.DOCUMENTS,
 
         element: (
-          <ProtectedRoute roles={[]}>
+          <ProtectedRoute roles={CONTENT_MANAGER_ROLES}>
             <Outlet />
           </ProtectedRoute>
         ),
@@ -503,12 +516,12 @@ export const adminWebRouter = createBrowserRouter([
           },
         ],
       },
-      // TAGS
+      // TAGS - Content managers only
       {
         path: ADMIN_WEB_ROUTES.TAGS,
 
         element: (
-          <ProtectedRoute roles={[]}>
+          <ProtectedRoute roles={CONTENT_MANAGER_ROLES}>
             <Outlet />
           </ProtectedRoute>
         ),
