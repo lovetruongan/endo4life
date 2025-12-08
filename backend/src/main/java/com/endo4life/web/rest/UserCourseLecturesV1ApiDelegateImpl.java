@@ -1,5 +1,6 @@
 package com.endo4life.web.rest;
 
+import com.endo4life.security.RoleAccess;
 import com.endo4life.service.userprogresscoursesection.UserProgressCourseSectionService;
 import com.endo4life.web.rest.model.IdWrapperDto;
 import com.endo4life.web.rest.model.LectureAndTestDto;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@RoleAccess.Authenticated // All methods require authentication
 public class UserCourseLecturesV1ApiDelegateImpl implements com.endo4life.web.rest.api.UserCourseLecturesV1ApiDelegate {
     private final UserProgressCourseSectionService userProgressCourseSectionService;
 

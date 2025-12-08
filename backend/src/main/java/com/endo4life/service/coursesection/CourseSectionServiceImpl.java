@@ -149,11 +149,9 @@ public class CourseSectionServiceImpl implements CourseSectionService {
             courseSectionEntity.setTagsDetail(StringUtil.convertListToString(updateCourseSectionDto.getTagsDetail()));
         }
 
+        // Only update thumbnail if explicitly provided (null means no change, not
+        // delete)
         UUID thumbnailDto = updateCourseSectionDto.getThumbnail();
-        if (Objects.isNull(thumbnailDto) && StringUtils.isNotBlank(courseSectionEntity.getThumbnail())) {
-            minioService.removeFile(courseSectionEntity.getThumbnail(), minioConfig.bucketThumbnail());
-            courseSectionEntity.setThumbnail(null);
-        }
         if (Objects.nonNull(thumbnailDto)) {
             if (!StringUtils.equalsIgnoreCase(courseSectionEntity.getThumbnail(), thumbnailDto.toString()) &&
                     StringUtils.isNotBlank(courseSectionEntity.getThumbnail())) {
@@ -162,11 +160,9 @@ public class CourseSectionServiceImpl implements CourseSectionService {
             courseSectionEntity.setThumbnail(thumbnailDto.toString());
         }
 
+        // Only update attachments if explicitly provided (null means no change, not
+        // delete)
         UUID attachmentDto = updateCourseSectionDto.getAttachments();
-        if (Objects.isNull(attachmentDto) && StringUtils.isNotBlank(courseSectionEntity.getAttachments())) {
-            minioService.removeFile(courseSectionEntity.getAttachments(), minioConfig.bucketVideo());
-            courseSectionEntity.setAttachments(null);
-        }
         if (Objects.nonNull(attachmentDto)) {
             if (!StringUtils.equalsIgnoreCase(courseSectionEntity.getAttachments(), attachmentDto.toString()) &&
                     StringUtils.isNotBlank(courseSectionEntity.getAttachments())) {

@@ -1,5 +1,6 @@
 package com.endo4life.web.rest;
 
+import com.endo4life.security.RoleAccess;
 import com.endo4life.service.doctoruserconversation.DoctorUserConversationService;
 import com.endo4life.web.rest.api.DoctorUserConversationsV1ApiDelegate;
 import com.endo4life.web.rest.model.*;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@RoleAccess.Authenticated
 public class DoctorUserConversationsV1ApiDelegateImpl implements DoctorUserConversationsV1ApiDelegate {
 
     private final DoctorUserConversationService conversationService;

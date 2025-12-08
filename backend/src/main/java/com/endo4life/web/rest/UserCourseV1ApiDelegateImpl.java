@@ -1,5 +1,6 @@
 package com.endo4life.web.rest;
 
+import com.endo4life.security.RoleAccess;
 import com.endo4life.service.usercourse.UserCourseService;
 import com.endo4life.web.rest.model.CourseCriteria;
 import com.endo4life.web.rest.model.StatusUserProgressCourseDto;
@@ -25,6 +26,7 @@ public class UserCourseV1ApiDelegateImpl implements com.endo4life.web.rest.api.U
     private final UserCourseService userCourseService;
 
     @Override
+    @RoleAccess.Authenticated
     public ResponseEntity<UserCourseResponsePaginatedDto> getUserCourses(CourseCriteria criteria, Pageable pageable) {
         Page<UserCourseResponseDto> page = userCourseService.getCourses(criteria, pageable);
         return ResponseEntity.ok(
@@ -34,18 +36,21 @@ public class UserCourseV1ApiDelegateImpl implements com.endo4life.web.rest.api.U
     }
 
     @Override
+    @RoleAccess.Authenticated
     public ResponseEntity<UserResponseDetailCourseDto> getUserCourseById(UUID id, UUID userInfoId) {
         return ResponseEntity.ok(
                 userCourseService.getUserCourseById(id, userInfoId));
     }
 
     @Override
+    @RoleAccess.Authenticated
     public ResponseEntity<List<UserProgressCourseDto>> getProgressCoursesUser(UUID userInfoId) {
         List<UserProgressCourseDto> list = userCourseService.getProgressCoursesUser(userInfoId);
         return ResponseEntity.status(HttpStatus.OK).body(list);
     }
 
     @Override
+    @RoleAccess.Authenticated
     public ResponseEntity<StatusUserProgressCourseDto> getStatusProgressCourseUser(UUID userInfoId, UUID courseId) {
         return ResponseEntity.ok(
                 userCourseService.getStatusProgressCourseUser(userInfoId, courseId));

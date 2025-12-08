@@ -1,5 +1,6 @@
 package com.endo4life.web.rest;
 
+import com.endo4life.security.RoleAccess;
 import com.endo4life.service.book.BookService;
 import com.endo4life.web.rest.api.BookV1ApiDelegate;
 import com.endo4life.web.rest.model.BookResponseDto;
@@ -19,11 +20,13 @@ public class BookV1ApiDelegateImpl implements BookV1ApiDelegate {
     private final BookService bookService;
 
     @Override
+    @RoleAccess.Authenticated
     public ResponseEntity<List<BookResponseDto>> getBooks() {
         return ResponseEntity.ok(bookService.getBooks());
     }
 
     @Override
+    @RoleAccess.Authenticated
     public ResponseEntity<BookResponseDto> getBookById(UUID id) {
         BookResponseDto book = bookService.getBook(id);
         if (book == null) {
@@ -33,6 +36,7 @@ public class BookV1ApiDelegateImpl implements BookV1ApiDelegate {
     }
 
     @Override
+    @RoleAccess.ContentManager // ADMIN or SPECIALIST
     public ResponseEntity<BookResponseDto> createBook(String title, String author, String description,
             MultipartFile file, MultipartFile cover) {
         BookResponseDto book = bookService.createBook(title, author, description, file, cover);
@@ -40,6 +44,7 @@ public class BookV1ApiDelegateImpl implements BookV1ApiDelegate {
     }
 
     @Override
+    @RoleAccess.ContentManager // ADMIN or SPECIALIST
     public ResponseEntity<BookResponseDto> updateBook(UUID id, String title, String author, String description,
             MultipartFile file, MultipartFile cover) {
         BookResponseDto book = bookService.updateBook(id, title, author, description, file, cover);
@@ -47,6 +52,7 @@ public class BookV1ApiDelegateImpl implements BookV1ApiDelegate {
     }
 
     @Override
+    @RoleAccess.ContentManager // ADMIN or SPECIALIST
     public ResponseEntity<Void> deleteBook(UUID id) {
         bookService.deleteBook(id);
         return ResponseEntity.noContent().build();

@@ -43,7 +43,8 @@ export function UserDetailForm({ loading, data, onSubmit }: Props) {
   const [open, openDialogAction] = useToggle(false);
 
   // Certificate management
-  const { data: certificates, isLoading: loadingCertificates } = useCertificates(id);
+  const { data: certificates, isLoading: loadingCertificates } =
+    useCertificates(id);
   const uploadCertificate = useCertificateUpload();
   const deleteCertificate = useCertificateDelete();
 
@@ -52,7 +53,7 @@ export function UserDetailForm({ loading, data, onSubmit }: Props) {
       toast.error('Không có ID người dùng');
       return;
     }
-    
+
     uploadCertificate.mutate(
       { userId: id, files },
       {
@@ -63,7 +64,7 @@ export function UserDetailForm({ loading, data, onSubmit }: Props) {
           console.error('Upload error:', error);
           toast.error('Không thể tải lên chứng chỉ');
         },
-      }
+      },
     );
   };
 
@@ -78,7 +79,7 @@ export function UserDetailForm({ loading, data, onSubmit }: Props) {
           console.error('Delete error:', error);
           toast.error('Không thể xóa chứng chỉ');
         },
-      }
+      },
     );
   };
 
@@ -185,10 +186,10 @@ export function UserDetailForm({ loading, data, onSubmit }: Props) {
           'space-y-6': true,
         })}
       >
-        <div className="flex justify-center h-fit pe-4 w-90">
-          <div className="px-56 pt-5 pb-20 border-2 shadow-xl rounded-2xl w-full bg-white h-[850px]">
-            <section className="grid gap-8 mb-6">
-              <div id="info-basic" className="grid gap-4">
+        <div className="flex justify-center px-4 py-6">
+          <div className="p-8 border shadow-lg rounded-2xl w-full max-w-4xl bg-white">
+            <section className="space-y-8">
+              <div id="info-basic" className="space-y-5">
                 <div>
                   <h3 className="my-1 text-lg font-semibold">
                     {t('user:basicInfo.title')}
@@ -311,7 +312,11 @@ export function UserDetailForm({ loading, data, onSubmit }: Props) {
                   label={t('user:basicInfo.certificate')}
                   userId={id}
                   certificates={certificates}
-                  loading={loadingCertificates || uploadCertificate.isLoading || deleteCertificate.isLoading}
+                  loading={
+                    loadingCertificates ||
+                    uploadCertificate.isLoading ||
+                    deleteCertificate.isLoading
+                  }
                   onUpload={handleCertificateUpload}
                   onDelete={handleCertificateDelete}
                   className="flex flex-col"
@@ -365,12 +370,15 @@ export function UserDetailForm({ loading, data, onSubmit }: Props) {
                 </div>
               </div>
             </section>
-            <div
-              className="inline-flex items-center justify-center gap-1 px-2 py-2 text-sm font-bold text-red-500 border border-red-500 rounded-lg hover:duration-300 hover:text-red-300 hover:cursor-pointer"
-              onClick={openDialogAction.toggle}
-            >
-              <VscTrash size={16} />
-              <span>{t('user:userDeleteAccount')}</span>
+            <div className="pt-4 border-t mt-6">
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 border border-red-300 rounded-lg hover:bg-red-50 hover:border-red-400 transition-colors"
+                onClick={openDialogAction.toggle}
+              >
+                <VscTrash size={16} />
+                <span>{t('user:userDeleteAccount')}</span>
+              </button>
             </div>
           </div>
         </div>

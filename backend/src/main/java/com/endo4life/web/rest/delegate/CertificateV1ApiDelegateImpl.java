@@ -2,6 +2,7 @@ package com.endo4life.web.rest.delegate;
 
 import com.endo4life.domain.document.Certificate;
 import com.endo4life.mapper.CertificateMapper;
+import com.endo4life.security.RoleAccess;
 import com.endo4life.security.UserContextHolder;
 import com.endo4life.service.certificate.CertificateService;
 import com.endo4life.web.rest.api.CertificateV1ApiDelegate;
@@ -13,10 +14,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ public class CertificateV1ApiDelegateImpl implements CertificateV1ApiDelegate {
     private final CertificateMapper certificateMapper;
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'COORDINATOR') or @securityService.isOwner(#userId)")
     public ResponseEntity<List<CertificateResponseDto>> getUserCertificates(
             UUID userId, CertificateType type) {
         log.info("Getting certificates for user: {}, type: {}", userId, type);
@@ -53,6 +55,7 @@ public class CertificateV1ApiDelegateImpl implements CertificateV1ApiDelegate {
     }
 
     @Override
+    @RoleAccess.Authenticated // Users can upload their professional certs
     public ResponseEntity<IdWrapperDto> createProfessionalCertificate(
             CreateCertificateRequestDto createCertificateRequestDto) {
         log.info("Creating professional certificate: {}", createCertificateRequestDto.getTitle());
@@ -81,6 +84,7 @@ public class CertificateV1ApiDelegateImpl implements CertificateV1ApiDelegate {
     }
 
     @Override
+    @RoleAccess.Authenticated
     public ResponseEntity<CertificateResponseDto> getCertificateById(UUID id) {
         log.info("Getting certificate by ID: {}", id);
 
@@ -91,6 +95,7 @@ public class CertificateV1ApiDelegateImpl implements CertificateV1ApiDelegate {
     }
 
     @Override
+    @RoleAccess.StaffOnly // ADMIN, SPECIALIST, COORDINATOR
     public ResponseEntity<Void> deleteCertificate(UUID id) {
         log.info("Deleting certificate: {}", id);
 
@@ -100,6 +105,7 @@ public class CertificateV1ApiDelegateImpl implements CertificateV1ApiDelegate {
     }
 
     @Override
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'COORDINATOR') or @securityService.isOwner(#userId)")
     public ResponseEntity<CertificateResponseDto> getCourseCertificate(UUID courseId, UUID userId) {
         log.info("Getting course certificate for courseId: {}, userId: {}", courseId, userId);
 

@@ -1,5 +1,6 @@
 package com.endo4life.web.rest;
 
+import com.endo4life.security.RoleAccess;
 import com.endo4life.service.usertest.UserTestService;
 import com.endo4life.web.rest.api.UserTestV1ApiDelegate;
 import com.endo4life.web.rest.model.*;
@@ -13,6 +14,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@RoleAccess.Authenticated // All methods require authentication
 public class UserTestV1ApiDelegateImpl implements UserTestV1ApiDelegate {
 
     private final UserTestService userTestService;

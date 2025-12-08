@@ -1,5 +1,6 @@
 package com.endo4life.web.rest;
 
+import com.endo4life.security.RoleAccess;
 import com.endo4life.service.userresourcehistory.UserResourceHistoryService;
 import com.endo4life.web.rest.model.IdWrapperDto;
 import com.endo4life.web.rest.model.UserResourceHistoryCriteria;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@RoleAccess.Authenticated // All methods require authentication
 public class UserResourceHistoryV1ApiDelegateImpl
         implements com.endo4life.web.rest.api.UserResourceHistoryV1ApiDelegate {
     private final UserResourceHistoryService userResourceService;
