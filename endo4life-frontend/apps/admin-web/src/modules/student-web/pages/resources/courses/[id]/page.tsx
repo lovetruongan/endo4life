@@ -12,17 +12,17 @@ import { useState, useEffect, useMemo } from 'react';
 import { STUDENT_WEB_ROUTES } from '@endo4life/feature-config';
 import { RichTextContent } from '@endo4life/feature-richtext-editor';
 import { stringToRichText } from '@endo4life/util-common';
-import { 
-  MdCheckCircle, 
-  MdSchool, 
-  MdPeople, 
+import {
+  MdCheckCircle,
+  MdSchool,
+  MdPeople,
   MdWarning,
   MdLibraryBooks,
   MdEdit,
   MdEmojiEvents,
   MdPlayArrow,
   MdVideocam,
-  MdStar
+  MdStar,
 } from 'react-icons/md';
 
 // Helper function to validate if a URL is a valid image URL
@@ -34,20 +34,38 @@ const isValidImageUrl = (url: string | undefined | null): boolean => {
   try {
     const urlObj = new URL(url);
     // Check for common image extensions or data URLs
-    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'];
+    const imageExtensions = [
+      '.jpg',
+      '.jpeg',
+      '.png',
+      '.gif',
+      '.webp',
+      '.svg',
+      '.bmp',
+    ];
     const pathname = urlObj.pathname.toLowerCase();
-    const isImageExtension = imageExtensions.some(ext => pathname.endsWith(ext));
+    const isImageExtension = imageExtensions.some((ext) =>
+      pathname.endsWith(ext),
+    );
     const isDataUrl = url.startsWith('data:image/');
-    return isImageExtension || isDataUrl || url.startsWith('http://') || url.startsWith('https://');
+    return (
+      isImageExtension ||
+      isDataUrl ||
+      url.startsWith('http://') ||
+      url.startsWith('https://')
+    );
   } catch {
     return false;
   }
 };
 
 // Helper function to parse JSON description and extract readable content
-const parseDescription = (description: string | undefined): { text: string; isRichText: boolean; richTextContent?: any } => {
-  if (!description || typeof description !== 'string') return { text: '', isRichText: false };
-  
+const parseDescription = (
+  description: string | undefined,
+): { text: string; isRichText: boolean; richTextContent?: any } => {
+  if (!description || typeof description !== 'string')
+    return { text: '', isRichText: false };
+
   // Check if it's JSON
   const trimmed = description.trim();
   if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
@@ -56,7 +74,11 @@ const parseDescription = (description: string | undefined): { text: string; isRi
       // Check for rich text editor format (Lexical)
       if (parsed.root?.children) {
         // This is a rich text format, return it for RichTextContent
-        return { text: '', isRichText: true, richTextContent: { content: description } };
+        return {
+          text: '',
+          isRichText: true,
+          richTextContent: { content: description },
+        };
       }
       // Check for metadata structure
       if (parsed.metadata) {
@@ -88,7 +110,7 @@ const parseDescription = (description: string | undefined): { text: string; isRi
       return { text: '', isRichText: false };
     }
   }
-  
+
   return { text: description, isRichText: false };
 };
 
@@ -106,10 +128,8 @@ export function ResourceCoursePage() {
 
   const isEnrolled = course?.isEnrolledCourse ?? false;
 
-  const {
-    data: progressStatus,
-    loading: progressLoading,
-  } = useCourseProgressStatus(userInfoId, id, isEnrolled);
+  const { data: progressStatus, loading: progressLoading } =
+    useCourseProgressStatus(userInfoId, id, isEnrolled);
 
   const {
     data: lectures,
@@ -121,7 +141,8 @@ export function ResourceCoursePage() {
 
   const [enrolling, setEnrolling] = useState(false);
 
-  const hasCompletedEntranceTest = progressStatus?.isCompletedEntranceTest ?? false;
+  const hasCompletedEntranceTest =
+    progressStatus?.isCompletedEntranceTest ?? false;
 
   // Error logging
   useEffect(() => {
@@ -146,7 +167,7 @@ export function ResourceCoursePage() {
 
   const handleEnroll = async () => {
     if (!userInfoId) {
-      toast.error('Please login to enroll in this course', {
+      toast.error('Vui lòng đăng nhập để đăng ký khóa học này', {
         position: 'top-right',
         autoClose: 3000,
       });
@@ -158,7 +179,7 @@ export function ResourceCoursePage() {
       { courseId: id, userInfoId },
       {
         onSuccess: () => {
-          toast.success('Successfully enrolled in course!', {
+          toast.success('Đăng ký khóa học thành công!', {
             position: 'top-right',
             autoClose: 3000,
           });
@@ -168,7 +189,7 @@ export function ResourceCoursePage() {
           console.error('Enrollment error details:', error);
 
           // Extract error message from axios error
-          let errorMessage = 'Failed to enroll in course';
+          let errorMessage = 'Đăng ký khóa học thất bại';
           if (error && typeof error === 'object' && 'response' in error) {
             const axiosError = error as {
               response?: { data?: { message?: string } };
@@ -178,7 +199,7 @@ export function ResourceCoursePage() {
             // Handle specific backend errors
             if (backendMessage?.includes('UserInfo not found')) {
               errorMessage =
-                'Please complete your profile before enrolling. Go to "My Profile" to set up your account.';
+                'Vui lòng hoàn thành hồ sơ trước khi đăng ký. Vào "Hồ sơ của tôi" để thiết lập tài khoản.';
             } else {
               errorMessage = backendMessage || errorMessage;
             }
@@ -199,7 +220,7 @@ export function ResourceCoursePage() {
   if (courseLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading course...</div>
+        <div className="text-lg">Đang tải khóa học...</div>
       </div>
     );
   }
@@ -207,7 +228,7 @@ export function ResourceCoursePage() {
   if (!course) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Course not found</div>
+        <div className="text-lg">Không tìm thấy khóa học</div>
       </div>
     );
   }
@@ -236,11 +257,13 @@ export function ResourceCoursePage() {
         {/* Course Basic Info - Right Side */}
         <div className="flex-1 flex flex-col gap-4">
           <div>
-            <h1 className="text-3xl lg:text-4xl font-bold mb-3">{course.title}</h1>
-            
+            <h1 className="text-3xl lg:text-4xl font-bold mb-3">
+              {course.title}
+            </h1>
+
             {course.lecturer && (
               <p className="text-base text-gray-600">
-                <span className="font-semibold">Instructor:</span>{' '}
+                <span className="font-semibold">Giảng viên:</span>{' '}
                 <span className="font-medium">{course.lecturer}</span>
               </p>
             )}
@@ -250,25 +273,25 @@ export function ResourceCoursePage() {
           <div className="flex flex-wrap items-center gap-3">
             {isEnrolled && (
               <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                <MdCheckCircle size={16} /> Enrolled
+                <MdCheckCircle size={16} /> Đã đăng ký
               </span>
             )}
-            
+
             {isEnrolled && hasCompletedEntranceTest && (
               <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                <MdCheckCircle size={16} /> Entrance Test Completed
+                <MdCheckCircle size={16} /> Đã hoàn thành bài kiểm tra đầu vào
               </span>
             )}
 
             {isEnrolled && progressStatus?.isCompletedCourse && (
               <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
-                <MdSchool size={16} /> Course Completed
+                <MdSchool size={16} /> Đã hoàn thành khóa học
               </span>
             )}
 
             {course.participantsCount !== undefined && (
               <span className="inline-flex items-center gap-1 text-sm text-gray-600 px-3 py-1 bg-gray-100 rounded-full">
-                <MdPeople size={16} /> {course.participantsCount} students
+                <MdPeople size={16} /> {course.participantsCount} học viên
               </span>
             )}
           </div>
@@ -282,11 +305,11 @@ export function ResourceCoursePage() {
                 className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
               >
                 {enrolling ? (
-                  'Enrolling...'
+                  'Đang đăng ký...'
                 ) : (
                   <>
                     <MdLibraryBooks size={18} />
-                    Enroll Now
+                    Đăng ký ngay
                   </>
                 )}
               </Button>
@@ -295,52 +318,75 @@ export function ResourceCoursePage() {
                 {!hasCompletedEntranceTest ? (
                   <Button
                     onClick={() => {
-                      const entranceTestRoute = STUDENT_WEB_ROUTES.COURSE_ENTRANCE_TEST.replace(':courseId', id);
+                      const entranceTestRoute =
+                        STUDENT_WEB_ROUTES.COURSE_ENTRANCE_TEST.replace(
+                          ':courseId',
+                          id,
+                        );
                       navigate(entranceTestRoute);
                     }}
                     className="inline-flex items-center gap-2 px-6 py-2.5 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg"
                   >
                     <MdEdit size={18} />
-                    Take Entrance Test
+                    Làm bài kiểm tra đầu vào
                   </Button>
-                ) : progressStatus?.isCompletedTotalCourseSection && !progressStatus?.isCompletedFinalCourseTest ? (
+                ) : progressStatus?.isCompletedTotalCourseSection &&
+                  !progressStatus?.isCompletedFinalCourseTest ? (
                   <Button
                     onClick={() => {
-                      const finalExamRoute = STUDENT_WEB_ROUTES.COURSE_FINAL_EXAM.replace(':courseId', id);
+                      const finalExamRoute =
+                        STUDENT_WEB_ROUTES.COURSE_FINAL_EXAM.replace(
+                          ':courseId',
+                          id,
+                        );
                       navigate(finalExamRoute);
                     }}
                     className="inline-flex items-center gap-2 px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg"
                   >
                     <MdEmojiEvents size={18} />
-                    Take Final Exam
+                    Làm bài thi cuối khóa
                   </Button>
                 ) : progressStatus?.isCompletedCourse ? (
                   <Button
                     onClick={() => {
-                      const finalExamRoute = STUDENT_WEB_ROUTES.COURSE_FINAL_EXAM.replace(':courseId', id);
+                      const finalExamRoute =
+                        STUDENT_WEB_ROUTES.COURSE_FINAL_EXAM.replace(
+                          ':courseId',
+                          id,
+                        );
                       navigate(finalExamRoute);
                     }}
                     className="inline-flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg"
                   >
                     <MdSchool size={18} />
-                    View Certificate
+                    Xem chứng chỉ
                   </Button>
                 ) : (
                   <Button
                     onClick={() => {
                       // Navigate to first incomplete lecture
-                      const firstIncompleteLecture = lectures?.find(l => !l.isCompletedCourseSection);
-                      if (firstIncompleteLecture && firstIncompleteLecture.courseSectionId) {
-                        const lectureRoute = STUDENT_WEB_ROUTES.COURSE_LECTURE
-                          .replace(':courseId', id)
-                          .replace(':lectureId', firstIncompleteLecture.courseSectionId);
+                      const firstIncompleteLecture = lectures?.find(
+                        (l) => !l.isCompletedCourseSection,
+                      );
+                      if (
+                        firstIncompleteLecture &&
+                        firstIncompleteLecture.courseSectionId
+                      ) {
+                        const lectureRoute =
+                          STUDENT_WEB_ROUTES.COURSE_LECTURE.replace(
+                            ':courseId',
+                            id,
+                          ).replace(
+                            ':lectureId',
+                            firstIncompleteLecture.courseSectionId,
+                          );
                         navigate(lectureRoute);
                       }
                     }}
                     className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
                   >
                     <MdPlayArrow size={18} />
-                    Continue Learning
+                    Tiếp tục học
                   </Button>
                 )}
               </>
@@ -351,13 +397,17 @@ export function ResourceCoursePage() {
           {isEnrolled && !hasCompletedEntranceTest && (
             <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
               <div className="flex items-start gap-2">
-                <MdWarning className="text-yellow-600 flex-shrink-0 mt-0.5" size={20} />
+                <MdWarning
+                  className="text-yellow-600 flex-shrink-0 mt-0.5"
+                  size={20}
+                />
                 <div className="flex-1">
                   <h3 className="text-sm font-semibold text-yellow-800">
-                    Entrance Test Required
+                    Yêu cầu bài kiểm tra đầu vào
                   </h3>
                   <p className="text-xs text-yellow-700 mt-0.5">
-                    Complete the entrance test to access course content.
+                    Hoàn thành bài kiểm tra đầu vào để truy cập nội dung khóa
+                    học.
                   </p>
                 </div>
               </div>
@@ -369,13 +419,20 @@ export function ResourceCoursePage() {
       {/* Course Description/Content - Full Width Below */}
       {(descriptionContent.isRichText || descriptionContent.text) && (
         <div className="bg-white rounded-xl shadow-md p-6 lg:p-8">
-          <h2 className="text-2xl font-bold mb-6 text-gray-900">About This Course</h2>
-          
-          {descriptionContent.isRichText && descriptionContent.richTextContent && (
-            <div className="text-gray-700 leading-relaxed prose max-w-none">
-              <RichTextContent value={stringToRichText(descriptionContent.richTextContent.content)} />
-            </div>
-          )}
+          <h2 className="text-2xl font-bold mb-6 text-gray-900">
+            Về khóa học này
+          </h2>
+
+          {descriptionContent.isRichText &&
+            descriptionContent.richTextContent && (
+              <div className="text-gray-700 leading-relaxed prose max-w-none">
+                <RichTextContent
+                  value={stringToRichText(
+                    descriptionContent.richTextContent.content,
+                  )}
+                />
+              </div>
+            )}
 
           {!descriptionContent.isRichText && descriptionContent.text && (
             <div className="text-gray-700 leading-relaxed">
@@ -389,10 +446,13 @@ export function ResourceCoursePage() {
       {isEnrolled && hasCompletedEntranceTest && (
         <div className="bg-white rounded-xl shadow-md p-6 lg:p-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Course Content</h2>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Nội dung khóa học
+            </h2>
             {lectures && lectures.length > 0 && (
               <span className="text-sm text-gray-600">
-                {lectures.filter(l => l.isCompletedCourseSection).length} / {lectures.length} completed
+                {lectures.filter((l) => l.isCompletedCourseSection).length} /{' '}
+                {lectures.length} đã hoàn thành
               </span>
             )}
           </div>
@@ -400,7 +460,7 @@ export function ResourceCoursePage() {
           {lecturesLoading ? (
             <div className="text-center py-12 text-gray-600">
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-3"></div>
-              <p className="text-sm">Loading lectures...</p>
+              <p className="text-sm">Đang tải bài giảng...</p>
             </div>
           ) : lectures && lectures.length > 0 ? (
             <div className="flex flex-col gap-3">
@@ -409,9 +469,11 @@ export function ResourceCoursePage() {
                   key={lecture.id}
                   onClick={() => {
                     if (lecture.courseSectionId) {
-                      const lectureRoute = STUDENT_WEB_ROUTES.COURSE_LECTURE
-                        .replace(':courseId', id)
-                        .replace(':lectureId', lecture.courseSectionId);
+                      const lectureRoute =
+                        STUDENT_WEB_ROUTES.COURSE_LECTURE.replace(
+                          ':courseId',
+                          id,
+                        ).replace(':lectureId', lecture.courseSectionId);
                       navigate(lectureRoute);
                     }
                   }}
@@ -428,12 +490,13 @@ export function ResourceCoursePage() {
                       <div className="flex items-center gap-3 mt-1">
                         {lecture.videoDuration && (
                           <span className="text-xs text-gray-500 flex items-center gap-1">
-                            <MdVideocam size={14} /> {Math.floor(lecture.videoDuration / 60)} min
+                            <MdVideocam size={14} />{' '}
+                            {Math.floor(lecture.videoDuration / 60)} phút
                           </span>
                         )}
                         {lecture.totalCredits && (
                           <span className="text-xs text-gray-500 flex items-center gap-1">
-                            <MdStar size={14} /> {lecture.totalCredits} credits
+                            <MdStar size={14} /> {lecture.totalCredits} tín chỉ
                           </span>
                         )}
                       </div>
@@ -454,8 +517,10 @@ export function ResourceCoursePage() {
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-gray-500 text-base">No lectures available yet</p>
-              <p className="text-gray-400 text-sm mt-2">Check back later for course content</p>
+              <p className="text-gray-500 text-base">Chưa có bài giảng</p>
+              <p className="text-gray-400 text-sm mt-2">
+                Hãy quay lại sau để xem nội dung khóa học
+              </p>
             </div>
           )}
         </div>

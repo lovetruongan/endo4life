@@ -1,4 +1,4 @@
 export default function MyQuestionsPageLoading() {
-  return <div>Loading...</div>;
+  return <div>Đang tải...</div>;
 }
 

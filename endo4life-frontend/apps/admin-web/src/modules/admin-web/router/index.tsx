@@ -114,6 +114,11 @@ export const adminWebRouter = createBrowserRouter([
     path: '/unauthorized',
     element: <UnauthorizedPage />,
   },
+  // Login route - redirect to home (Keycloak handles auth)
+  {
+    path: '/login',
+    element: <UnauthorizedPage />,
+  },
   {
     path: ADMIN_WEB_ROUTES.ROOT,
     errorElement: <div> Loading</div>,

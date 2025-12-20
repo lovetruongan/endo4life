@@ -74,7 +74,7 @@ function Main({ children }: Props) {
   // }, []);
 
   if (isLoading) {
-    return <div className="p-6 text-center">Loading...</div>;
+    return <div className="p-6 text-center">Đang tải...</div>;
   }
 
   return (

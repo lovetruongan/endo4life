@@ -42,8 +42,8 @@ export function WatchHistoryPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Watch History</h1>
-        <p className="text-gray-600">View your recently watched content</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Lịch sử xem</h1>
+        <p className="text-gray-600">Xem nội dung bạn đã xem gần đây</p>
       </div>
 
       {/* Tabs */}
@@ -56,7 +56,7 @@ export function WatchHistoryPage() {
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
-          Videos
+          Video
         </button>
         <button
           onClick={() => handleTabChange('IMAGE')}
@@ -66,7 +66,7 @@ export function WatchHistoryPage() {
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
-          Images
+          Hình ảnh
         </button>
       </div>
 
@@ -75,7 +75,7 @@ export function WatchHistoryPage() {
         <div className="flex items-center justify-center py-12">
           <div className="flex flex-col items-center gap-4">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className="text-gray-600">Loading...</p>
+            <p className="text-gray-600">Đang tải...</p>
           </div>
         </div>
       )}
@@ -84,8 +84,8 @@ export function WatchHistoryPage() {
       {error && (
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
-            <p className="text-red-600 text-lg">Failed to load watch history</p>
-            <p className="text-gray-600">Please try again later</p>
+            <p className="text-red-600 text-lg">Không thể tải lịch sử xem</p>
+            <p className="text-gray-600">Vui lòng thử lại sau</p>
           </div>
         </div>
       )}
@@ -110,16 +110,16 @@ export function WatchHistoryPage() {
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              No {activeTab === 'VIDEO' ? 'Videos' : 'Images'} Watched Yet
+              Chưa có {activeTab === 'VIDEO' ? 'video' : 'hình ảnh'} nào được xem
             </h2>
             <p className="text-gray-600 mb-6">
-              Start watching content to see your history here
+              Bắt đầu xem nội dung để thấy lịch sử tại đây
             </p>
             <button
               onClick={() => navigate(STUDENT_WEB_ROUTES.RESOURCES)}
               className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
             >
-              Browse Resources
+              Duyệt tài nguyên
             </button>
           </div>
         </div>
@@ -174,10 +174,10 @@ export function WatchHistoryPage() {
                 {/* Content */}
                 <div className="p-4">
                   <h3 className="text-sm font-semibold text-gray-900 mb-2 line-clamp-2">
-                    {item.resource.title || 'Untitled'}
+                    {item.resource.title || 'Không có tiêu đề'}
                   </h3>
                   <p className="text-xs text-gray-600">
-                    Watched {moment(item.createdAt).fromNow()}
+                    Đã xem {moment(item.createdAt).locale('vi').fromNow()}
                   </p>
                 </div>
               </div>
@@ -192,10 +192,10 @@ export function WatchHistoryPage() {
                 disabled={page === 0}
                 className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Previous
+                Trước
               </button>
               <span className="text-gray-600">
-                Page {page + 1} of {Math.ceil(pagination.totalCount / pagination.size)}
+                Trang {page + 1} / {Math.ceil(pagination.totalCount / pagination.size)}
               </span>
               <button
                 onClick={() =>
@@ -211,7 +211,7 @@ export function WatchHistoryPage() {
                 }
                 className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Next
+                Tiếp
               </button>
             </div>
           )}

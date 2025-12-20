@@ -364,7 +364,7 @@ export function QuestionImageCropDialog({
                 <button
                   onClick={handleResetZoom}
                   className="p-1.5 rounded hover:bg-gray-100 transition-colors"
-                  title="Reset zoom"
+                  title="Đặt lại zoom"
                 >
                   <MdZoomOutMap size={20} />
                 </button>

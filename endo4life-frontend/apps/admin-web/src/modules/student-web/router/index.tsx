@@ -67,7 +67,7 @@ export const studentWebRouter = createBrowserRouter([
   {
     path: '/login',
     element: (
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div>Đang tải...</div>}>
         <LoginPage />
       </Suspense>
     ),
@@ -75,7 +75,7 @@ export const studentWebRouter = createBrowserRouter([
   // MAIN APP - With Layout (has header/footer)
   {
     path: STUDENT_WEB_ROUTES.ROOT,
-    errorElement: <div> Loading</div>,
+    errorElement: <div> Đang tải</div>,
     element: (
       <Layout header={<Header />}>
         <Outlet />

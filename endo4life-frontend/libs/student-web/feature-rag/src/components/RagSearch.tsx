@@ -138,7 +138,7 @@ export function RagSearch({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Enter your search query..."
+                  placeholder="Nhập nội dung tìm kiếm..."
                   className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
                   disabled={searchMutation.isLoading}
                 />

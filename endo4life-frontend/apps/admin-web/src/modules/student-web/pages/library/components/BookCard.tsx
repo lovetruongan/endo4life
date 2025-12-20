@@ -41,7 +41,7 @@ export function BookCard({ book }: BookCardProps) {
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-gray-300">
             <IoBookOutline size={48} className="mb-2" />
-            <span className="text-xs font-medium">No Cover</span>
+            <span className="text-xs font-medium">Không có ảnh bìa</span>
           </div>
         )}
 

@@ -46,10 +46,10 @@ export function FinalExamPage() {
         <div className="text-center max-w-md">
           <MdWarning className="text-yellow-600 mx-auto mb-4" size={72} />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Lectures Not Complete
+            Chưa hoàn thành bài giảng
           </h2>
           <p className="text-gray-600 mb-6">
-            You must complete all lectures and their review questions before taking the final exam.
+            Bạn phải hoàn thành tất cả bài giảng và câu hỏi ôn tập trước khi làm bài thi cuối khóa.
           </p>
           <button
             onClick={() => {
@@ -78,7 +78,7 @@ export function FinalExamPage() {
       return result;
     } catch (error) {
       console.error('Failed to submit final exam:', error);
-      toast.error('Failed to submit final exam. Please try again.', {
+      toast.error('Gửi bài thi thất bại. Vui lòng thử lại.', {
         position: 'top-right',
         autoClose: 3000,
       });
@@ -89,12 +89,12 @@ export function FinalExamPage() {
   const handleTestComplete = (result: any) => {
     if (result.passed) {
       setShowCongratulations(true);
-      toast.success('Congratulations! You passed the final exam and completed the course!', {
+      toast.success('Chúc mừng! Bạn đã vượt qua bài thi cuối khóa và hoàn thành khóa học!', {
         position: 'top-right',
         autoClose: 10000,
       });
     } else {
-      toast.error('You did not pass the final exam. Review the course materials and try again.', {
+      toast.error('Bạn chưa vượt qua bài thi cuối khóa. Hãy xem lại tài liệu và thử lại.', {
         position: 'top-right',
         autoClose: 5000,
       });
@@ -110,17 +110,17 @@ export function FinalExamPage() {
     if (certificate?.fileUrl) {
       // Open certificate in new tab to download
       window.open(certificate.fileUrl, '_blank');
-      toast.success('Certificate download started!', {
+      toast.success('Bắt đầu tải chứng chỉ!', {
         position: 'top-right',
         autoClose: 3000,
       });
     } else if (certificateLoading) {
-      toast.info('Loading certificate...', {
+      toast.info('Đang tải chứng chỉ...', {
         position: 'top-right',
         autoClose: 2000,
       });
     } else {
-      toast.error('Certificate not available yet. Please contact support.', {
+      toast.error('Chứng chỉ chưa có sẵn. Vui lòng liên hệ hỗ trợ.', {
       position: 'top-right',
       autoClose: 3000,
     });
@@ -132,7 +132,7 @@ export function FinalExamPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading final exam...</p>
+          <p className="text-gray-600">Đang tải bài thi cuối khóa...</p>
         </div>
       </div>
     );
@@ -144,18 +144,18 @@ export function FinalExamPage() {
         <div className="text-center max-w-md">
           <MdWarning className="text-red-600 mx-auto mb-4" size={72} />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Failed to Load Final Exam
+            Không thể tải bài thi cuối khóa
           </h2>
           <p className="text-gray-600 mb-6">
             {error
-              ? 'There was an error loading the final exam. Please try again later.'
-              : 'The final exam is not available for this course.'}
+              ? 'Có lỗi khi tải bài thi cuối khóa. Vui lòng thử lại sau.'
+              : 'Bài thi cuối khóa không khả dụng cho khóa học này.'}
           </p>
           <button
             onClick={handleClose}
             className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
           >
-            Back to Course
+            Quay lại khóa học
           </button>
         </div>
       </div>
@@ -172,32 +172,32 @@ export function FinalExamPage() {
             <div className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 p-8 text-center">
               <MdEmojiEvents className="mx-auto text-white" size={120} />
               <h1 className="text-4xl font-bold text-white mt-4">
-                Congratulations!
+                Chúc mừng!
               </h1>
             </div>
 
             {/* Content */}
             <div className="p-8 text-center">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                You've Completed the Course!
+                Bạn đã hoàn thành khóa học!
               </h2>
               <p className="text-lg text-gray-700 mb-6">
-                You've successfully passed the final exam and completed all requirements for this course.
+                Bạn đã vượt qua bài thi cuối khóa và hoàn thành tất cả yêu cầu của khóa học này.
               </p>
 
               {/* Achievement Stats */}
               <div className="grid grid-cols-3 gap-4 mb-8">
                 <div className="bg-blue-50 rounded-lg p-4">
                   <MdCheck className="text-3xl font-bold text-blue-600 mx-auto" size={32} />
-                  <p className="text-sm text-gray-600 mt-2">Entrance Test</p>
+                  <p className="text-sm text-gray-600 mt-2">Bài kiểm tra đầu vào</p>
                 </div>
                 <div className="bg-green-50 rounded-lg p-4">
                   <MdCheck className="text-3xl font-bold text-green-600 mx-auto" size={32} />
-                  <p className="text-sm text-gray-600 mt-2">All Lectures</p>
+                  <p className="text-sm text-gray-600 mt-2">Tất cả bài giảng</p>
                 </div>
                 <div className="bg-purple-50 rounded-lg p-4">
                   <MdCheck className="text-3xl font-bold text-purple-600 mx-auto" size={32} />
-                  <p className="text-sm text-gray-600 mt-2">Final Exam</p>
+                  <p className="text-sm text-gray-600 mt-2">Bài thi cuối khóa</p>
                 </div>
               </div>
 
@@ -212,13 +212,13 @@ export function FinalExamPage() {
                 ) : (
                 <MdSchool className="mx-auto mb-2 text-blue-700" size={40} />
                 )}
-                <p className="font-semibold text-gray-900">Certificate of Completion</p>
+                <p className="font-semibold text-gray-900">Chứng chỉ hoàn thành</p>
                 <p className="text-sm text-gray-600 mt-2">
-                  Awarded to {userProfile?.firstName} {userProfile?.lastName}
+                  Trao cho {userProfile?.firstName} {userProfile?.lastName}
                 </p>
                 {certificate?.issuedAt && (
                   <p className="text-xs text-gray-500 mt-1">
-                    Issued: {new Date(certificate.issuedAt).toLocaleDateString()}
+                    Ngày cấp: {new Date(certificate.issuedAt).toLocaleDateString('vi-VN')}
                   </p>
                 )}
               </div>
@@ -230,7 +230,7 @@ export function FinalExamPage() {
                   className="flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-lg transition-all shadow-lg"
                 >
                   <MdDownload size={20} />
-                  Download Certificate
+                  Tải chứng chỉ
                 </button>
                 <button
                   onClick={() => {
@@ -239,7 +239,7 @@ export function FinalExamPage() {
                   }}
                   className="px-8 py-3 bg-white hover:bg-gray-50 text-gray-800 font-medium rounded-lg border-2 border-gray-300 transition-colors"
                 >
-                  View My Learning
+                  Khóa học của tôi
                 </button>
               </div>
 
@@ -247,7 +247,7 @@ export function FinalExamPage() {
                 onClick={handleClose}
                 className="mt-6 text-gray-600 hover:text-gray-900 underline"
               >
-                Back to Course Page
+                Quay lại trang khóa học
               </button>
             </div>
           </div>
@@ -264,10 +264,10 @@ export function FinalExamPage() {
           <MdGpsFixed className="text-purple-700" size={24} />
           <div>
             <p className="text-sm font-medium text-purple-800">
-              Final Exam - Course Completion Test
+              Bài thi cuối khóa - Bài kiểm tra hoàn thành khóa học
             </p>
             <p className="text-xs text-purple-700">
-              Pass this exam to complete the course and earn your certificate
+              Vượt qua bài thi này để hoàn thành khóa học và nhận chứng chỉ
             </p>
           </div>
         </div>

@@ -217,7 +217,7 @@ export function RagChat({
     setShowClearDialog(false);
     setShouldAutoScroll(true);
     setIsUserScrolling(false);
-    toast.success('Chat history cleared');
+    toast.success('Đã xóa lịch sử trò chuyện');
   };
 
   const scrollToBottomButton = () => {
@@ -237,21 +237,21 @@ export function RagChat({
             </div>
             <div>
               <h2 className="text-lg font-semibold">RAG Chat Assistant</h2>
-              <p className="text-xs text-gray-500">Ask questions about your documents</p>
+              <p className="text-xs text-gray-500">Đặt câu hỏi về tài liệu của bạn</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Link
               to={STUDENT_WEB_ROUTES.RAG_SEARCH}
               className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-              title="Document Search"
+              title="Tìm kiếm tài liệu"
             >
               <PiMagnifyingGlassBold size={20} />
             </Link>
             <Link
               to={STUDENT_WEB_ROUTES.RAG_INGEST}
               className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-              title="Upload Documents"
+              title="Tải lên tài liệu"
             >
               <PiUploadSimpleFill size={20} />
             </Link>
@@ -259,7 +259,7 @@ export function RagChat({
             onClick={() => setShowSettings(!showSettings)}
             size="small"
             className={clsx({ 'bg-blue-100': showSettings })}
-            title="Settings"
+            title="Cài đặt"
           >
             <PiGearFill size={20} />
           </IconButton>
@@ -268,7 +268,7 @@ export function RagChat({
               onClick={() => setShowClearDialog(true)} 
               size="small" 
               color="error"
-              title="Clear chat history"
+              title="Xóa lịch sử trò chuyện"
             >
               <PiTrashFill size={20} />
             </IconButton>
@@ -317,7 +317,7 @@ export function RagChat({
                     className="bg-white"
                   >
                     {isLoadingCollections ? (
-                      <MenuItem value={selectedCollection}>Loading...</MenuItem>
+                      <MenuItem value={selectedCollection}>Đang tải...</MenuItem>
                     ) : collectionsData?.collections && collectionsData.collections.length > 0 ? (
                       collectionsData.collections.map((col) => (
                         <MenuItem key={col.collection_name} value={col.collection_name}>
@@ -582,7 +582,7 @@ export function RagChat({
           <button
             onClick={scrollToBottomButton}
             className="fixed bottom-32 right-8 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all hover:scale-110 z-10 animate-bounce"
-            title="Scroll to bottom"
+            title="Cuộn xuống cuối"
           >
             <PiArrowDownBold size={24} />
           </button>
@@ -596,7 +596,7 @@ export function RagChat({
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Ask a question about your documents..."
+            placeholder="Đặt câu hỏi về tài liệu của bạn..."
             className="flex-1 px-4 py-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             rows={2}
             disabled={isGenerating}
@@ -622,7 +622,7 @@ export function RagChat({
           </button>
         </div>
         <p className="text-xs text-gray-500 text-center mt-2">
-          Press Enter to send, Shift+Enter for new line
+          Nhấn Enter để gửi, Shift+Enter để xuống dòng
         </p>
       </div>
 

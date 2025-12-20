@@ -43,10 +43,10 @@ export function LectureReviewPage() {
         <div className="text-center max-w-md">
           <MdWarning className="text-yellow-600 mx-auto mb-4" size={72} />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Video Not Complete
+            Chưa xem hết video
           </h2>
           <p className="text-gray-600 mb-6">
-            You must watch at least {requiredPercentage}% of the lecture video before taking the review questions.
+            Bạn phải xem ít nhất {requiredPercentage}% video bài giảng trước khi làm câu hỏi ôn tập.
           </p>
           <button
             onClick={() => {
@@ -57,7 +57,7 @@ export function LectureReviewPage() {
             }}
             className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
           >
-            Back to Lecture
+            Quay lại bài giảng
           </button>
         </div>
       </div>
@@ -77,7 +77,7 @@ export function LectureReviewPage() {
       return result;
     } catch (error) {
       console.error('Failed to submit review questions:', error);
-      toast.error('Failed to submit review questions. Please try again.', {
+      toast.error('Gửi câu trả lời thất bại. Vui lòng thử lại.', {
         position: 'top-right',
         autoClose: 3000,
       });
@@ -87,7 +87,7 @@ export function LectureReviewPage() {
 
   const handleTestComplete = (result: any) => {
     if (result.passed) {
-      toast.success('Great job! You passed the review questions!', {
+      toast.success('Tuyệt vời! Bạn đã vượt qua câu hỏi ôn tập!', {
         position: 'top-right',
         autoClose: 5000,
       });
@@ -101,7 +101,7 @@ export function LectureReviewPage() {
         // User will see "Continue" button in the result modal
       }
     } else {
-      toast.error('You did not pass the review questions. Please review the lecture and try again.', {
+      toast.error('Bạn chưa vượt qua câu hỏi ôn tập. Hãy xem lại bài giảng và thử lại.', {
         position: 'top-right',
         autoClose: 5000,
       });
@@ -137,7 +137,7 @@ export function LectureReviewPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading review questions...</p>
+          <p className="text-gray-600">Đang tải câu hỏi ôn tập...</p>
         </div>
       </div>
     );
@@ -149,18 +149,18 @@ export function LectureReviewPage() {
         <div className="text-center max-w-md">
           <MdWarning className="text-red-600 mx-auto mb-4" size={72} />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Failed to Load Review Questions
+            Không thể tải câu hỏi ôn tập
           </h2>
           <p className="text-gray-600 mb-6">
             {error
-              ? 'There was an error loading the review questions. Please try again later.'
-              : 'The review questions are not available for this lecture.'}
+              ? 'Có lỗi khi tải câu hỏi ôn tập. Vui lòng thử lại sau.'
+              : 'Câu hỏi ôn tập không khả dụng cho bài giảng này.'}
           </p>
           <button
             onClick={handleClose}
             className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
           >
-            Back to Lecture
+            Quay lại bài giảng
           </button>
         </div>
       </div>
@@ -175,10 +175,10 @@ export function LectureReviewPage() {
           <MdEditNote className="text-yellow-700" size={24} />
           <div>
             <p className="text-sm font-medium text-yellow-800">
-              Lecture Review Questions
+              Câu hỏi ôn tập bài giảng
             </p>
             <p className="text-xs text-yellow-700">
-              You must pass these questions to proceed to the next lecture
+              Bạn phải vượt qua các câu hỏi này để tiếp tục bài giảng tiếp theo
             </p>
           </div>
         </div>

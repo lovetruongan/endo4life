@@ -157,7 +157,7 @@ export function BookDetailPage() {
                                 <iframe
                                     src={`${book.fileUrl}#page=1&view=FitH&toolbar=0`}
                                     className="w-full h-full"
-                                    title="Book Preview"
+                                    title="Xem trước tài liệu"
                                 />
                             ) : (
                                 <div className="flex items-center justify-center h-full text-gray-500">

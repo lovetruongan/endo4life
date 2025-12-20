@@ -74,12 +74,12 @@ export default function TagCreateDialog({
 
   const handleSubmit = async () => {
     if (parentTags.length === 0) {
-      toast.error('At least one tag is required');
+      toast.error('Cần ít nhất một nhãn');
       return;
     }
 
     if (parentTags.length > 1 && detailTags.length > 0) {
-      toast.error('Only one parent tag allowed when creating detail tags');
+      toast.error('Chỉ được phép một nhãn cha khi tạo nhãn chi tiết');
       return;
     }
 
@@ -89,11 +89,11 @@ export default function TagCreateDialog({
         detailTag: detailTags,
         type: tagType,
       });
-      toast.success('Tag created successfully');
+      toast.success('Tạo nhãn thành công');
       onSuccess();
       onClose();
     } catch (error: any) {
-      toast.error(error?.message || 'Failed to create tag');
+      toast.error(error?.message || 'Tạo nhãn thất bại');
     }
   };
 
@@ -113,7 +113,7 @@ export default function TagCreateDialog({
       <DialogTitle className="pb-2">
         <div className="flex items-center gap-2">
           <TbTags size={24} />
-          <span>Create New Tags</span>
+          <span>Tạo nhãn mới</span>
         </div>
       </DialogTitle>
       
@@ -125,7 +125,7 @@ export default function TagCreateDialog({
           <Box>
             <TextField
               select
-              label="Tag Type"
+              label="Loại nhãn"
               value={tagType}
               onChange={(e) => setTagType(e.target.value as TagType)}
               fullWidth
@@ -144,12 +144,12 @@ export default function TagCreateDialog({
             <div className="flex items-center gap-2 mb-3">
               <TbTags size={18} className="text-gray-600" />
               <Typography variant="subtitle2" className="font-semibold text-gray-700">
-                Parent Tags
+                Nhãn cha
               </Typography>
             </div>
             
             <TextField
-              label="Add Parent Tag"
+              label="Thêm nhãn cha"
               value={currentTag}
               onChange={(e) => setCurrentTag(e.target.value)}
               onKeyPress={(e) => {
@@ -160,8 +160,8 @@ export default function TagCreateDialog({
               }}
               fullWidth
               size="small"
-              placeholder="Type tag name and press Enter"
-              helperText="Press Enter to add tag to the list below"
+              placeholder="Nhập tên nhãn và nhấn Enter"
+              helperText="Nhấn Enter để thêm nhãn vào danh sách bên dưới"
             />
             
             {parentTags.length > 0 && (
@@ -187,18 +187,18 @@ export default function TagCreateDialog({
                 <div className="flex items-center gap-2 mb-3">
                   <TbSubtask size={18} className="text-blue-600" />
                   <Typography variant="subtitle2" className="font-semibold text-blue-700">
-                    Detail Tags (Optional)
+                    Nhãn chi tiết (Tùy chọn)
                   </Typography>
                 </div>
                 
                 {parentTags.length > 1 && (
                   <Alert severity="warning" className="mb-3">
-                    Detail tags can only be added with a single parent tag. Please add only one parent tag to enable this feature.
+                    Nhãn chi tiết chỉ có thể được thêm với một nhãn cha duy nhất. Vui lòng chỉ thêm một nhãn cha để kích hoạt tính năng này.
                   </Alert>
                 )}
                 
                 <TextField
-                  label="Add Detail Tag"
+                  label="Thêm nhãn chi tiết"
                   value={currentDetailTag}
                   onChange={(e) => setCurrentDetailTag(e.target.value)}
                   onKeyPress={(e) => {
@@ -209,8 +209,8 @@ export default function TagCreateDialog({
                   }}
                   fullWidth
                   size="small"
-                  placeholder="Type detail tag name and press Enter"
-                  helperText="Detail tags are children of the parent tag"
+                  placeholder="Nhập tên nhãn chi tiết và nhấn Enter"
+                  helperText="Nhãn chi tiết là con của nhãn cha"
                   disabled={parentTags.length !== 1}
                 />
                 
@@ -236,8 +236,8 @@ export default function TagCreateDialog({
           {parentTags.length > 0 && (
             <Alert severity="info" icon={false}>
               <Typography variant="body2">
-                <strong>Summary:</strong> Creating {parentTags.length} parent tag{parentTags.length > 1 ? 's' : ''}
-                {detailTags.length > 0 && ` with ${detailTags.length} detail tag${detailTags.length > 1 ? 's' : ''}`}
+                <strong>Tóm tắt:</strong> Tạo {parentTags.length} nhãn cha
+                {detailTags.length > 0 && ` với ${detailTags.length} nhãn chi tiết`}
               </Typography>
             </Alert>
           )}
@@ -248,7 +248,7 @@ export default function TagCreateDialog({
       
       <DialogActions className="px-6 py-4">
         <Button onClick={onClose} variant="outlined">
-          Cancel
+          Huỷ
         </Button>
         <Button
           onClick={handleSubmit}
@@ -257,7 +257,7 @@ export default function TagCreateDialog({
           disabled={parentTags.length === 0 || mutation.isLoading}
           startIcon={mutation.isLoading ? <CircularProgress size={16} color="inherit" /> : <TbTags size={18} />}
         >
-          {mutation.isLoading ? 'Creating...' : 'Create Tags'}
+          {mutation.isLoading ? 'Đang tạo...' : 'Tạo nhãn'}
         </Button>
       </DialogActions>
     </Dialog>

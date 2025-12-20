@@ -427,7 +427,7 @@ ${steps.map(formatStep).join(`\n`)}
         <button
           className="test-recorder-button"
           id="test-recorder-button-snapshot"
-          title="Insert snapshot"
+          title="Chèn ảnh chụp"
           onClick={onSnapshotClick}
         />
         <button

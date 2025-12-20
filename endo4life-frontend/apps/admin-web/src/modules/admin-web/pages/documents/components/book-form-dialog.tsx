@@ -21,7 +21,7 @@ interface BookFormData {
 }
 
 const schema = yup.object().shape({
-  title: yup.string().required('Title is required'),
+  title: yup.string().required('Tiêu đề là bắt buộc'),
   author: yup.string(),
   description: yup.string(),
 });
@@ -83,7 +83,7 @@ export function BookFormDialog({
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle className="flex items-center justify-between border-b">
         <span className="text-lg font-semibold">
-          {isEdit ? 'Edit Document' : 'Add New Document'}
+          {isEdit ? 'Chỉnh sửa tài liệu' : 'Thêm tài liệu mới'}
         </span>
         <button
           onClick={onClose}
@@ -101,7 +101,7 @@ export function BookFormDialog({
             render={({ field: { onChange, value, name } }) => (
               <FormInputText
                 key={name}
-                label="Title"
+                label="Tiêu đề"
                 isRequired
                 value={value}
                 onSubmit={onChange}
@@ -116,7 +116,7 @@ export function BookFormDialog({
             render={({ field: { onChange, value, name } }) => (
               <FormInputText
                 key={name}
-                label="Author"
+                label="Tác giả"
                 value={value}
                 onSubmit={onChange}
                 errMessage={formState.errors?.author?.message}
@@ -130,7 +130,7 @@ export function BookFormDialog({
             render={({ field: { onChange, value, name } }) => (
               <FormInputTextarea
                 key={name}
-                label="Description"
+                label="Mô tả"
                 value={value}
                 onSubmit={onChange}
                 rows={3}
@@ -142,7 +142,7 @@ export function BookFormDialog({
             {/* File Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                PDF File {!isEdit && <span className="text-red-500">*</span>}
+                File PDF {!isEdit && <span className="text-red-500">*</span>}
               </label>
               <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer">
                 <input
@@ -154,7 +154,7 @@ export function BookFormDialog({
                 <div className="flex flex-col items-center pointer-events-none">
                   <IoCloudUploadOutline className="text-gray-400 mb-1" size={24} />
                   <span className="text-xs text-gray-600 truncate w-full">
-                    {file ? file.name : isEdit ? 'Replace file' : 'Select PDF'}
+                    {file ? file.name : isEdit ? 'Thay thế file' : 'Chọn PDF'}
                   </span>
                 </div>
               </div>
@@ -163,7 +163,7 @@ export function BookFormDialog({
             {/* Cover Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Cover Image
+                Ảnh bìa
               </label>
               <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer">
                 <input
@@ -175,7 +175,7 @@ export function BookFormDialog({
                 <div className="flex flex-col items-center pointer-events-none">
                   <IoCloudUploadOutline className="text-gray-400 mb-1" size={24} />
                   <span className="text-xs text-gray-600 truncate w-full">
-                    {cover ? cover.name : isEdit ? 'Replace cover' : 'Select image'}
+                    {cover ? cover.name : isEdit ? 'Thay thế ảnh bìa' : 'Chọn ảnh'}
                   </span>
                 </div>
               </div>
@@ -185,7 +185,7 @@ export function BookFormDialog({
 
         <DialogActions className="border-t p-4">
           <Button onClick={onClose} disabled={isLoading} color="inherit">
-            Cancel
+            Huỷ
           </Button>
           <Button
             type="submit"
@@ -193,7 +193,7 @@ export function BookFormDialog({
             disabled={isLoading}
             startIcon={isLoading && <CircularProgress size={16} />}
           >
-            {isEdit ? 'Save Changes' : 'Create Document'}
+            {isEdit ? 'Lưu thay đổi' : 'Tạo tài liệu'}
           </Button>
         </DialogActions>
       </form>
