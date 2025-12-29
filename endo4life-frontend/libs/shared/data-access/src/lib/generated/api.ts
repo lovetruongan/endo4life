@@ -26,6 +26,286 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
+ * @interface AIAnalysisRequestDto
+ */
+export interface AIAnalysisRequestDto {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof AIAnalysisRequestDto
+     */
+    'runDetection'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof AIAnalysisRequestDto
+     */
+    'runClassification'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof AIAnalysisRequestDto
+     */
+    'runSegmentation'?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof AIAnalysisRequestDto
+     */
+    'confidenceThreshold'?: number;
+}
+/**
+ * 
+ * @export
+ * @interface AIAnalysisResponseDto
+ */
+export interface AIAnalysisResponseDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof AIAnalysisResponseDto
+     */
+    'imageUrl'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof AIAnalysisResponseDto
+     */
+    'imageWidth'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof AIAnalysisResponseDto
+     */
+    'imageHeight'?: number;
+    /**
+     * 
+     * @type {Array<AIDetectionDto>}
+     * @memberof AIAnalysisResponseDto
+     */
+    'detections'?: Array<AIDetectionDto>;
+    /**
+     * 
+     * @type {AIClassificationDto}
+     * @memberof AIAnalysisResponseDto
+     */
+    'classification'?: AIClassificationDto;
+    /**
+     * 
+     * @type {AISegmentationDto}
+     * @memberof AIAnalysisResponseDto
+     */
+    'segmentation'?: AISegmentationDto;
+    /**
+     * 
+     * @type {number}
+     * @memberof AIAnalysisResponseDto
+     */
+    'processingTimeMs'?: number;
+    /**
+     * 
+     * @type {{ [key: string]: Array<string> | undefined; }}
+     * @memberof AIAnalysisResponseDto
+     */
+    'suggestedTags'?: { [key: string]: Array<string> | undefined; };
+}
+/**
+ * 
+ * @export
+ * @interface AIBoundingBoxDto
+ */
+export interface AIBoundingBoxDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof AIBoundingBoxDto
+     */
+    'x1'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof AIBoundingBoxDto
+     */
+    'y1'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof AIBoundingBoxDto
+     */
+    'x2'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof AIBoundingBoxDto
+     */
+    'y2'?: number;
+}
+/**
+ * 
+ * @export
+ * @interface AIClassificationDto
+ */
+export interface AIClassificationDto {
+    /**
+     * 
+     * @type {AIPredictionDto}
+     * @memberof AIClassificationDto
+     */
+    'hpStatus'?: AIPredictionDto;
+    /**
+     * 
+     * @type {AIPredictionDto}
+     * @memberof AIClassificationDto
+     */
+    'lesionType'?: AIPredictionDto;
+    /**
+     * 
+     * @type {{ [key: string]: Array<AIPredictionDto> | undefined; }}
+     * @memberof AIClassificationDto
+     */
+    'allPredictions'?: { [key: string]: Array<AIPredictionDto> | undefined; };
+}
+/**
+ * 
+ * @export
+ * @interface AIDetectionDto
+ */
+export interface AIDetectionDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof AIDetectionDto
+     */
+    'className'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof AIDetectionDto
+     */
+    'confidence'?: number;
+    /**
+     * 
+     * @type {AIBoundingBoxDto}
+     * @memberof AIDetectionDto
+     */
+    'bbox'?: AIBoundingBoxDto;
+    /**
+     * 
+     * @type {number}
+     * @memberof AIDetectionDto
+     */
+    'area'?: number;
+}
+/**
+ * 
+ * @export
+ * @interface AIHealthResponseDto
+ */
+export interface AIHealthResponseDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof AIHealthResponseDto
+     */
+    'status'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof AIHealthResponseDto
+     */
+    'aiServiceAvailable'?: boolean;
+}
+/**
+ * 
+ * @export
+ * @interface AIPolygonPointDto
+ */
+export interface AIPolygonPointDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof AIPolygonPointDto
+     */
+    'x'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof AIPolygonPointDto
+     */
+    'y'?: number;
+}
+/**
+ * 
+ * @export
+ * @interface AIPredictionDto
+ */
+export interface AIPredictionDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof AIPredictionDto
+     */
+    'className'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof AIPredictionDto
+     */
+    'confidence'?: number;
+}
+/**
+ * 
+ * @export
+ * @interface AISegmentationDto
+ */
+export interface AISegmentationDto {
+    /**
+     * 
+     * @type {Array<AISegmentationMaskDto>}
+     * @memberof AISegmentationDto
+     */
+    'masks'?: Array<AISegmentationMaskDto>;
+    /**
+     * 
+     * @type {string}
+     * @memberof AISegmentationDto
+     */
+    'combinedMaskUrl'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface AISegmentationMaskDto
+ */
+export interface AISegmentationMaskDto {
+    /**
+     * 
+     * @type {number}
+     * @memberof AISegmentationMaskDto
+     */
+    'detectionIndex'?: number;
+    /**
+     * 
+     * @type {Array<AIPolygonPointDto>}
+     * @memberof AISegmentationMaskDto
+     */
+    'polygon'?: Array<AIPolygonPointDto>;
+    /**
+     * 
+     * @type {number}
+     * @memberof AISegmentationMaskDto
+     */
+    'area'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof AISegmentationMaskDto
+     */
+    'iouScore'?: number;
+}
+/**
+ * 
+ * @export
  * @interface CertificateResponseDto
  */
 export interface CertificateResponseDto {
@@ -4013,6 +4293,300 @@ export class ActuatorApi extends BaseAPI {
      */
     public actuatorHealth(options?: RawAxiosRequestConfig) {
         return ActuatorApiFp(this.configuration).actuatorHealth(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * AiV1Api - axios parameter creator
+ * @export
+ */
+export const AiV1ApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Analyze an image by URL
+         * @param {string} imageUrl 
+         * @param {AIAnalysisRequestDto} [aIAnalysisRequestDto] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        analyzeByUrl: async (imageUrl: string, aIAnalysisRequestDto?: AIAnalysisRequestDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'imageUrl' is not null or undefined
+            assertParamExists('analyzeByUrl', 'imageUrl', imageUrl)
+            const localVarPath = `/api/v1/ai/analyze`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (imageUrl !== undefined) {
+                localVarQueryParameter['imageUrl'] = imageUrl;
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(aIAnalysisRequestDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Analyze a resource (image) using AI models
+         * @param {string} resourceId 
+         * @param {AIAnalysisRequestDto} [aIAnalysisRequestDto] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        analyzeResource: async (resourceId: string, aIAnalysisRequestDto?: AIAnalysisRequestDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'resourceId' is not null or undefined
+            assertParamExists('analyzeResource', 'resourceId', resourceId)
+            const localVarPath = `/api/v1/ai/resources/{resourceId}/analyze`
+                .replace(`{${"resourceId"}}`, encodeURIComponent(String(resourceId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(aIAnalysisRequestDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Check AI service health status
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAIHealth: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/ai/health`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * AiV1Api - functional programming interface
+ * @export
+ */
+export const AiV1ApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = AiV1ApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Analyze an image by URL
+         * @param {string} imageUrl 
+         * @param {AIAnalysisRequestDto} [aIAnalysisRequestDto] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async analyzeByUrl(imageUrl: string, aIAnalysisRequestDto?: AIAnalysisRequestDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AIAnalysisResponseDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.analyzeByUrl(imageUrl, aIAnalysisRequestDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AiV1Api.analyzeByUrl']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Analyze a resource (image) using AI models
+         * @param {string} resourceId 
+         * @param {AIAnalysisRequestDto} [aIAnalysisRequestDto] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async analyzeResource(resourceId: string, aIAnalysisRequestDto?: AIAnalysisRequestDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AIAnalysisResponseDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.analyzeResource(resourceId, aIAnalysisRequestDto, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AiV1Api.analyzeResource']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Check AI service health status
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getAIHealth(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AIHealthResponseDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getAIHealth(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AiV1Api.getAIHealth']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * AiV1Api - factory interface
+ * @export
+ */
+export const AiV1ApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = AiV1ApiFp(configuration)
+    return {
+        /**
+         * Analyze an image by URL
+         * @param {AiV1ApiAnalyzeByUrlRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        analyzeByUrl(requestParameters: AiV1ApiAnalyzeByUrlRequest, options?: RawAxiosRequestConfig): AxiosPromise<AIAnalysisResponseDto> {
+            return localVarFp.analyzeByUrl(requestParameters.imageUrl, requestParameters.aIAnalysisRequestDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Analyze a resource (image) using AI models
+         * @param {AiV1ApiAnalyzeResourceRequest} requestParameters Request parameters.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        analyzeResource(requestParameters: AiV1ApiAnalyzeResourceRequest, options?: RawAxiosRequestConfig): AxiosPromise<AIAnalysisResponseDto> {
+            return localVarFp.analyzeResource(requestParameters.resourceId, requestParameters.aIAnalysisRequestDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Check AI service health status
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAIHealth(options?: RawAxiosRequestConfig): AxiosPromise<AIHealthResponseDto> {
+            return localVarFp.getAIHealth(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * Request parameters for analyzeByUrl operation in AiV1Api.
+ * @export
+ * @interface AiV1ApiAnalyzeByUrlRequest
+ */
+export interface AiV1ApiAnalyzeByUrlRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof AiV1ApiAnalyzeByUrl
+     */
+    readonly imageUrl: string
+
+    /**
+     * 
+     * @type {AIAnalysisRequestDto}
+     * @memberof AiV1ApiAnalyzeByUrl
+     */
+    readonly aIAnalysisRequestDto?: AIAnalysisRequestDto
+}
+
+/**
+ * Request parameters for analyzeResource operation in AiV1Api.
+ * @export
+ * @interface AiV1ApiAnalyzeResourceRequest
+ */
+export interface AiV1ApiAnalyzeResourceRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof AiV1ApiAnalyzeResource
+     */
+    readonly resourceId: string
+
+    /**
+     * 
+     * @type {AIAnalysisRequestDto}
+     * @memberof AiV1ApiAnalyzeResource
+     */
+    readonly aIAnalysisRequestDto?: AIAnalysisRequestDto
+}
+
+/**
+ * AiV1Api - object-oriented interface
+ * @export
+ * @class AiV1Api
+ * @extends {BaseAPI}
+ */
+export class AiV1Api extends BaseAPI {
+    /**
+     * Analyze an image by URL
+     * @param {AiV1ApiAnalyzeByUrlRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AiV1Api
+     */
+    public analyzeByUrl(requestParameters: AiV1ApiAnalyzeByUrlRequest, options?: RawAxiosRequestConfig) {
+        return AiV1ApiFp(this.configuration).analyzeByUrl(requestParameters.imageUrl, requestParameters.aIAnalysisRequestDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Analyze a resource (image) using AI models
+     * @param {AiV1ApiAnalyzeResourceRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AiV1Api
+     */
+    public analyzeResource(requestParameters: AiV1ApiAnalyzeResourceRequest, options?: RawAxiosRequestConfig) {
+        return AiV1ApiFp(this.configuration).analyzeResource(requestParameters.resourceId, requestParameters.aIAnalysisRequestDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Check AI service health status
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AiV1Api
+     */
+    public getAIHealth(options?: RawAxiosRequestConfig) {
+        return AiV1ApiFp(this.configuration).getAIHealth(options).then((request) => request(this.axios, this.basePath));
     }
 }
 

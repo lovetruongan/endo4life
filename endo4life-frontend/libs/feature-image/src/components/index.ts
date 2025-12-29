@@ -7,3 +7,4 @@ export * from './image-cropping/image-cropping';
 export * from './image-delete-multiple-display/image-delete-multiple-display';
 export * from './image-import-image-video-modal/image-import-image-video-modal';
 export * from './image-import-zip-modal/image-import-zip-modal';
+export * from './image-annotation';

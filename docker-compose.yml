@@ -130,6 +130,76 @@ services:
       - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
       - "traefik.docker.network=proxy"
 
+  # Backend API
+  backend:
+    build:
+      context: ./endo4life/backend
+      dockerfile: Dockerfile
+    container_name: endo4life_backend
+    restart: always
+    networks:
+      - proxy
+      - endo4life-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_HOST=postgresql
+      - DB_PORT=5432
+      - DB_NAME=elearning
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123
+      - KEYCLOAK_BASE_URL=https://keycloak.mydevopsproject2023.id.vn
+      - KEYCLOAK_INTERNAL_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=endo4life
+      - KEYCLOAK_CLIENT_ID=endo4life_app
+      - KEYCLOAK_CLIENT_SECRET=0LsxczPTGzHaGeZI8N9mIWn0XbtNfF4d
+      - MINIO_USERNAME=minioadmin
+      - MINIO_PASSWORD=minio123456
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+      minio:
+        condition: service_started
+    labels:
+      - "traefik.enable=true"
+      # HTTPS router
+      - "traefik.http.routers.backend.rule=Host(`api.mydevopsproject2023.id.vn`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
+      # HTTP to HTTPS redirect
+      - "traefik.http.routers.backend-http.rule=Host(`api.mydevopsproject2023.id.vn`)"
+      - "traefik.http.routers.backend-http.entrypoints=web"
+      - "traefik.http.routers.backend-http.middlewares=backend-redirect"
+      - "traefik.http.middlewares.backend-redirect.redirectscheme.scheme=https"
+      - "traefik.http.services.backend.loadbalancer.server.port=8080"
+      - "traefik.docker.network=proxy"
+
+  # Frontend Admin Web
+  frontend:
+    build:
+      context: ./endo4life/endo4life-frontend
+      dockerfile: docker/admin-web/Dockerfile
+      args:
+        - APP_ENV=prod
+    container_name: endo4life_frontend
+    restart: always
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      # HTTPS router
+      - "traefik.http.routers.frontend.rule=Host(`endo4life.mydevopsproject2023.id.vn`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
+      # HTTP to HTTPS redirect
+      - "traefik.http.routers.frontend-http.rule=Host(`endo4life.mydevopsproject2023.id.vn`)"
+      - "traefik.http.routers.frontend-http.entrypoints=web"
+      - "traefik.http.routers.frontend-http.middlewares=frontend-redirect"
+      - "traefik.http.middlewares.frontend-redirect.redirectscheme.scheme=https"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+      - "traefik.docker.network=proxy"
+
   # MinIO with Traefik labels
   minio:
     image: minio/minio:RELEASE.2023-05-04T21-44-30Z
@@ -143,6 +213,9 @@ services:
     environment:
       - MINIO_ROOT_USER=${MINIO_USERNAME:-minioadmin}
       - MINIO_ROOT_PASSWORD=${MINIO_PASSWORD:-minio123456}
+      - MINIO_NOTIFY_WEBHOOK_ENABLE_PRIMARY=on
+      - MINIO_NOTIFY_WEBHOOK_ENDPOINT_PRIMARY=http://backend:8080/api/v1/webhooks/minio
+      - MINIO_NOTIFY_WEBHOOK_QUEUE_LIMIT_PRIMARY=10000
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
@@ -153,14 +226,70 @@ services:
       - "traefik.http.routers.minio-api.entrypoints=websecure"
       - "traefik.http.routers.minio-api.rule=Host(`minio-api.mydevopsproject2023.id.vn`)"
       - "traefik.http.routers.minio-api.service=minio-api"
+      - "traefik.http.routers.minio-api.tls.certresolver=letsencrypt"
       - "traefik.http.services.minio-api.loadbalancer.server.port=9000"
-      - "traefik.http.services.minio-api.loadbalancer.passhostheader=true"
       # MinIO Console
       - "traefik.http.routers.minio-console.entrypoints=websecure"
       - "traefik.http.routers.minio-console.rule=Host(`minio.mydevopsproject2023.id.vn`)"
       - "traefik.http.routers.minio-console.service=minio-console"
+      - "traefik.http.routers.minio-console.tls.certresolver=letsencrypt"
       - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
-      - "traefik.http.services.minio-console.loadbalancer.passhostheader=true"
+
+  # MinIO Client - Configure webhooks automatically
+  minio-client:
+    image: minio/mc:latest
+    container_name: endo4life_minio_client
+    depends_on:
+      - minio
+      - backend
+    networks:
+      - endo4life-network
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        sleep 10
+        mc alias set myminio http://minio:9000 minioadmin minio123456
+        
+        # Create buckets if they don't exist
+        mc mb --ignore-existing myminio/images
+        mc mb --ignore-existing myminio/videos
+        mc mb --ignore-existing myminio/thumbnails
+        mc mb --ignore-existing myminio/avatars
+        mc mb --ignore-existing myminio/process
+        
+        # Set public policy for buckets (optional)
+        mc anonymous set download myminio/images
+        mc anonymous set download myminio/videos
+        mc anonymous set download myminio/thumbnails
+        mc anonymous set download myminio/avatars
+        
+        # Configure webhook endpoint FIRST
+        mc admin config set myminio notify_webhook:PRIMARY \
+          endpoint="http://backend:8080/api/v1/webhooks/minio" \
+          queue_limit="10000"
+        
+        # Restart MinIO to apply webhook config (non-interactive)
+        mc admin service restart myminio || true
+        
+        # Wait for MinIO to restart
+        sleep 5
+        
+        # Re-alias after restart
+        mc alias set myminio http://minio:9000 minioadmin minio123456
+        
+        # Configure webhook for process bucket (compressed files)
+        mc event add myminio/process arn:minio:sqs::PRIMARY:webhook --event put,delete || echo "Warning: Failed to add event for process bucket"
+        
+        # Configure webhook for images bucket (auto-thumbnails)
+        mc event add myminio/images arn:minio:sqs::PRIMARY:webhook --event put || echo "Warning: Failed to add event for images bucket"
+        
+        # Configure webhook for videos bucket (auto-thumbnails)
+        mc event add myminio/videos arn:minio:sqs::PRIMARY:webhook --event put || echo "Warning: Failed to add event for videos bucket"
+        
+        echo "MinIO webhooks configured successfully!"
+        tail -f /dev/null
+    restart: unless-stopped
+
 
 volumes:
   postgres_data:
