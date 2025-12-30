@@ -104,10 +104,16 @@ export interface AIAnalysisResponseDto {
     'processingTimeMs'?: number;
     /**
      * 
-     * @type {{ [key: string]: Array<string> | undefined; }}
+     * @type {AISuggestedTagsDto}
      * @memberof AIAnalysisResponseDto
      */
-    'suggestedTags'?: { [key: string]: Array<string> | undefined; };
+    'suggestedTags'?: AISuggestedTagsDto;
+    /**
+     * 
+     * @type {AIClinicalSummaryDto}
+     * @memberof AIAnalysisResponseDto
+     */
+    'clinicalSummary'?: AIClinicalSummaryDto;
 }
 /**
  * 
@@ -160,10 +166,53 @@ export interface AIClassificationDto {
     'lesionType'?: AIPredictionDto;
     /**
      * 
+     * @type {AILocationDto}
+     * @memberof AIClassificationDto
+     */
+    'location'?: AILocationDto;
+    /**
+     * 
+     * @type {AISeverityDto}
+     * @memberof AIClassificationDto
+     */
+    'severity'?: AISeverityDto;
+    /**
+     * 
+     * @type {AIRiskLevelDto}
+     * @memberof AIClassificationDto
+     */
+    'riskLevel'?: AIRiskLevelDto;
+    /**
+     * 
      * @type {{ [key: string]: Array<AIPredictionDto> | undefined; }}
      * @memberof AIClassificationDto
      */
     'allPredictions'?: { [key: string]: Array<AIPredictionDto> | undefined; };
+}
+/**
+ * 
+ * @export
+ * @interface AIClinicalSummaryDto
+ */
+export interface AIClinicalSummaryDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof AIClinicalSummaryDto
+     */
+    'finding'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AIClinicalSummaryDto
+     */
+    'recommendation'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof AIClinicalSummaryDto
+     */
+    'confidenceScore'?: number;
 }
 /**
  * 
@@ -218,6 +267,43 @@ export interface AIHealthResponseDto {
 /**
  * 
  * @export
+ * @interface AILocationDto
+ */
+export interface AILocationDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof AILocationDto
+     */
+    'location'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AILocationDto
+     */
+    'locationVi'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AILocationDto
+     */
+    'giRegion'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AILocationDto
+     */
+    'giRegionVi'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof AILocationDto
+     */
+    'confidence'?: number;
+}
+/**
+ * 
+ * @export
  * @interface AIPolygonPointDto
  */
 export interface AIPolygonPointDto {
@@ -248,8 +334,39 @@ export interface AIPredictionDto {
     'className'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof AIPredictionDto
+     */
+    'classNameVi'?: string;
+    /**
+     * 
      * @type {number}
      * @memberof AIPredictionDto
+     */
+    'confidence'?: number;
+}
+/**
+ * 
+ * @export
+ * @interface AIRiskLevelDto
+ */
+export interface AIRiskLevelDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof AIRiskLevelDto
+     */
+    'riskLevel'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AIRiskLevelDto
+     */
+    'riskLevelVi'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof AIRiskLevelDto
      */
     'confidence'?: number;
 }
@@ -302,6 +419,74 @@ export interface AISegmentationMaskDto {
      * @memberof AISegmentationMaskDto
      */
     'iouScore'?: number;
+}
+/**
+ * 
+ * @export
+ * @interface AISeverityDto
+ */
+export interface AISeverityDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof AISeverityDto
+     */
+    'severity'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AISeverityDto
+     */
+    'severityVi'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof AISeverityDto
+     */
+    'confidence'?: number;
+}
+/**
+ * 
+ * @export
+ * @interface AISuggestedTagsDto
+ */
+export interface AISuggestedTagsDto {
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof AISuggestedTagsDto
+     */
+    'tag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof AISuggestedTagsDto
+     */
+    'detailTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof AISuggestedTagsDto
+     */
+    'anatomyLocationTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof AISuggestedTagsDto
+     */
+    'hpTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof AISuggestedTagsDto
+     */
+    'upperGastroAnatomyTag'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof AISuggestedTagsDto
+     */
+    'lightTag'?: Array<string>;
 }
 /**
  * 

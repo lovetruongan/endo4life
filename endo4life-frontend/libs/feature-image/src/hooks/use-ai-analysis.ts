@@ -8,6 +8,38 @@ import { toast } from 'react-toastify';
 import { EnvConfig } from '@endo4life/feature-config';
 import { keycloakUtils } from '@endo4life/data-access';
 
+export interface AIPrediction {
+  className: string;
+  classNameVi?: string;
+  confidence: number;
+}
+
+export interface AILocation {
+  location: string;
+  locationVi?: string;
+  giRegion?: string;
+  giRegionVi?: string;
+  confidence: number;
+}
+
+export interface AISeverity {
+  severity: string;
+  severityVi?: string;
+  confidence: number;
+}
+
+export interface AIRiskLevel {
+  riskLevel: string;
+  riskLevelVi?: string;
+  confidence: number;
+}
+
+export interface AIClinicalSummary {
+  finding: string;
+  recommendation: string;
+  confidenceScore: number;
+}
+
 export interface AIAnalysisResult {
   imageUrl: string;
   imageWidth: number;
@@ -24,18 +56,12 @@ export interface AIAnalysisResult {
     area?: number;
   }>;
   classification?: {
-    hpStatus?: {
-      className: string;
-      confidence: number;
-    };
-    lesionType?: {
-      className: string;
-      confidence: number;
-    };
-    allPredictions?: {
-      hp_status?: Array<{ className: string; confidence: number }>;
-      lesion_type?: Array<{ className: string; confidence: number }>;
-    };
+    hpStatus?: AIPrediction;
+    lesionType?: AIPrediction;
+    location?: AILocation;
+    severity?: AISeverity;
+    riskLevel?: AIRiskLevel;
+    allPredictions?: Record<string, AIPrediction[]>;
   };
   segmentation?: {
     masks: Array<{
@@ -49,8 +75,12 @@ export interface AIAnalysisResult {
   suggestedTags?: {
     tag?: string[];
     detailTag?: string[];
+    anatomyLocationTag?: string[];
     hpTag?: string[];
+    upperGastroAnatomyTag?: string[];
+    lightTag?: string[];
   };
+  clinicalSummary?: AIClinicalSummary;
 }
 
 export interface AIAnalysisRequest {

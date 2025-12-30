@@ -3832,11 +3832,48 @@ components:
           type: number
           format: double
         suggestedTags:
-          type: object
-          additionalProperties:
-            type: array
-            items:
-              type: string
+          $ref: '#/components/schemas/AISuggestedTagsDto'
+        clinicalSummary:
+          $ref: '#/components/schemas/AIClinicalSummaryDto'
+
+    AISuggestedTagsDto:
+      type: object
+      properties:
+        tag:
+          type: array
+          items:
+            type: string
+        detailTag:
+          type: array
+          items:
+            type: string
+        anatomyLocationTag:
+          type: array
+          items:
+            type: string
+        hpTag:
+          type: array
+          items:
+            type: string
+        upperGastroAnatomyTag:
+          type: array
+          items:
+            type: string
+        lightTag:
+          type: array
+          items:
+            type: string
+
+    AIClinicalSummaryDto:
+      type: object
+      properties:
+        finding:
+          type: string
+        recommendation:
+          type: string
+        confidenceScore:
+          type: number
+          format: double
 
     AIDetectionDto:
       type: object
@@ -3875,6 +3912,12 @@ components:
           $ref: '#/components/schemas/AIPredictionDto'
         lesionType:
           $ref: '#/components/schemas/AIPredictionDto'
+        location:
+          $ref: '#/components/schemas/AILocationDto'
+        severity:
+          $ref: '#/components/schemas/AISeverityDto'
+        riskLevel:
+          $ref: '#/components/schemas/AIRiskLevelDto'
         allPredictions:
           type: object
           additionalProperties:
@@ -3886,6 +3929,45 @@ components:
       type: object
       properties:
         className:
+          type: string
+        classNameVi:
+          type: string
+        confidence:
+          type: number
+          format: double
+
+    AILocationDto:
+      type: object
+      properties:
+        location:
+          type: string
+        locationVi:
+          type: string
+        giRegion:
+          type: string
+        giRegionVi:
+          type: string
+        confidence:
+          type: number
+          format: double
+
+    AISeverityDto:
+      type: object
+      properties:
+        severity:
+          type: string
+        severityVi:
+          type: string
+        confidence:
+          type: number
+          format: double
+
+    AIRiskLevelDto:
+      type: object
+      properties:
+        riskLevel:
+          type: string
+        riskLevelVi:
           type: string
         confidence:
           type: number
