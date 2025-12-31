@@ -8,6 +8,8 @@ import com.endo4life.mapper.DoctorUserConversationMapper;
 import com.endo4life.repository.DoctorUserConversationRepository;
 import com.endo4life.repository.ResourceRepository;
 import com.endo4life.repository.UserInfoRepository;
+import com.endo4life.security.AuthoritiesConstants;
+import com.endo4life.security.SecurityService;
 import com.endo4life.security.UserContextHolder;
 import com.endo4life.service.minio.MinioService;
 import com.endo4life.web.rest.errors.BadRequestException;
@@ -42,6 +44,7 @@ public class DoctorUserConversationServiceImpl implements DoctorUserConversation
     private final DoctorUserConversationMapper mapper;
     private final MinioService minioService;
     private final ObjectMapper objectMapper;
+    private final SecurityService securityService;
 
     @Override
     public DoctorUserConversationResponsePaginatedDto getConversations(
@@ -134,7 +137,13 @@ public class DoctorUserConversationServiceImpl implements DoctorUserConversation
         DoctorUserConversations conversation = conversationRepository.findById(id)
                 .orElseThrow(() -> new BadRequestException("Conversation not found with id {0}", id));
 
-        // TODO: Add permission check - only admin or assignee can update
+        // Permission check: only admin or assignee can update
+        boolean isAdmin = securityService.hasRole(AuthoritiesConstants.ADMIN);
+        boolean isAssignee = conversation.getAssignee() != null &&
+                securityService.isOwner(conversation.getAssignee().getUserId());
+        if (!isAdmin && !isAssignee) {
+            throw new BadRequestException("You don't have permission to update this conversation");
+        }
 
         mapper.updateEntityFromDto(conversation, dto);
 
@@ -154,7 +163,10 @@ public class DoctorUserConversationServiceImpl implements DoctorUserConversation
 
     @Override
     public void deleteConversation(UUID id) {
-        // TODO: Add permission check - only admin can delete
+        // Permission check: only admin can delete
+        if (!securityService.hasRole(AuthoritiesConstants.ADMIN)) {
+            throw new BadRequestException("Only administrators can delete conversations");
+        }
         if (!conversationRepository.existsById(id)) {
             throw new BadRequestException("Conversation not found with id {0}", id);
         }

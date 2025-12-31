@@ -119,15 +119,12 @@ export function useBookDetail(bookId: string) {
 
 /**
  * Hook để tăng view count khi xem sách
- * TODO: Implement khi có backend API
+ * Note: Not implemented yet - requires backend API for book view tracking
  */
 export function useRecordBookView() {
   return {
-    recordView: async (bookId: string) => {
-      // TODO: Replace with actual API call
-      // const api = new LibraryApiImpl();
-      // return api.recordBookView(bookId);
-      console.log('Record view for book:', bookId);
+    recordView: async (_bookId: string) => {
+      // Not implemented - backend doesn't support book view tracking yet
     },
   };
 }

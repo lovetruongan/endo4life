@@ -2,6 +2,7 @@ package com.endo4life.controller;
 
 import com.endo4life.security.UserContext;
 import com.endo4life.security.UserContextHolder;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/test")
+@Profile("dev")
 public class TestAuthController {
 
     @GetMapping("/public")

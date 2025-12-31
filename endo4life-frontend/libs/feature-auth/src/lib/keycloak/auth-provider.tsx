@@ -149,8 +149,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       },
     });
 
-    console.log(userInfo);
-
     newUserProfile = {
       ...newUserProfile,
       username: userInfo?.data?.username,
@@ -176,13 +174,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     expiresIn?: number,
   ) => {
     try {
-      console.log('Starting direct login with token...');
       setIsAuthenticating(true);
 
       // Decode the token to get user info
       const tokenParts = token.split('.');
       const tokenPayload = JSON.parse(atob(tokenParts[1]));
-      console.log('Token payload:', tokenPayload);
 
       // Create user profile from token
       const newUserProfile: KeycloakUserProfile = {
@@ -198,7 +194,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } as KeycloakUserProfile;
 
       setUserProfile(newUserProfile);
-      console.log('User profile from token:', newUserProfile);
 
       // Create a minimal Keycloak instance for compatibility
       const keycloakInstance = {
@@ -218,7 +213,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsAuthenticated(true);
       setKeycloak(keycloakInstance);
       keycloakUtils.setKeycloak(keycloakInstance);
-      console.log('Authentication successful! Tokens saved to storage.');
 
       // Try to load additional user info from backend (optional)
       // This is non-blocking - app will work even if this fails
@@ -229,19 +223,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
           },
         })
         .then((response) => {
-          console.log('User info from backend:', response.data);
-          // Update profile with backend data if available
           const updatedProfile = {
             ...newUserProfile,
             ...response.data,
           };
           setUserProfile(updatedProfile);
         })
-        .catch((error) => {
-          console.log(
-            'Could not load user info from backend (non-critical):',
-            error.message,
-          );
+        .catch(() => {
+          // Non-critical: app works without backend user info
         });
     } catch (error) {
       console.error('Direct login error:', error);
@@ -256,14 +245,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       if (useDirectLogin) {
         // Try to restore session from localStorage
-        console.log('Checking for existing session...');
         const { token, refreshToken, expiry } = getTokensFromStorage();
 
         if (token && refreshToken) {
           // Check if token is still valid
           if (!isTokenExpired(expiry)) {
-            console.log('Found valid session, restoring...');
-
             // Restore user profile from storage
             const savedProfile = getUserProfileFromStorage();
             if (savedProfile) {
@@ -287,13 +273,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
             setIsAuthenticated(true);
             setKeycloak(keycloakInstance);
             keycloakUtils.setKeycloak(keycloakInstance);
-            console.log('Session restored successfully!');
           } else {
-            console.log('Token expired, clearing storage...');
             clearTokensFromStorage();
           }
-        } else {
-          console.log('No existing session found.');
         }
 
         setIsAuthenticating(false);
@@ -328,14 +310,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Listen for storage changes (after login from another tab or after login success)
   useEffect(() => {
     const handleStorageChange = () => {
-      console.log('Storage changed, checking for new session...');
       const { token, refreshToken, expiry } = getTokensFromStorage();
 
       if (token && refreshToken && !isTokenExpired(expiry)) {
         const savedProfile = getUserProfileFromStorage();
         if (savedProfile && !isAuthenticated) {
-          console.log('New session detected, restoring...');
-
           const tokenParts = token.split('.');
           const tokenPayload = JSON.parse(atob(tokenParts[1]));
 
@@ -353,7 +332,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setIsAuthenticated(true);
           setKeycloak(keycloakInstance);
           keycloakUtils.setKeycloak(keycloakInstance);
-          console.log('Session restored from storage event!');
         }
       }
     };

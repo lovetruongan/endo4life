@@ -8,11 +8,7 @@ import com.endo4life.web.rest.model.ResourceType;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
-import io.minio.SetBucketNotificationArgs;
 import io.minio.SetBucketPolicyArgs;
-import io.minio.messages.EventType;
-import io.minio.messages.NotificationConfiguration;
-import io.minio.messages.QueueConfiguration;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -20,8 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -100,29 +94,6 @@ public class MinioConfiguration {
             setBucketPolicy(client, minioProperties.getBucketBook(),
                     MinioUtil.generatePolicyPublic(minioProperties.getBucketBook(), actionsForPublicBucket));
 
-            // TODO: Setup webhook notifications for automatic thumbnail generation
-            // First configure webhook in MinIO server, then uncomment this:
-            /*
-             * List<EventType> webhookEvents = List.of(EventType.OBJECT_CREATED_ANY);
-             * 
-             * QueueConfiguration queueConfiguration = new QueueConfiguration();
-             * queueConfiguration.setQueue(
-             * String.format(Constants.queueArnWebhook,
-             * minioProperties.getWebhookIdentifier()));
-             * queueConfiguration.setEvents(webhookEvents);
-             * 
-             * NotificationConfiguration notiConfig = new NotificationConfiguration();
-             * notiConfig.setQueueConfigurationList(List.of(queueConfiguration));
-             * 
-             * // Set notifications for image and video buckets
-             * setNotificationForBucket(client, notiConfig,
-             * minioProperties.getBucketImage());
-             * setNotificationForBucket(client, notiConfig,
-             * minioProperties.getBucketVideo());
-             * setNotificationForBucket(client, notiConfig,
-             * minioProperties.getBucketProcess());
-             */
-
             return client;
         } catch (Exception e) {
             log.error("Failed to initialize Minio client", e);
@@ -150,16 +121,5 @@ public class MinioConfiguration {
                         .bucket(bucketName)
                         .config(policy)
                         .build());
-    }
-
-    @SneakyThrows
-    private void setNotificationForBucket(MinioClient client, NotificationConfiguration notiConfig,
-            String bucketName) {
-        client.setBucketNotification(
-                SetBucketNotificationArgs.builder()
-                        .bucket(bucketName)
-                        .config(notiConfig)
-                        .build());
-        log.info("Webhook notification set for bucket: {}", bucketName);
     }
 }
