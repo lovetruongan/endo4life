@@ -86,7 +86,7 @@ export default function DocumentsPage() {
   return (
     <div className="flex flex-col h-full">
       <PageHeader
-        title="Document Management"
+        title="Quản lý tài liệu"
         titleAction={
           <Tooltip title={t('common:txtRefresh')} arrow>
             <span>
@@ -108,14 +108,14 @@ export default function DocumentsPage() {
           pagination && (
             <span>
               <strong className="pr-1">{formatNumber(pagination.totalCount)}</strong>
-              <span>documents</span>
+              <span>tài liệu</span>
             </span>
           )
         }
         leading={
           <div className="flex items-center gap-4">
             <Button
-              text="Add Document"
+              text="Thêm tài liệu"
               textClassName="hidden md:block"
               onClick={handleAdd}
             >

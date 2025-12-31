@@ -1,5 +1,6 @@
 package com.endo4life.web.rest;
 
+import com.endo4life.security.RoleAccess;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.endo4life.service.course.CourseService;
@@ -21,6 +22,7 @@ public class CourseV1ApiDelegateImpl implements CourseV1ApiDelegate {
     private final CourseService courseService;
 
     @Override
+    @RoleAccess.Authenticated
     public ResponseEntity<CourseResponsePaginatedDto> getCourses(CourseCriteria criteria, Pageable pageable) {
         Page<CourseResponseDto> page = courseService.getCourses(criteria, pageable);
         return ResponseEntity.ok(
@@ -30,18 +32,21 @@ public class CourseV1ApiDelegateImpl implements CourseV1ApiDelegate {
     }
 
     @Override
+    @RoleAccess.ContentManager // ADMIN or SPECIALIST
     public ResponseEntity<IdWrapperDto> createCourse(CreateCourseRequestDto course) {
         UUID id = courseService.createCourse(course);
         return ResponseEntity.status(HttpStatus.CREATED).body(new IdWrapperDto().id(id));
     }
 
     @Override
+    @RoleAccess.Authenticated
     public ResponseEntity<CourseDetailResponseDto> getCourseById(UUID id) {
         return ResponseEntity.ok(
                 courseService.getCourseById(id));
     }
 
     @Override
+    @RoleAccess.ContentManager // ADMIN or SPECIALIST
     public ResponseEntity<CourseDetailResponseDto> updateCourse(UUID id,
             UpdateCourseRequestDto updateCourseRequestDto) {
         return ResponseEntity.ok(
@@ -49,6 +54,7 @@ public class CourseV1ApiDelegateImpl implements CourseV1ApiDelegate {
     }
 
     @Override
+    @RoleAccess.ContentManager // ADMIN or SPECIALIST
     public ResponseEntity<Void> deleteCourse(UUID id) {
         courseService.deleteCourse(id);
         return ResponseEntity.noContent().build();

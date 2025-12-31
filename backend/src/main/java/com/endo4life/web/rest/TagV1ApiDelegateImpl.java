@@ -1,5 +1,6 @@
 package com.endo4life.web.rest;
 
+import com.endo4life.security.RoleAccess;
 import com.endo4life.service.tag.TagService;
 import com.endo4life.web.rest.model.CreateTagRequestDto;
 import com.endo4life.web.rest.model.TagResponseDto;
@@ -19,17 +20,20 @@ public class TagV1ApiDelegateImpl implements com.endo4life.web.rest.api.TagV1Api
     private final TagService tagService;
 
     @Override
+    @RoleAccess.Authenticated
     public ResponseEntity<List<TagResponseDto>> getTags(List<UUID> parentTag, TagType type) {
         return ResponseEntity.ok(tagService.getTags(parentTag, type));
     }
 
     @Override
+    @RoleAccess.ContentManager // ADMIN or SPECIALIST
     public ResponseEntity<Void> createTag(CreateTagRequestDto createTagRequestDto) {
         tagService.createTag(createTagRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Override
+    @RoleAccess.ContentManager // ADMIN or SPECIALIST
     public ResponseEntity<Void> deleteTag(List<UUID> tagIds, List<UUID> tagDetailIds) {
         tagService.deleteTag(tagIds, tagDetailIds);
         return ResponseEntity.noContent().build();

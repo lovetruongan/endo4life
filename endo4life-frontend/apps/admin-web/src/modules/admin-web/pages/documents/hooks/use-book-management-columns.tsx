@@ -29,7 +29,7 @@ function useBookManagementColumns({
         id: 1,
         colId: 'coverUrl',
         field: 'coverUrl',
-        headerName: 'Cover',
+        headerName: 'Ảnh bìa',
         hide: false,
         initialFlex: 0.15,
         minWidth: 80,
@@ -56,7 +56,7 @@ function useBookManagementColumns({
         id: 2,
         colId: 'title',
         field: 'title',
-        headerName: 'Title',
+        headerName: 'Tiêu đề',
         hide: false,
         initialFlex: 0.35,
         minWidth: 150,
@@ -82,7 +82,7 @@ function useBookManagementColumns({
         id: 3,
         colId: 'author',
         field: 'author',
-        headerName: 'Author',
+        headerName: 'Tác giả',
         hide: false,
         initialFlex: 0.25,
         minWidth: 120,
@@ -98,7 +98,7 @@ function useBookManagementColumns({
         id: 4,
         colId: 'createdAt',
         field: 'createdAt',
-        headerName: 'Created',
+        headerName: 'Ngày tạo',
         hide: false,
         initialFlex: 0.2,
         minWidth: 100,
@@ -117,7 +117,7 @@ function useBookManagementColumns({
         id: 5,
         colId: 'actions',
         field: 'actions',
-        headerName: 'Actions',
+        headerName: 'Hành động',
         hide: false,
         initialFlex: 0.15,
         minWidth: 100,
@@ -126,7 +126,7 @@ function useBookManagementColumns({
         sortable: false,
         cellRenderer: (params: ICellRendererParams<IBookEntity>) => (
           <div className="flex items-center justify-center h-full gap-1">
-            <Tooltip title="Edit" arrow>
+            <Tooltip title="Chỉnh sửa" arrow>
               <IconButton
                 size="small"
                 onClick={() => params?.data && onEdit(params.data)}
@@ -135,7 +135,7 @@ function useBookManagementColumns({
                 <FiEdit2 size={16} />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Delete" arrow>
+            <Tooltip title="Xoá" arrow>
               <IconButton
                 size="small"
                 onClick={() => params?.data && onDelete(params.data)}

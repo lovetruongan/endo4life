@@ -970,7 +970,7 @@ export default function ToolbarPlugin({
               onClick={insertLink}
               className={'toolbar-item spaced ' + (isLink ? 'active' : '')}
               aria-label="Insert link"
-              title="Insert link"
+              title="Chèn liên kết"
               type="button"
             >
               <i className="format link" />

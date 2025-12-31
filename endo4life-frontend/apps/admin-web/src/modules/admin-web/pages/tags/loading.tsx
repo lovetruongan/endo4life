@@ -1,3 +1,3 @@
 export default function TagsLoadingPage() {
-  return <div>Loading...</div>;
+  return <div>Đang tải...</div>;
 }

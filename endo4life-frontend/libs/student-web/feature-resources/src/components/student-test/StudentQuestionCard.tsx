@@ -128,11 +128,11 @@ export function StudentQuestionCard({
             value={essayText}
             onChange={(e) => onEssayChange?.(e.target.value)}
             disabled={disabled}
-            placeholder="Type your answer here..."
+            placeholder="Nhập câu trả lời của bạn..."
             className="w-full min-h-[200px] p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y disabled:bg-gray-100 disabled:cursor-not-allowed"
           />
           <p className="text-sm text-gray-500 mt-2">
-            {essayText.length} characters
+            {essayText.length} ký tự
           </p>
         </div>
       )}
@@ -140,7 +140,7 @@ export function StudentQuestionCard({
       {/* Attachments */}
       {question.attachments && question.attachments.length > 0 && (
         <div className="mt-4 pt-4 border-t border-gray-200">
-          <p className="text-sm font-medium text-gray-700 mb-2">Attachments:</p>
+          <p className="text-sm font-medium text-gray-700 mb-2">Đính kèm:</p>
           <div className="flex flex-wrap gap-4 items-start">
             {question.attachments.map((attachment) => {
               const url = (attachment as any)?.fileUrl || '';

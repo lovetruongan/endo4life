@@ -85,21 +85,21 @@ export function RagIngestForm() {
 
     // Show completion notification
     if (currentStatus === 'FINISHED') {
-      toast.success('Documents ingested successfully!');
+      toast.success('Nhập tài liệu thành công!');
       setSelectedFiles([]);
       refetchCollections();
       if (viewingCollection === collectionName) {
         refetchDocuments();
       }
     } else if (currentStatus === 'FAILED') {
-      toast.error('Document ingestion failed');
+      toast.error('Nhập tài liệu thất bại');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [taskStatus, taskState?.status, taskState?.taskId, refetchCollections]);
 
   const handleCreateCollection = async () => {
     if (!collectionName.trim()) {
-      toast.error('Please enter a collection name');
+      toast.error('Vui lòng nhập tên bộ sưu tập');
       return;
     }
 
@@ -133,12 +133,12 @@ export function RagIngestForm() {
 
   const handleUpload = async () => {
     if (selectedFiles.length === 0) {
-      toast.error('Please select files to upload');
+      toast.error('Vui lòng chọn file để tải lên');
       return;
     }
 
     if (!collectionName.trim()) {
-      toast.error('Please enter a collection name');
+      toast.error('Vui lòng nhập tên bộ sưu tập');
       return;
     }
 
@@ -172,9 +172,9 @@ export function RagIngestForm() {
             validationErrors: [],
           });
         }, 100);
-        toast.info('Upload started. Monitoring progress...');
+        toast.info('Bắt đầu tải lên. Đang theo dõi tiến trình...');
       } else {
-        toast.success('Documents uploaded successfully');
+        toast.success('Tải lên tài liệu thành công');
         setSelectedFiles([]);
         refetchCollections();
       }
@@ -648,10 +648,10 @@ export function RagIngestForm() {
                                 color="error"
                                 onClick={() => {
                                   if (window.confirm(`Delete "${doc.filename || doc.document_name}"?`)) {
-                                    toast.info('Delete functionality coming soon');
+                                    toast.info('Chức năng xóa sẽ sớm có');
                                   }
                                 }}
-                                title="Delete document"
+                                title="Xóa tài liệu"
                               >
                                 <PiTrashFill size={18} />
                               </IconButton>
@@ -661,8 +661,8 @@ export function RagIngestForm() {
                       ) : (
                         <div className="text-center py-8 text-gray-500">
                           <PiFileTextFill size={48} className="mx-auto mb-3 text-gray-300" />
-                          <p className="text-sm">No documents found in this collection</p>
-                          <p className="text-xs mt-1">Upload files to get started</p>
+                          <p className="text-sm">Không tìm thấy tài liệu trong bộ sưu tập này</p>
+                          <p className="text-xs mt-1">Tải file lên để bắt đầu</p>
                         </div>
                       )}
                     </div>

@@ -1211,6 +1211,78 @@ paths:
         204:
           description: Tags deleted successfully
 
+  # AI Analysis APIs
+  /api/v1/ai/resources/{resourceId}/analyze:
+    post:
+      description: Analyze a resource (image) using AI models
+      operationId: analyzeResource
+      tags:
+        - 'ai-v1'
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIAnalysisRequestDto'
+      responses:
+        200:
+          description: AI analysis completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIAnalysisResponseDto'
+        503:
+          description: AI service unavailable
+
+  /api/v1/ai/analyze:
+    post:
+      description: Analyze an image by URL
+      operationId: analyzeByUrl
+      tags:
+        - 'ai-v1'
+      parameters:
+        - name: imageUrl
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIAnalysisRequestDto'
+      responses:
+        200:
+          description: AI analysis completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIAnalysisResponseDto'
+        503:
+          description: AI service unavailable
+
+  /api/v1/ai/health:
+    get:
+      description: Check AI service health status
+      operationId: getAIHealth
+      tags:
+        - 'ai-v1'
+      responses:
+        200:
+          description: AI service health status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIHealthResponseDto'
+
   # Dashboard Statistics APIs
   /api/v1/stats/user-growth:
     get:
@@ -3720,3 +3792,227 @@ components:
           format: binary
       required:
         - title
+
+    # AI Analysis schemas
+    AIAnalysisRequestDto:
+      type: object
+      properties:
+        runDetection:
+          type: boolean
+          default: true
+        runClassification:
+          type: boolean
+          default: true
+        runSegmentation:
+          type: boolean
+          default: true
+        confidenceThreshold:
+          type: number
+          format: double
+          default: 0.5
+
+    AIAnalysisResponseDto:
+      type: object
+      properties:
+        imageUrl:
+          type: string
+        imageWidth:
+          type: integer
+        imageHeight:
+          type: integer
+        detections:
+          type: array
+          items:
+            $ref: '#/components/schemas/AIDetectionDto'
+        classification:
+          $ref: '#/components/schemas/AIClassificationDto'
+        segmentation:
+          $ref: '#/components/schemas/AISegmentationDto'
+        processingTimeMs:
+          type: number
+          format: double
+        suggestedTags:
+          $ref: '#/components/schemas/AISuggestedTagsDto'
+        clinicalSummary:
+          $ref: '#/components/schemas/AIClinicalSummaryDto'
+
+    AISuggestedTagsDto:
+      type: object
+      properties:
+        tag:
+          type: array
+          items:
+            type: string
+        detailTag:
+          type: array
+          items:
+            type: string
+        anatomyLocationTag:
+          type: array
+          items:
+            type: string
+        hpTag:
+          type: array
+          items:
+            type: string
+        upperGastroAnatomyTag:
+          type: array
+          items:
+            type: string
+        lightTag:
+          type: array
+          items:
+            type: string
+
+    AIClinicalSummaryDto:
+      type: object
+      properties:
+        finding:
+          type: string
+        recommendation:
+          type: string
+        confidenceScore:
+          type: number
+          format: double
+
+    AIDetectionDto:
+      type: object
+      properties:
+        className:
+          type: string
+        confidence:
+          type: number
+          format: double
+        bbox:
+          $ref: '#/components/schemas/AIBoundingBoxDto'
+        area:
+          type: number
+          format: double
+
+    AIBoundingBoxDto:
+      type: object
+      properties:
+        x1:
+          type: number
+          format: double
+        y1:
+          type: number
+          format: double
+        x2:
+          type: number
+          format: double
+        y2:
+          type: number
+          format: double
+
+    AIClassificationDto:
+      type: object
+      properties:
+        hpStatus:
+          $ref: '#/components/schemas/AIPredictionDto'
+        lesionType:
+          $ref: '#/components/schemas/AIPredictionDto'
+        location:
+          $ref: '#/components/schemas/AILocationDto'
+        severity:
+          $ref: '#/components/schemas/AISeverityDto'
+        riskLevel:
+          $ref: '#/components/schemas/AIRiskLevelDto'
+        allPredictions:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/AIPredictionDto'
+
+    AIPredictionDto:
+      type: object
+      properties:
+        className:
+          type: string
+        classNameVi:
+          type: string
+        confidence:
+          type: number
+          format: double
+
+    AILocationDto:
+      type: object
+      properties:
+        location:
+          type: string
+        locationVi:
+          type: string
+        giRegion:
+          type: string
+        giRegionVi:
+          type: string
+        confidence:
+          type: number
+          format: double
+
+    AISeverityDto:
+      type: object
+      properties:
+        severity:
+          type: string
+        severityVi:
+          type: string
+        confidence:
+          type: number
+          format: double
+
+    AIRiskLevelDto:
+      type: object
+      properties:
+        riskLevel:
+          type: string
+        riskLevelVi:
+          type: string
+        confidence:
+          type: number
+          format: double
+
+    AISegmentationDto:
+      type: object
+      properties:
+        masks:
+          type: array
+          items:
+            $ref: '#/components/schemas/AISegmentationMaskDto'
+        combinedMaskUrl:
+          type: string
+
+    AISegmentationMaskDto:
+      type: object
+      properties:
+        detectionIndex:
+          type: integer
+        polygon:
+          type: array
+          items:
+            $ref: '#/components/schemas/AIPolygonPointDto'
+        area:
+          type: number
+          format: double
+        iouScore:
+          type: number
+          format: double
+
+    AIPolygonPointDto:
+      type: object
+      properties:
+        x:
+          type: number
+          format: double
+        y:
+          type: number
+          format: double
+
+    AIHealthResponseDto:
+      type: object
+      properties:
+        status:
+          type: string
+        aiServiceAvailable:
+          type: boolean

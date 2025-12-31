@@ -1,5 +1,6 @@
 package com.endo4life.web.rest;
 
+import com.endo4life.security.RoleAccess;
 import com.endo4life.service.coursesection.CourseSectionService;
 import com.endo4life.web.rest.model.CourseSectionCriteria;
 import com.endo4life.web.rest.model.CourseSectionResponseDto;
@@ -27,6 +28,7 @@ public class CourseSectionV1ApiDelegateImpl implements com.endo4life.web.rest.ap
     private final CourseSectionService courseSectionService;
 
     @Override
+    @RoleAccess.Authenticated
     public ResponseEntity<CourseSectionResponsePaginatedDto> getCourseSections(CourseSectionCriteria criteria,
             Pageable pageable) {
         Page<CourseSectionResponseDto> pageCourseSectionResponseDto = courseSectionService.getCourseSections(criteria,
@@ -38,6 +40,7 @@ public class CourseSectionV1ApiDelegateImpl implements com.endo4life.web.rest.ap
     }
 
     @Override
+    @RoleAccess.ContentManager // ADMIN or SPECIALIST
     public ResponseEntity<IdWrapperDto> createCourseSection(CreateCourseSectionRequestDto courseSectionRequestDto) {
         try {
             UUID id = courseSectionService.createCourseSection(courseSectionRequestDto);
@@ -50,12 +53,14 @@ public class CourseSectionV1ApiDelegateImpl implements com.endo4life.web.rest.ap
     }
 
     @Override
+    @RoleAccess.Authenticated
     public ResponseEntity<ResponseDetailCourseSectionDto> getCourseSectionById(UUID id) {
         return ResponseEntity.ok(
                 courseSectionService.getCourseSectionById(id));
     }
 
     @Override
+    @RoleAccess.ContentManager // ADMIN or SPECIALIST
     public ResponseEntity<IdWrapperDto> updateCourseSection(UUID id, UpdateCourseSectionRequestDto metadata) {
         try {
             UUID courseSectionId = courseSectionService.updateCourseSection(id, metadata);
@@ -68,12 +73,14 @@ public class CourseSectionV1ApiDelegateImpl implements com.endo4life.web.rest.ap
     }
 
     @Override
+    @RoleAccess.ContentManager // ADMIN or SPECIALIST
     public ResponseEntity<Void> deleteCourseSection(UUID id) {
         courseSectionService.deleteCourseSection(id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
+    @RoleAccess.ContentManager // ADMIN or SPECIALIST
     public ResponseEntity<Void> deleteCourseSections(List<UUID> ids) {
         courseSectionService.deleteCourseSections(ids);
         return ResponseEntity.noContent().build();

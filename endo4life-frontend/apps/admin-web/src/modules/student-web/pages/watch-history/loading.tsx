@@ -1,3 +1,3 @@
 export default function WatchHistoryPageLoading() {
-  return <div>Loading...</div>;
+  return <div>Đang tải...</div>;
 }

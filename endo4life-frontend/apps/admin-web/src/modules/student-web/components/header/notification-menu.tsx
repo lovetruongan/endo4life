@@ -55,13 +55,13 @@ export default function NotificationMenu({
 
         {loading && (
           <div className="flex items-center justify-center px-4 py-8 text-slate-500">
-            Loading...
+            Đang tải...
           </div>
         )}
 
         {!loading && displayNotifications.length === 0 && (
           <div className="flex items-center justify-center px-4 py-8 text-slate-500">
-            No new notifications
+            Không có thông báo mới
           </div>
         )}
 

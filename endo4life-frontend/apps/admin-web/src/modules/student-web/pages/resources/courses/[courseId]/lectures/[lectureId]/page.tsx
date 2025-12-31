@@ -174,7 +174,7 @@ export function LecturePlayerPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading lecture...</p>
+          <p className="text-gray-600">Đang tải bài giảng...</p>
         </div>
       </div>
     );
@@ -186,17 +186,16 @@ export function LecturePlayerPage() {
         <div className="text-center max-w-md">
           <MdWarning className="text-red-600 mx-auto mb-4" size={72} />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Lecture Not Found
+            Không tìm thấy bài giảng
           </h2>
           <p className="text-gray-600 mb-6">
-            The lecture you're looking for could not be found or you don't have
-            access to it.
+            Bài giảng bạn đang tìm không tồn tại hoặc bạn không có quyền truy cập.
           </p>
           <button
             onClick={handleBackToCourse}
             className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
           >
-            Back to Course
+            Quay lại khóa học
           </button>
         </div>
       </div>
@@ -214,19 +213,19 @@ export function LecturePlayerPage() {
               className="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-medium transition-colors"
             >
               <MdArrowBack size={20} />
-              Back to Course
+              Quay lại khóa học
             </button>
             <div className="flex items-center gap-4">
               {isVideoComplete && (
                 <span className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
                   <MdCheckCircle size={16} />
-                  Video Completed
+                  Đã xem hết video
                 </span>
               )}
               {hasCompletedReview && (
                 <span className="flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                   <MdCheckCircle size={16} />
-                  Review Completed
+                  Đã hoàn thành ôn tập
                 </span>
               )}
             </div>
@@ -257,7 +256,7 @@ export function LecturePlayerPage() {
                 ) : (
                   <div className="flex items-center justify-center h-full text-white">
                     <div className="text-center">
-                      <p className="text-lg">No video available</p>
+                      <p className="text-lg">Không có video</p>
                     </div>
                   </div>
                 )}
@@ -289,7 +288,7 @@ export function LecturePlayerPage() {
                             {target && (
                               <div>
                                 <h3 className="text-base font-semibold text-gray-900 mb-1">
-                                  Objectives
+                                  Mục tiêu
                                 </h3>
                                 <RichTextContent
                                   value={stringToRichText(target)}
@@ -307,12 +306,12 @@ export function LecturePlayerPage() {
                 <div className="flex items-center gap-4 mt-4 text-sm text-gray-600">
                   {currentLecture.videoDuration && (
                     <span>
-                      Duration: {Math.floor(currentLecture.videoDuration / 60)}{' '}
-                      min
+                      Thời lượng: {Math.floor(currentLecture.videoDuration / 60)}{' '}
+                      phút
                     </span>
                   )}
                   {currentLecture.totalCredits && (
-                    <span>Credits: {currentLecture.totalCredits}</span>
+                    <span>Tín chỉ: {currentLecture.totalCredits}</span>
                   )}
                 </div>
               </div>
@@ -326,8 +325,8 @@ export function LecturePlayerPage() {
                   className="w-full px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg flex items-center justify-center gap-2"
                 >
                   {hasCompletedReview
-                    ? 'Review Questions Again'
-                    : 'Take Review Questions'}
+                    ? 'Làm lại câu hỏi ôn tập'
+                    : 'Làm câu hỏi ôn tập'}
                   <MdArrowForward size={20} />
                 </button>
               )}
@@ -337,7 +336,7 @@ export function LecturePlayerPage() {
                   onClick={handleNextLecture}
                   className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg flex items-center justify-center gap-2"
                 >
-                  Next Lecture: {nextLecture.title}
+                  Bài tiếp theo: {nextLecture.title}
                   <MdArrowForward size={20} />
                 </button>
               )}
@@ -345,8 +344,7 @@ export function LecturePlayerPage() {
               {hasReviewQuestions && !canAccessReviewQuestions && (
                 <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
                   <p className="text-sm text-gray-600">
-                    Watch at least 80% of the video to unlock the review
-                    questions.
+                    Xem ít nhất 80% video để mở khóa câu hỏi ôn tập.
                   </p>
                 </div>
               )}
@@ -357,7 +355,7 @@ export function LecturePlayerPage() {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-md p-6 sticky top-24">
               <h2 className="text-lg font-bold text-gray-900 mb-4">
-                Course Content
+                Nội dung khóa học
               </h2>
               <div className="space-y-2 max-h-[600px] overflow-y-auto">
                 {lectures?.map((lecture, index) => (
@@ -388,7 +386,7 @@ export function LecturePlayerPage() {
                         </h3>
                         {lecture.videoDuration && (
                           <p className="text-xs text-gray-500 mt-1">
-                            {Math.floor(lecture.videoDuration / 60)} min
+                            {Math.floor(lecture.videoDuration / 60)} phút
                           </p>
                         )}
                       </div>
@@ -411,14 +409,14 @@ export function LecturePlayerPage() {
                   className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <MdArrowBack size={16} />
-                  Previous
+                  Trước
                 </button>
                 <button
                   onClick={handleNextLecture}
                   disabled={!nextLecture}
                   className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  Next
+                  Tiếp
                   <MdArrowForward size={16} />
                 </button>
               </div>

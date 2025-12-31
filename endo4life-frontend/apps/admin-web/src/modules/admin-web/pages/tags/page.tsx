@@ -89,7 +89,7 @@ export default function TagsPage() {
   return (
     <div className="flex flex-col h-full">
       <PageHeader
-        title="Tag Management"
+        title="Quản lý nhãn"
         titleAction={
           <Tooltip title={t('common:txtRefresh')}>
             <span>
@@ -107,7 +107,7 @@ export default function TagsPage() {
           <div className="flex items-center gap-4 lg:gap-8">
             <Button
               textClassName="hidden lg:block"
-              text="Create Tag"
+              text="Tạo nhãn"
               onClick={openCreateDialog}
             >
               <VscAdd size={16} />
@@ -115,7 +115,7 @@ export default function TagsPage() {
             {selectedTags.length > 0 && (
               <Button
                 textClassName="hidden lg:block"
-                text={`Delete (${selectedTags.length})`}
+                text={`Xoá (${selectedTags.length})`}
                 variant="error"
                 onClick={openDeleteDialog}
               >
@@ -132,7 +132,7 @@ export default function TagsPage() {
             <Card className="h-full">
               <CardContent>
                 <Typography variant="h6" className="mb-3 font-semibold">
-                  Tag Type
+                  Loại nhãn
                 </Typography>
                 <FormInputSelect
                   label=""
@@ -164,10 +164,10 @@ export default function TagsPage() {
 
         {selectedType === TagType.DamageTag && (
           <Alert severity="info" className="mb-4">
-            <AlertTitle>Damage Tag Structure</AlertTitle>
-            Damage tags support parent-child relationships. Create a single
-            parent tag first, then add detail tags as children. Other tag types
-            are flat lists without hierarchies.
+            <AlertTitle>Cấu trúc Damage Tag</AlertTitle>
+            Damage Tag hỗ trợ quan hệ cha-con. Tạo nhãn cha trước, sau đó thêm
+            nhãn chi tiết làm con. Các loại nhãn khác là danh sách phẳng không
+            có phân cấp.
           </Alert>
         )}
 

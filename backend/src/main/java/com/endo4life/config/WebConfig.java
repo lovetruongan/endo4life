@@ -32,6 +32,8 @@ import com.endo4life.web.rest.api.WebhookV1ApiController;
 import com.endo4life.web.rest.api.WebhookV1ApiDelegate;
 import com.endo4life.web.rest.api.CommentV1ApiController;
 import com.endo4life.web.rest.api.CommentV1ApiDelegate;
+import com.endo4life.web.rest.api.AiV1ApiController;
+import com.endo4life.web.rest.api.AiV1ApiDelegate;
 
 @Configuration
 public class WebConfig {
@@ -112,6 +114,11 @@ public class WebConfig {
     @Bean
     public CommentV1ApiController commentV1ApiController(CommentV1ApiDelegate delegate) {
         return new CommentV1ApiController(delegate);
+    }
+
+    @Bean
+    public AiV1ApiController aiV1ApiController(AiV1ApiDelegate delegate) {
+        return new AiV1ApiController(delegate);
     }
 
 }

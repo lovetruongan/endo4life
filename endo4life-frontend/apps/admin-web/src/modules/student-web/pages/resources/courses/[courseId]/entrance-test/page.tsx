@@ -33,7 +33,7 @@ export function EntranceTestPage() {
       return result;
     } catch (error) {
       console.error('Failed to submit entrance test:', error);
-      toast.error('Failed to submit test. Please try again.', {
+      toast.error('Gửi bài kiểm tra thất bại. Vui lòng thử lại.', {
         position: 'top-right',
         autoClose: 3000,
       });
@@ -43,12 +43,12 @@ export function EntranceTestPage() {
 
   const handleTestComplete = (result: any) => {
     if (result.passed) {
-      toast.success('Congratulations! You passed the entrance test!', {
+      toast.success('Chúc mừng! Bạn đã vượt qua bài kiểm tra đầu vào!', {
         position: 'top-right',
         autoClose: 5000,
       });
     } else {
-      toast.error('You did not pass the entrance test. Please try again.', {
+      toast.error('Bạn chưa vượt qua bài kiểm tra đầu vào. Vui lòng thử lại.', {
         position: 'top-right',
         autoClose: 5000,
       });
@@ -65,7 +65,7 @@ export function EntranceTestPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading entrance test...</p>
+          <p className="text-gray-600">Đang tải bài kiểm tra đầu vào...</p>
         </div>
       </div>
     );
@@ -77,18 +77,18 @@ export function EntranceTestPage() {
         <div className="text-center max-w-md">
           <MdWarning className="text-red-600 mx-auto mb-4" size={72} />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Failed to Load Test
+            Không thể tải bài kiểm tra
           </h2>
           <p className="text-gray-600 mb-6">
             {error
-              ? 'There was an error loading the entrance test. Please try again later.'
-              : 'The entrance test is not available for this course.'}
+              ? 'Có lỗi khi tải bài kiểm tra đầu vào. Vui lòng thử lại sau.'
+              : 'Bài kiểm tra đầu vào không khả dụng cho khóa học này.'}
           </p>
           <button
             onClick={handleClose}
             className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
           >
-            Back to Course
+            Quay lại khóa học
           </button>
         </div>
       </div>

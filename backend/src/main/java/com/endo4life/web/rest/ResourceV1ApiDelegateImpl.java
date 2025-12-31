@@ -1,5 +1,6 @@
 package com.endo4life.web.rest;
 
+import com.endo4life.security.RoleAccess;
 import com.endo4life.web.rest.api.ResourceV1ApiDelegate;
 import com.endo4life.web.rest.model.*;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class ResourceV1ApiDelegateImpl implements ResourceV1ApiDelegate {
     private final ResourceService resourceService;
 
     @Override
+    @RoleAccess.Authenticated
     public ResponseEntity<ResourceResponsePaginatedDto> getResources(ResourceCriteria criteria, Pageable pageable) {
         var result = resourceService.getResources(criteria, pageable);
         return ResponseEntity.ok(
@@ -29,16 +31,19 @@ public class ResourceV1ApiDelegateImpl implements ResourceV1ApiDelegate {
     }
 
     @Override
+    @RoleAccess.ContentManager // ADMIN or SPECIALIST
     public ResponseEntity<List<UUID>> createResource(CreateResourceRequest createResourceRequest) {
         return ResponseEntity.ok(resourceService.createResource(createResourceRequest));
     }
 
     @Override
+    @RoleAccess.Authenticated
     public ResponseEntity<ResourceDetailResponseDto> getResourceById(UUID id) {
         return ResponseEntity.ok(resourceService.getResourceById(id));
     }
 
     @Override
+    @RoleAccess.ContentManager // ADMIN or SPECIALIST
     public ResponseEntity<Void> updateResource(UUID id,
             UpdateResourceRequestDto updateResourceRequest) {
         resourceService.updateResource(id, updateResourceRequest);
@@ -46,12 +51,14 @@ public class ResourceV1ApiDelegateImpl implements ResourceV1ApiDelegate {
     }
 
     @Override
+    @RoleAccess.ContentManager // ADMIN or SPECIALIST
     public ResponseEntity<Void> deleteResource(UUID id) {
         resourceService.deleteResource(id);
         return ResponseEntity.ok().build();
     }
 
     @Override
+    @RoleAccess.ContentManager // ADMIN or SPECIALIST
     public ResponseEntity<Void> deleteResources(List<UUID> ids) {
         resourceService.deleteResources(ids);
         return ResponseEntity.noContent().build();

@@ -133,3 +133,8 @@ spring:
 trust:
   store: ${TRUST_STORE:}
   store-password: ${TRUST_STORE_PASSWORD:}
+
+ai-service:
+  url: ${AI_SERVICE_URL:http://localhost:8000}
+  timeout: ${AI_SERVICE_TIMEOUT:120000}
+  enabled: ${AI_SERVICE_ENABLED:true}

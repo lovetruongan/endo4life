@@ -342,21 +342,43 @@ export default function CommentsPage() {
           </div>
           <p className="text-sm mb-2">{comment.content}</p>
           {comment.attachments && comment.attachments.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
-              {comment.attachments.map((url, index) => (
-                <a
-                  key={index}
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-blue-600 hover:underline"
-                >
-                  <span role="img" aria-label="attachment">
-                    📎
-                  </span>{' '}
-                  Đính kèm {index + 1}
-                </a>
-              ))}
+            <div className="mt-3 pt-3 border-t border-gray-200">
+              <p className="text-xs text-gray-500 mb-2">
+                Đính kèm ({comment.attachments.length}):
+              </p>
+              <div className="flex flex-wrap gap-3">
+                {comment.attachments.map((url, index) => (
+                  <div key={index} className="relative">
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block border rounded overflow-hidden hover:shadow-md transition-shadow"
+                    >
+                      <img
+                        src={url}
+                        alt={`Đính kèm ${index + 1}`}
+                        className="max-h-40 max-w-52 object-contain bg-gray-100"
+                        style={{ minHeight: '80px', minWidth: '80px' }}
+                        onLoad={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.backgroundColor = 'white';
+                        }}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.onerror = null;
+                          target.src = '';
+                          target.alt = `📎 File ${index + 1}`;
+                          target.className =
+                            'flex items-center justify-center text-blue-600 text-sm p-4';
+                          target.style.minHeight = '60px';
+                          target.style.minWidth = '100px';
+                        }}
+                      />
+                    </a>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
