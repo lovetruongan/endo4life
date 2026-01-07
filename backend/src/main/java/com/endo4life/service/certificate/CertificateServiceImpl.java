@@ -4,16 +4,20 @@ import com.endo4life.constant.Constants;
 import com.endo4life.domain.document.Certificate;
 import com.endo4life.domain.document.Course;
 import com.endo4life.domain.document.UserInfo;
+import com.endo4life.domain.document.UserRegistrationCourse;
 import com.endo4life.web.rest.errors.BadRequestException;
 import com.endo4life.web.rest.errors.UserNotFoundException;
 import com.endo4life.repository.CertificateRepository;
+import com.endo4life.repository.CourseRepository;
 import com.endo4life.repository.UserInfoRepository;
+import com.endo4life.repository.UserRegistrationCourseRepository;
 import com.endo4life.security.UserContextHolder;
 import com.endo4life.service.minio.MinioProperties;
 import com.endo4life.service.minio.MinioService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.mock.web.MockMultipartFile;
@@ -31,6 +35,8 @@ public class CertificateServiceImpl implements CertificateService {
 
     private final CertificateRepository certificateRepository;
     private final UserInfoRepository userInfoRepository;
+    private final UserRegistrationCourseRepository userRegistrationCourseRepository;
+    private final CourseRepository courseRepository;
     private final CertificateGeneratorService certificateGeneratorService;
     private final MinioService minioService;
     private final MinioProperties minioProperties;
@@ -103,7 +109,7 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Certificate generateCourseCompletionCertificate(UserInfo user, Course course) {
         log.info("Generating course completion certificate for user: {} and course: {}",
                 user.getId(), course.getId());
@@ -235,6 +241,37 @@ public class CertificateServiceImpl implements CertificateService {
                     String.format("Course certificate not found for user: %s and course: %s", userId, courseId));
         }
 
-        return certificates.get(0); // Should only be one certificate per user per course
+        return certificates.get(0);
+    }
+
+    @Override
+    @Transactional
+    public Certificate getOrGenerateCourseCertificate(UUID userId, UUID courseId) {
+        // Return existing certificate if found
+        if (hasCourseCertificate(userId, courseId)) {
+            return getCourseCertificate(userId, courseId);
+        }
+
+        // Check if course is complete
+        UserRegistrationCourse registration = userRegistrationCourseRepository
+                .findByCourseIdAndUserId(courseId, userId)
+                .orElseThrow(() -> new BadRequestException("User not enrolled in course"));
+
+        if (!Boolean.TRUE.equals(registration.getIsCompletedCourse())) {
+            throw new BadRequestException("Course not completed yet");
+        }
+
+        // Auto-generate certificate
+        UserInfo userInfo = userInfoRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("UserInfo not found"));
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new BadRequestException("Course not found"));
+
+        Certificate certificate = generateCourseCompletionCertificate(userInfo, course);
+        registration.setCourseCertificateId(certificate.getId());
+        userRegistrationCourseRepository.save(registration);
+
+        log.info("Auto-generated certificate {} for user {} course {}", certificate.getId(), userId, courseId);
+        return certificate;
     }
 }

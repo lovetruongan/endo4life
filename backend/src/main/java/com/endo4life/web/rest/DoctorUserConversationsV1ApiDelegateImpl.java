@@ -16,12 +16,12 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@RoleAccess.Authenticated
 public class DoctorUserConversationsV1ApiDelegateImpl implements DoctorUserConversationsV1ApiDelegate {
 
     private final DoctorUserConversationService conversationService;
 
     @Override
+    @RoleAccess.Authenticated // All authenticated users can list (filtered by their role in frontend)
     public ResponseEntity<DoctorUserConversationResponsePaginatedDto> getDoctorUserConversations(
             DoctorUserConversationCriteria criteria,
             Pageable pageable) {
@@ -31,6 +31,7 @@ public class DoctorUserConversationsV1ApiDelegateImpl implements DoctorUserConve
     }
 
     @Override
+    @RoleAccess.Authenticated // All authenticated users can create questions
     public ResponseEntity<IdWrapperDto> createConversationDoctorAndUser(
             CreateDoctorUserConversationDto createDoctorUserConversationDto) {
         log.info("Creating doctor-user conversation");
@@ -41,6 +42,7 @@ public class DoctorUserConversationsV1ApiDelegateImpl implements DoctorUserConve
     }
 
     @Override
+    @RoleAccess.Authenticated // All authenticated users can view their conversations
     public ResponseEntity<DoctorUserConversationResponseDto> getDoctorUserConversationById(UUID id) {
         log.info("Getting doctor-user conversation by id: {}", id);
         DoctorUserConversationResponseDto result = conversationService.getConversationById(id);
@@ -48,6 +50,7 @@ public class DoctorUserConversationsV1ApiDelegateImpl implements DoctorUserConve
     }
 
     @Override
+    @RoleAccess.Authenticated // Service layer checks permission (admin, coordinator, or assignee)
     public ResponseEntity<Void> updateDoctorUserConversation(
             UUID id,
             UpdateDoctorUserConversationDto updateDoctorUserConversationDto) {
@@ -57,6 +60,7 @@ public class DoctorUserConversationsV1ApiDelegateImpl implements DoctorUserConve
     }
 
     @Override
+    @RoleAccess.UserManager // ADMIN or COORDINATOR can delete
     public ResponseEntity<Void> deleteDoctorUserConversation(UUID id) {
         log.info("Deleting doctor-user conversation: {}", id);
         conversationService.deleteConversation(id);

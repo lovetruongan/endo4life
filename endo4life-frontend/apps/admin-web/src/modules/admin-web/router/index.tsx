@@ -182,12 +182,12 @@ export const adminWebRouter = createBrowserRouter([
           },
         ],
       },
-      // COMMENT - Staff can view comments
+      // COMMENT - Only ADMIN and COORDINATOR can manage comments
       {
         path: ADMIN_WEB_ROUTES.COMMENTS,
 
         element: (
-          <ProtectedRoute roles={STAFF_ROLES}>
+          <ProtectedRoute roles={USER_MANAGER_ROLES}>
             <Outlet />
           </ProtectedRoute>
         ),
@@ -475,12 +475,12 @@ export const adminWebRouter = createBrowserRouter([
           },
         ],
       },
-      // QUESTION - Content managers only
+      // QUESTION (Q&A) - Only ADMIN and COORDINATOR can manage
       {
         path: ADMIN_WEB_ROUTES.QUESTIONS,
 
         element: (
-          <ProtectedRoute roles={CONTENT_MANAGER_ROLES}>
+          <ProtectedRoute roles={USER_MANAGER_ROLES}>
             <Outlet />
           </ProtectedRoute>
         ),
@@ -498,12 +498,12 @@ export const adminWebRouter = createBrowserRouter([
           },
         ],
       },
-      // DOCUMENT - Content managers only
+      // DOCUMENT - All staff can access
       {
         path: ADMIN_WEB_ROUTES.DOCUMENTS,
 
         element: (
-          <ProtectedRoute roles={CONTENT_MANAGER_ROLES}>
+          <ProtectedRoute roles={STAFF_ROLES}>
             <Outlet />
           </ProtectedRoute>
         ),

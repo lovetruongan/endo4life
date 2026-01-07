@@ -12,6 +12,9 @@ import { PiGearSix, PiUserCircle } from 'react-icons/pi';
 import { TbMessage2Question } from 'react-icons/tb';
 import { Link } from 'react-router-dom';
 
+// Staff roles that can access admin panel
+const STAFF_ROLES = ['ADMIN', 'SPECIALIST', 'COORDINATOR'];
+
 interface IProfileMenu {
   opened: boolean;
 }
@@ -22,6 +25,10 @@ export default function ProfileMenu({ opened }: IProfileMenu) {
     logout: onClickLogout,
     changeWebClientId,
   } = useAuthContext();
+  
+  // Check if user is staff (can access admin panel)
+  const userRole = userProfile?.roles?.[0]?.toUpperCase();
+  const isStaff = userRole ? STAFF_ROLES.includes(userRole) : false;
   const { t } = useTranslation('common');
   const firstCharacterName = useNameInitial(userProfile);
 
@@ -68,15 +75,17 @@ export default function ProfileMenu({ opened }: IProfileMenu) {
             {t('account.txtProfile')}
           </span>
         </Link>
-        <button
-          className="flex items-center w-full gap-3 px-4 py-2 hover:bg-slate-100"
-          onClick={onClickSwitchToAdmin}
-        >
-          <PiGearSix size={20} color="gray" />
-          <span className="flex-auto text-sm text-left">
-            {t('account.txtAdmin')}
-          </span>
-        </button>
+        {isStaff && (
+          <button
+            className="flex items-center w-full gap-3 px-4 py-2 hover:bg-slate-100"
+            onClick={onClickSwitchToAdmin}
+          >
+            <PiGearSix size={20} color="gray" />
+            <span className="flex-auto text-sm text-left">
+              {t('account.txtAdmin')}
+            </span>
+          </button>
+        )}
       </section>
 
       <section className="pt-2 pb-1 border-t-2">

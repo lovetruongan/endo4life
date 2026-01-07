@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useRagSearch } from '../hooks';
+import { useRagSearch, useCollections } from '../hooks';
 import { SearchRequest } from '../api';
 import { CircularProgress, Card, CardContent, Chip, Collapse } from '@mui/material';
 import { 
@@ -20,24 +20,26 @@ interface RagSearchProps {
 }
 
 export function RagSearch({
-  collectionName = 'multimodal_data',
+  collectionName: defaultCollectionName = 'multimodal_data',
   defaultTopK = 10,
 }: RagSearchProps) {
   const [query, setQuery] = useState('');
   const [topK, setTopK] = useState(defaultTopK);
   const [enableReranker, setEnableReranker] = useState(true);
   const [expandedDoc, setExpandedDoc] = useState<number | null>(null);
+  const [selectedCollection, setSelectedCollection] = useState(defaultCollectionName);
   const searchMutation = useRagSearch();
+  const { data: collectionsData, isLoading: collectionsLoading } = useCollections();
 
   const handleSearch = async () => {
-    if (!query.trim()) return;
+    if (!query.trim() || !selectedCollection) return;
 
     const request: SearchRequest = {
       query: query.trim(),
       reranker_top_k: 2,
       vdb_top_k: topK,
       vdb_endpoint: 'http://milvus:19530',
-      collection_names: [collectionName],
+      collection_names: [selectedCollection],
       enable_query_rewriting: false,
       enable_reranker: enableReranker,
     };
@@ -94,6 +96,33 @@ export function RagSearch({
             <CardContent className="p-6">
               <h2 className="text-lg font-semibold mb-4">Search Settings</h2>
               <div className="space-y-4">
+                {/* Collection Selector */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Collection
+                  </label>
+                  <select
+                    value={selectedCollection}
+                    onChange={(e) => setSelectedCollection(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                    disabled={collectionsLoading}
+                  >
+                    {collectionsLoading ? (
+                      <option>Loading...</option>
+                    ) : collectionsData?.collections?.length ? (
+                      collectionsData.collections.map((col) => (
+                        <option key={col.collection_name} value={col.collection_name}>
+                          {col.collection_name} ({col.num_entities} docs)
+                        </option>
+                      ))
+                    ) : (
+                      <option value="multimodal_data">multimodal_data (default)</option>
+                    )}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {collectionsData?.total_collections || 0} collections available
+                  </p>
+                </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     Top K Results

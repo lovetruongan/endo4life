@@ -1,5 +1,6 @@
 package com.endo4life.config;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +18,18 @@ public class WebConfigurer {
     public CorsFilter corsFilter() {
         CorsConfiguration cfg = applicationProperties.cors();
         if (cfg == null) {
-            cfg = new CorsConfiguration().applyPermitDefaultValues();
+            cfg = new CorsConfiguration();
+            cfg.setAllowedOriginPatterns(List.of("*"));
+            cfg.setAllowedMethods(List.of("*"));
+            cfg.setAllowedHeaders(List.of("*"));
+            cfg.setAllowCredentials(true);
+        }
+        // If credentials enabled and using wildcard origins, switch to patterns
+        if (Boolean.TRUE.equals(cfg.getAllowCredentials()) 
+                && cfg.getAllowedOrigins() != null 
+                && cfg.getAllowedOrigins().contains("*")) {
+            cfg.setAllowedOrigins(null);
+            cfg.setAllowedOriginPatterns(List.of("*"));
         }
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cfg);

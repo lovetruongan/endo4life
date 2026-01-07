@@ -49,5 +49,10 @@ public interface CertificateService {
      * Get course completion certificate for a user
      */
     Certificate getCourseCertificate(UUID userId, UUID courseId);
+
+    /**
+     * Get course certificate, auto-generate if missing but course is complete
+     */
+    Certificate getOrGenerateCourseCertificate(UUID userId, UUID courseId);
 }
 

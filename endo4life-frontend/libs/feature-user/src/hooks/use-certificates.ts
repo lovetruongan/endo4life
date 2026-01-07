@@ -41,7 +41,7 @@ export const useCertificates = (userId?: string) => {
 };
 
 export const useCourseCertificate = (courseId?: string, userId?: string) => {
-  const { data, error, isFetching } = useQuery<CertificateResponseDto>(
+  const { data, error, isFetching, refetch } = useQuery<CertificateResponseDto>(
     [REACT_QUERY_KEYS.COURSE_CERTIFICATE, courseId, userId],
     async () => {
       const helper = new CertificateApiHelper();
@@ -54,9 +54,10 @@ export const useCourseCertificate = (courseId?: string, userId?: string) => {
     },
     {
       refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      refetchOnMount: true, // Refetch when component mounts
+      staleTime: 0, // Always consider data stale for certificates
       enabled: !!courseId && !!userId, // Only run query if both are provided
+      retry: false, // Don't retry on 404 (certificate not found)
     }
   );
 
@@ -64,6 +65,7 @@ export const useCourseCertificate = (courseId?: string, userId?: string) => {
     data,
     error,
     isLoading: isFetching,
+    refetch,
   };
 };
 

@@ -104,7 +104,7 @@ export default function MyProfilePage() {
         setLoadingUserInfo(true);
         const helper = new UserApiHelper();
         const api = await helper.getUserApi();
-        const response = await api.getUserById({ id: authUserProfile.id });
+        const response = await api.getCurrentUserInfo();
         setUserInfo(response.data);
 
         // Set form data

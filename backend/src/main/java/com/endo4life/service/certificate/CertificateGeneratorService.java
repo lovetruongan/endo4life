@@ -34,19 +34,19 @@ public class CertificateGeneratorService {
     private static final String FONT_PATH = "fonts/NotoSans-Regular.ttf";
     private static final String FONT_BOLD_PATH = "fonts/NotoSans-Bold.ttf";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    private static final int PREVIEW_DPI = 300; // High resolution for preview image
+    private static final int PREVIEW_DPI = 150; // DPI for preview image
 
-    // Certificate dimensions (landscape A4: 842 x 595 points)
-    private static final float PAGE_WIDTH = 842f;
-    private static final float PAGE_HEIGHT = 595f;
+    // Certificate dimensions (portrait A4: 595 x 842 points)
+    private static final float PAGE_WIDTH = 595f;
+    private static final float PAGE_HEIGHT = 842f;
 
-    // Text positions (calibrated for template)
-    private static final float USER_NAME_Y = 310f; // Center position for user name
-    private static final float COURSE_NAME_Y = 270f; // Position for course name
-    private static final float DATE_X = 150f; // Left position for date
-    private static final float DATE_Y = 100f;
-    private static final float SIGNATURE_X = 692f; // Right position for signature
-    private static final float SIGNATURE_Y = 100f;
+    // Text positions (calibrated for portrait template)
+    private static final float USER_NAME_Y = 480f; // Center position for user name
+    private static final float COURSE_NAME_Y = 430f; // Position for course name
+    private static final float DATE_X = 100f; // Left position for date
+    private static final float DATE_Y = 120f;
+    private static final float SIGNATURE_X = 495f; // Right position for signature
+    private static final float SIGNATURE_Y = 120f;
 
     /**
      * DTO to hold both PDF and preview image
@@ -80,7 +80,7 @@ public class CertificateGeneratorService {
         String userName = formatUserName(user);
 
         try (PDDocument document = new PDDocument()) {
-            // Create landscape A4 page (no rotation needed)
+            // Create portrait A4 page
             PDPage page = new PDPage(new PDRectangle(PAGE_WIDTH, PAGE_HEIGHT));
             document.addPage(page);
 

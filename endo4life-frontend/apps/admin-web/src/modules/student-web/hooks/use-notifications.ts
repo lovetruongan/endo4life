@@ -2,6 +2,7 @@ import { useAuthContext } from '@endo4life/feature-auth';
 import { useDoctorUserConversations } from '@endo4life/feature-discussion';
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import { useCommentNotifications } from './use-comment-notifications';
+import { useWebSocketNotifications, WebSocketNotification } from './use-websocket-notifications';
 
 export type NotificationType = 'CONVERSATION' | 'COMMENT';
 
@@ -164,9 +165,29 @@ export function useNotifications() {
   
   const commentNotifications = commentNotifs;
 
+  // Get real-time WebSocket notifications
+  const {
+    notifications: wsNotifications,
+    connected: wsConnected,
+    markAsRead: wsMarkAsRead,
+  } = useWebSocketNotifications();
+
+  // Convert WebSocket notifications to INotification format
+  const realtimeNotifications = useMemo(() => {
+    return wsNotifications.map((ws: WebSocketNotification): INotification => ({
+      id: `ws-${ws.id}`,
+      type: ws.type as NotificationType,
+      title: ws.title,
+      content: ws.content,
+      link: ws.link,
+      createdAt: new Date(ws.createdAt),
+      isUnread: ws.isUnread,
+    }));
+  }, [wsNotifications]);
+
   // Combine all notifications and apply read status
   const allNotifications = useMemo(() => {
-    const combined = [...conversationNotifications, ...commentNotifications];
+    const combined = [...realtimeNotifications, ...conversationNotifications, ...commentNotifications];
     
     // Mark notifications as read if they're in readNotificationIds
     const withReadStatus = combined.map((notif) => ({
@@ -178,7 +199,7 @@ export function useNotifications() {
     return withReadStatus.sort(
       (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
     );
-  }, [conversationNotifications, commentNotifications, readNotificationIds]);
+  }, [realtimeNotifications, conversationNotifications, commentNotifications, readNotificationIds]);
 
   const unreadCount = useMemo(() => {
     return allNotifications.filter((n) => n.isUnread).length;
@@ -186,13 +207,19 @@ export function useNotifications() {
 
   // Mark a single notification as read
   const markAsRead = useCallback((notificationId: string) => {
+    // Handle WebSocket notifications
+    if (notificationId.startsWith('ws-')) {
+      const wsId = notificationId.replace('ws-', '');
+      wsMarkAsRead(wsId);
+    }
+    
     setReadNotificationIds((prev) => {
       if (prev.includes(notificationId)) return prev;
       const updated = [...prev, notificationId];
       saveReadNotifications(updated);
       return updated;
     });
-  }, []);
+  }, [wsMarkAsRead]);
 
   // Mark all notifications as read
   const markAllAsRead = useCallback(() => {

@@ -1,7 +1,9 @@
 package com.endo4life.web.rest.delegate;
 
 import com.endo4life.domain.document.Certificate;
+import com.endo4life.domain.document.UserInfo;
 import com.endo4life.mapper.CertificateMapper;
+import com.endo4life.repository.UserInfoRepository;
 import com.endo4life.security.RoleAccess;
 import com.endo4life.security.UserContextHolder;
 import com.endo4life.service.certificate.CertificateService;
@@ -14,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -29,15 +31,22 @@ public class CertificateV1ApiDelegateImpl implements CertificateV1ApiDelegate {
 
     private final CertificateService certificateService;
     private final CertificateMapper certificateMapper;
+    private final UserInfoRepository userInfoRepository;
 
     @Override
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'COORDINATOR') or @securityService.isOwner(#userId)")
+    @RoleAccess.Authenticated
     public ResponseEntity<List<CertificateResponseDto>> getUserCertificates(
             UUID userId, CertificateType type) {
         log.info("Getting certificates for user: {}, type: {}", userId, type);
 
-        // If userId not provided, use current user
-        UUID targetUserId = userId != null ? userId : getCurrentUserId();
+        // Get current user's UserInfo.id (database ID)
+        UUID currentUserInfoId = getCurrentUserInfoId();
+        UUID targetUserId = userId != null ? userId : currentUserInfoId;
+        
+        // Check permission: only admin/coordinator can view other users' certificates
+        if (!targetUserId.equals(currentUserInfoId) && !UserContextHolder.hasAnyAuthorities("ADMIN", "COORDINATOR")) {
+            throw new AccessDeniedException("Cannot view other users' certificates");
+        }
 
         List<Certificate> certificates;
         if (type != null) {
@@ -63,7 +72,7 @@ public class CertificateV1ApiDelegateImpl implements CertificateV1ApiDelegate {
         // If userId not provided, use current user
         UUID targetUserId = createCertificateRequestDto.getUserId() != null
                 ? createCertificateRequestDto.getUserId()
-                : getCurrentUserId();
+                : getCurrentUserInfoId();
 
         LocalDateTime expiresAt = createCertificateRequestDto.getExpiresAt() != null
                 ? createCertificateRequestDto.getExpiresAt().toLocalDateTime()
@@ -105,20 +114,33 @@ public class CertificateV1ApiDelegateImpl implements CertificateV1ApiDelegate {
     }
 
     @Override
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'COORDINATOR') or @securityService.isOwner(#userId)")
+    @RoleAccess.Authenticated
     public ResponseEntity<CertificateResponseDto> getCourseCertificate(UUID courseId, UUID userId) {
         log.info("Getting course certificate for courseId: {}, userId: {}", courseId, userId);
 
-        Certificate certificate = certificateService.getCourseCertificate(userId, courseId);
-        CertificateResponseDto response = certificateMapper.toCertificateResponseDto(certificate);
+        UUID currentUserInfoId = getCurrentUserInfoId();
+        UUID targetUserId = userId != null ? userId : currentUserInfoId;
+        
+        // Check permission
+        if (!targetUserId.equals(currentUserInfoId) && !UserContextHolder.hasAnyAuthorities("ADMIN", "COORDINATOR")) {
+            throw new AccessDeniedException("Cannot view other users' certificates");
+        }
 
-        return ResponseEntity.ok(response);
+        Certificate certificate = certificateService.getOrGenerateCourseCertificate(targetUserId, courseId);
+        return ResponseEntity.ok(certificateMapper.toCertificateResponseDto(certificate));
     }
 
-    private UUID getCurrentUserId() {
-        return UserContextHolder.getUserId()
+    /**
+     * Get the current user's UserInfo.id (database ID), not Keycloak UUID
+     */
+    private UUID getCurrentUserInfoId() {
+        UUID keycloakUserId = UserContextHolder.getUserId()
                 .map(UUID::fromString)
                 .orElseThrow(() -> new RuntimeException("User not authenticated"));
+        
+        return userInfoRepository.findByUserId(keycloakUserId)
+                .map(UserInfo::getId)
+                .orElseThrow(() -> new RuntimeException("UserInfo not found for user: " + keycloakUserId));
     }
 }
 

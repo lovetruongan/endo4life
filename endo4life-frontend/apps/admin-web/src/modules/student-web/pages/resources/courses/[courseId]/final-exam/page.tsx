@@ -34,7 +34,7 @@ export function FinalExamPage() {
   const hasCompletedFinalExam = progressStatus?.isCompletedFinalCourseTest ?? false;
 
   // Fetch certificate only if course is completed
-  const { data: certificate, isLoading: certificateLoading } = useCourseCertificate(
+  const { data: certificate, isLoading: certificateLoading, refetch: refetchCertificate } = useCourseCertificate(
     courseId,
     userInfoId
   );
@@ -86,13 +86,18 @@ export function FinalExamPage() {
     }
   };
 
-  const handleTestComplete = (result: any) => {
+  const handleTestComplete = async (result: any) => {
     if (result.passed) {
       setShowCongratulations(true);
       toast.success('Chúc mừng! Bạn đã vượt qua bài thi cuối khóa và hoàn thành khóa học!', {
         position: 'top-right',
         autoClose: 10000,
       });
+      
+      // Wait a bit for backend to generate certificate, then refetch
+      setTimeout(() => {
+        refetchCertificate();
+      }, 2000);
     } else {
       toast.error('Bạn chưa vượt qua bài thi cuối khóa. Hãy xem lại tài liệu và thử lại.', {
         position: 'top-right',
@@ -106,7 +111,7 @@ export function FinalExamPage() {
     navigate(courseRoute);
   };
 
-  const handleDownloadCertificate = () => {
+  const handleDownloadCertificate = async () => {
     if (certificate?.fileUrl) {
       // Open certificate in new tab to download
       window.open(certificate.fileUrl, '_blank');
@@ -120,10 +125,24 @@ export function FinalExamPage() {
         autoClose: 2000,
       });
     } else {
-      toast.error('Chứng chỉ chưa có sẵn. Vui lòng liên hệ hỗ trợ.', {
-      position: 'top-right',
-      autoClose: 3000,
-    });
+      // Try to refetch certificate - it might have just been generated
+      toast.info('Đang tải chứng chỉ...', {
+        position: 'top-right',
+        autoClose: 2000,
+      });
+      const result = await refetchCertificate();
+      if (result.data?.fileUrl) {
+        window.open(result.data.fileUrl, '_blank');
+        toast.success('Bắt đầu tải chứng chỉ!', {
+          position: 'top-right',
+          autoClose: 3000,
+        });
+      } else {
+        toast.error('Chứng chỉ chưa có sẵn. Vui lòng thử lại sau.', {
+          position: 'top-right',
+          autoClose: 3000,
+        });
+      }
     }
   };
 

@@ -12,6 +12,7 @@ import com.endo4life.security.AuthoritiesConstants;
 import com.endo4life.security.SecurityService;
 import com.endo4life.security.UserContextHolder;
 import com.endo4life.service.minio.MinioService;
+import com.endo4life.service.notification.NotificationService;
 import com.endo4life.web.rest.errors.BadRequestException;
 import com.endo4life.web.rest.model.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -45,6 +46,7 @@ public class DoctorUserConversationServiceImpl implements DoctorUserConversation
     private final MinioService minioService;
     private final ObjectMapper objectMapper;
     private final SecurityService securityService;
+    private final NotificationService notificationService;
 
     @Override
     public DoctorUserConversationResponsePaginatedDto getConversations(
@@ -122,6 +124,43 @@ public class DoctorUserConversationServiceImpl implements DoctorUserConversation
         conversation.setUpdatedBy(UserContextHolder.getEmail().orElse(Constants.SYSTEM));
 
         conversationRepository.save(conversation);
+
+        // Send real-time notifications
+        try {
+            if (Objects.nonNull(parentId)) {
+                // This is a reply - notify the parent conversation owner
+                DoctorUserConversations parent = conversationRepository.findById(parentId).orElse(null);
+                if (parent != null) {
+                    // Notify questioner if replier is not the questioner
+                    if (parent.getQuestioner() != null && !parent.getQuestioner().getId().equals(questioner.getId())) {
+                        notificationService.notifyQuestionReplied(
+                                parent.getQuestioner().getId(),
+                                parentId,
+                                dto.getContent()
+                        );
+                    }
+                    // Notify assignee if replier is not the assignee
+                    if (parent.getAssignee() != null && !parent.getAssignee().getId().equals(questioner.getId())) {
+                        notificationService.notifyQuestionReplied(
+                                parent.getAssignee().getId(),
+                                parentId,
+                                dto.getContent()
+                        );
+                    }
+                }
+            } else if (Objects.nonNull(assigneeId)) {
+                // New question with assignee - notify the specialist
+                notificationService.notifyNewQuestionAssigned(
+                        assigneeId,
+                        conversation.getId(),
+                        dto.getContent()
+                );
+            }
+        } catch (Exception e) {
+            log.warn("Failed to send notification: {}", e.getMessage());
+            // Don't fail the operation if notification fails
+        }
+
         return conversation.getId();
     }
 
@@ -137,35 +176,69 @@ public class DoctorUserConversationServiceImpl implements DoctorUserConversation
         DoctorUserConversations conversation = conversationRepository.findById(id)
                 .orElseThrow(() -> new BadRequestException("Conversation not found with id {0}", id));
 
-        // Permission check: only admin or assignee can update
+        // Permission check: admin, coordinator, or assignee can update
         boolean isAdmin = securityService.hasRole(AuthoritiesConstants.ADMIN);
+        boolean isCoordinator = securityService.hasRole(AuthoritiesConstants.COORDINATOR);
         boolean isAssignee = conversation.getAssignee() != null &&
                 securityService.isOwner(conversation.getAssignee().getUserId());
-        if (!isAdmin && !isAssignee) {
+        if (!isAdmin && !isCoordinator && !isAssignee) {
             throw new BadRequestException("You don't have permission to update this conversation");
         }
+
+        // Track old values for notification
+        UUID oldAssigneeId = conversation.getAssignee() != null ? conversation.getAssignee().getId() : null;
+        String oldState = conversation.getState();
 
         mapper.updateEntityFromDto(conversation, dto);
 
         // Update assignee if provided
         UUID assigneeId = dto.getAssigneeId();
+        boolean assigneeChanged = false;
         if (Objects.nonNull(assigneeId)) {
             UserInfo assignee = userInfoRepository.findById(assigneeId)
                     .orElseThrow(() -> new BadRequestException("Assignee not found with id {0}", assigneeId));
             conversation.setAssignee(assignee);
+            assigneeChanged = !assigneeId.equals(oldAssigneeId);
         }
 
         // Update audit fields
         conversation.setUpdatedBy(UserContextHolder.getEmail().orElse(Constants.SYSTEM));
 
         conversationRepository.save(conversation);
+
+        // Send real-time notifications
+        try {
+            // Notify new assignee if changed
+            if (assigneeChanged && Objects.nonNull(assigneeId)) {
+                notificationService.notifyNewQuestionAssigned(
+                        assigneeId,
+                        id,
+                        conversation.getContent()
+                );
+            }
+
+            // Notify questioner if status changed to RESOLVED
+            if (conversation.getQuestioner() != null &&
+                    "RESOLVED".equals(conversation.getState()) &&
+                    !"RESOLVED".equals(oldState)) {
+                notificationService.notifyQuestionResolved(
+                        conversation.getQuestioner().getId(),
+                        id
+                );
+            }
+        } catch (Exception e) {
+            log.warn("Failed to send notification: {}", e.getMessage());
+            // Don't fail the operation if notification fails
+        }
     }
 
     @Override
     public void deleteConversation(UUID id) {
-        // Permission check: only admin can delete
-        if (!securityService.hasRole(AuthoritiesConstants.ADMIN)) {
-            throw new BadRequestException("Only administrators can delete conversations");
+        // Permission check: admin or coordinator can delete
+        boolean isAdmin = securityService.hasRole(AuthoritiesConstants.ADMIN);
+        boolean isCoordinator = securityService.hasRole(AuthoritiesConstants.COORDINATOR);
+        if (!isAdmin && !isCoordinator) {
+            throw new BadRequestException("Only administrators or coordinators can delete conversations");
         }
         if (!conversationRepository.existsById(id)) {
             throw new BadRequestException("Conversation not found with id {0}", id);

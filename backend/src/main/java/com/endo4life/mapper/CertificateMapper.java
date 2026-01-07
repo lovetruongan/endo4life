@@ -29,12 +29,22 @@ public abstract class CertificateMapper {
     @Mapping(target = "fileUrl", source = "certificate.filePath", qualifiedByName = "filePathToUrl")
     @Mapping(target = "previewImageUrl", source = "certificate.previewImagePath", qualifiedByName = "filePathToUrl")
     @Mapping(target = "userId", source = "certificate.user.id")
-    @Mapping(target = "courseId", source = "certificate.course.id")
-    @Mapping(target = "courseName", source = "certificate.course.title")
+    @Mapping(target = "courseId", source = "certificate", qualifiedByName = "extractCourseId")
+    @Mapping(target = "courseName", source = "certificate", qualifiedByName = "extractCourseName")
     @Mapping(target = "issuedAt", source = "certificate.issuedAt", qualifiedByName = "toOffsetDateTime")
     @Mapping(target = "expiresAt", source = "certificate.expiresAt", qualifiedByName = "toOffsetDateTime")
     @Mapping(target = "createdAt", source = "certificate.createdAt", qualifiedByName = "toOffsetDateTime")
     public abstract CertificateResponseDto toCertificateResponseDto(Certificate certificate);
+
+    @Named("extractCourseId")
+    public java.util.UUID extractCourseId(Certificate certificate) {
+        return certificate.getCourse() != null ? certificate.getCourse().getId() : null;
+    }
+
+    @Named("extractCourseName")
+    public String extractCourseName(Certificate certificate) {
+        return certificate.getCourse() != null ? certificate.getCourse().getTitle() : null;
+    }
 
     @Named("mapCertificateType")
     public CertificateType mapCertificateType(Certificate.CertificateType type) {

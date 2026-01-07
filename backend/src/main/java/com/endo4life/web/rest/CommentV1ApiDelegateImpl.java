@@ -21,17 +21,18 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@RoleAccess.Authenticated // All users can interact with comments
 public class CommentV1ApiDelegateImpl implements CommentV1ApiDelegate {
     private final CommentService commentService;
 
     @Override
+    @RoleAccess.Authenticated // All authenticated users can create comments
     public ResponseEntity<IdWrapperDto> createComment(CreateCommentRequestDto createCommentRequestDto) {
         UUID id = commentService.createComment(createCommentRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(new IdWrapperDto().id(id));
     }
 
     @Override
+    @RoleAccess.Authenticated // All authenticated users can view comments (filtered by resource)
     public ResponseEntity<CommentResponsePaginatedDto> getComments(CommentCriteria criteria,
             Pageable pageable) {
         var result = commentService.getComments(criteria, pageable);
@@ -42,12 +43,14 @@ public class CommentV1ApiDelegateImpl implements CommentV1ApiDelegate {
     }
 
     @Override
+    @RoleAccess.UserManager // ADMIN or COORDINATOR can update comments
     public ResponseEntity<CommentResponseDto> updateComment(UUID id, UpdateCommentRequestDto updateCommentRequestDto) {
         CommentResponseDto result = commentService.updateComment(id, updateCommentRequestDto);
         return ResponseEntity.ok(result);
     }
 
     @Override
+    @RoleAccess.UserManager // ADMIN or COORDINATOR can delete comments
     public ResponseEntity<Void> deleteComment(UUID id) {
         commentService.deleteComment(id);
         return ResponseEntity.noContent().build();
