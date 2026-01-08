@@ -33,8 +33,8 @@ export default function Navbar() {
   };
 
   return (
-    <div className="flex flex-col items-center flex-none h-full gap-4 min-w-40">
-      <div className="w-full px-5 py-4">
+    <div className="flex flex-col items-center flex-none h-full gap-4 w-52 md:w-48 lg:w-52">
+      <div className="hidden w-full px-5 py-4 md:block">
         <Link to={ADMIN_WEB_ROUTES.ROOT}>
           <img
             alt="logo"
@@ -44,6 +44,8 @@ export default function Navbar() {
           />
         </Link>
       </div>
+      {/* Mobile spacer for close button */}
+      <div className="h-12 md:hidden" />
 
       <section className="px-5">
         {menuSections.map((section, idx) => {
@@ -103,7 +105,7 @@ export default function Navbar() {
                 userProfile?.lastName?.charAt(0) ||
                 userProfile?.email?.charAt(0)?.toUpperCase())}
           </Avatar>
-          <span className="text-left">
+          <span className="flex-1 text-left truncate max-w-28">
             {userProfile?.lastName} {userProfile?.firstName}
           </span>
           {menuOpened ? <VscChevronUp /> : <VscChevronDown />}

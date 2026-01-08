@@ -27,6 +27,28 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   const [isConnected, setIsConnected] = useState(false);
   const clientRef = useRef<Client | null>(null);
   const subscriptionsRef = useRef<Map<string, any>>(new Map());
+  
+  // Store callbacks in refs to avoid useEffect/useCallback dependency issues
+  const onConnectRef = useRef(onConnect);
+  const onDisconnectRef = useRef(onDisconnect);
+  const onErrorRef = useRef(onError);
+  
+  // Update refs when callbacks change
+  useEffect(() => {
+    onConnectRef.current = onConnect;
+    onDisconnectRef.current = onDisconnect;
+    onErrorRef.current = onError;
+  }, [onConnect, onDisconnect, onError]);
+
+  const disconnect = useCallback(() => {
+    if (clientRef.current) {
+      console.log('[WebSocket] Disconnecting');
+      clientRef.current.deactivate();
+      clientRef.current = null;
+      subscriptionsRef.current.clear();
+      setIsConnected(false);
+    }
+  }, []);
 
   const connect = useCallback(() => {
     if (clientRef.current?.connected) {
@@ -44,31 +66,22 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       onConnect: () => {
         console.log('[WebSocket] Connected');
         setIsConnected(true);
-        onConnect?.();
+        onConnectRef.current?.();
       },
       onDisconnect: () => {
         console.log('[WebSocket] Disconnected');
         setIsConnected(false);
-        onDisconnect?.();
+        onDisconnectRef.current?.();
       },
       onStompError: (frame) => {
         console.error('[WebSocket] STOMP error:', frame);
-        onError?.(frame);
+        onErrorRef.current?.(frame);
       },
     });
 
     client.activate();
     clientRef.current = client;
-  }, [url, onConnect, onDisconnect, onError]);
-
-  const disconnect = useCallback(() => {
-    if (clientRef.current) {
-      console.log('[WebSocket] Disconnecting');
-      clientRef.current.deactivate();
-      clientRef.current = null;
-      subscriptionsRef.current.clear();
-    }
-  }, []);
+  }, [url]); // Only depend on url
 
   const subscribe = useCallback(
     (destination: string, callback: (message: WebSocketMessage) => void) => {
@@ -98,6 +111,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     []
   );
 
+  // Connect once on mount, disconnect on unmount
   useEffect(() => {
     if (autoConnect) {
       connect();
@@ -106,7 +120,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     return () => {
       disconnect();
     };
-  }, [autoConnect, connect, disconnect]);
+  }, [autoConnect]); // Remove connect/disconnect from deps - they're stable now
 
   return {
     isConnected,

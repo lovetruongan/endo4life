@@ -22,7 +22,7 @@ import { IconButton, Tooltip } from '@mui/material';
 import { SortChangedEvent } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { useToggle } from 'ahooks';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuSendHorizonal } from 'react-icons/lu';
 import { PiUpload } from 'react-icons/pi';
@@ -86,10 +86,6 @@ export default function UsersPage() {
   const handleCloseConfirmDeleteDialog = () => {
     deleteDialogToggle.setLeft();
   };
-
-  useEffect(() => {
-    client.invalidateQueries([REACT_QUERY_KEYS.USERS]);
-  }, [data, client]);
 
   return (
     <div className="flex flex-col h-full">

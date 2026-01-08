@@ -3,7 +3,6 @@ package com.endo4life.service.notification;
 import java.util.UUID;
 
 public interface NotificationService {
-    // Upload progress notifications
     void notifyUploadProgress(String fileName, int progress);
 
     void notifyUploadProgress(String sessionId, int processed, int total, String message);
@@ -16,7 +15,6 @@ public interface NotificationService {
 
     void notifyZipUploadFailure(String sessionId, String errorMessage);
 
-    // User notifications (real-time)
     void notifyUser(UUID userId, String type, String title, String content, String link);
 
     void notifyNewQuestionAssigned(UUID specialistId, UUID conversationId, String questionContent);

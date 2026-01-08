@@ -23,26 +23,29 @@ export function useZipUploadProgress(): UseZipUploadProgressReturn {
   const [progress, setProgress] = useState<ZipUploadProgress | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
+  const hasSubscribedRef = useRef(false);
 
   const { isConnected, subscribe } = useWebSocket({
     autoConnect: true,
-    onConnect: () => {
-      console.log('[ZipUpload] WebSocket connected');
-    },
-    onError: (error) => {
-      console.error('[ZipUpload] WebSocket error:', error);
-    },
   });
 
+  // Store subscribe in ref to avoid dependency issues
+  const subscribeRef = useRef(subscribe);
   useEffect(() => {
-    if (!isConnected) {
+    subscribeRef.current = subscribe;
+  }, [subscribe]);
+
+  useEffect(() => {
+    // Only subscribe once when connected
+    if (!isConnected || hasSubscribedRef.current) {
       return;
     }
 
     const destination = `/topic/zip-upload-progress/${sessionId}`;
     console.log('[ZipUpload] Subscribing to:', destination);
+    hasSubscribedRef.current = true;
 
-    unsubscribeRef.current = subscribe(destination, (message) => {
+    unsubscribeRef.current = subscribeRef.current(destination, (message) => {
       console.log('[ZipUpload] Received message:', message);
 
       if (message.status === 'SUCCESS') {
@@ -77,9 +80,10 @@ export function useZipUploadProgress(): UseZipUploadProgressReturn {
       if (unsubscribeRef.current) {
         unsubscribeRef.current();
         unsubscribeRef.current = null;
+        hasSubscribedRef.current = false;
       }
     };
-  }, [isConnected, sessionId, subscribe]);
+  }, [isConnected, sessionId]); // Remove subscribe from deps
 
   const resetProgress = useCallback(() => {
     setProgress(null);
